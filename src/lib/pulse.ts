@@ -109,6 +109,11 @@ export function usePulse() {
     const t = Date.now();
     localStorage.setItem(CHECKIN_KEY, String(t));
     setLastCheckIn(t);
+    // Append to check-in history
+    const raw = localStorage.getItem("pulse:checkins");
+    const history: number[] = raw ? JSON.parse(raw) : [];
+    history.push(t);
+    localStorage.setItem("pulse:checkins", JSON.stringify(history));
     // Light haptic feedback if supported
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
       navigator.vibrate(15);

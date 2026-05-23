@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
-import { Home, Shield } from "lucide-react";
+import { Home, Shield, History } from "lucide-react";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
@@ -12,6 +12,7 @@ function AppLayout() {
   const tabs = [
     { to: "/" as const, label: "Home", icon: Home },
     { to: "/emergency-contact" as const, label: "Emergency", icon: Shield },
+    { to: "/history" as const, label: "History", icon: History },
   ];
 
   return (
