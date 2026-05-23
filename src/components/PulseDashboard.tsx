@@ -115,12 +115,12 @@ export function PulseDashboard() {
           <button
             key={tickKey}
             onClick={handleCheckIn}
-            className="animate-tick relative z-10 w-[260px] h-[260px] md:w-[280px] md:h-[280px] rounded-full
+            className={`${buttonPulse ? "animate-pulse-once" : ""} animate-tick relative z-10 w-[260px] h-[260px] md:w-[280px] md:h-[280px] rounded-full
                        bg-gradient-to-b from-[var(--color-primary-glow)] to-[var(--color-primary)]
                        text-primary-foreground font-display font-semibold text-3xl md:text-4xl
                        shadow-[var(--shadow-pulse)] transition-transform
                        hover:scale-[1.03] active:scale-[0.96] focus:outline-none
-                       focus-visible:ring-4 focus-visible:ring-primary/30"
+                       focus-visible:ring-4 focus-visible:ring-primary/30`}
             aria-label="I'm safe — check in now"
           >
             I'm Safe
