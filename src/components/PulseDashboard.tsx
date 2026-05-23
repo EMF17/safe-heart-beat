@@ -95,11 +95,17 @@ export function PulseDashboard() {
         <h1 className="font-display text-4xl md:text-5xl font-semibold text-center mb-2 leading-tight">
           {statusCopy}
         </h1>
-        <p className="text-muted-foreground text-sm md:text-base text-center max-w-sm mb-12">
+        <p className="text-muted-foreground text-sm md:text-base text-center max-w-sm mb-10">
           {p.lastCheckIn
-            ? `Last check-in ${formatSince(Date.now() - p.lastCheckIn)}.`
-            : "One tap every 48 hours keeps your safety net armed."}
+            ? `Next check-in due in: ${Math.max(0, Math.floor(p.msUntilDue / (1000 * 60 * 60)))} hours ${Math.max(0, Math.floor((p.msUntilDue % (1000 * 60 * 60)) / (1000 * 60)))} minutes`
+            : "First check-in ready. Tap the button to start."}
         </p>
+
+        {showSuccess && (
+          <div className="mb-6 px-5 py-3 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium animate-in fade-in slide-in-from-bottom-2">
+            ✓ Check-in recorded. See you in 48 hours!
+          </div>
+        )}
 
         <div className="relative w-[340px] h-[340px] md:w-[380px] md:h-[380px] flex items-center justify-center">
           {p.status !== "alert" && (
