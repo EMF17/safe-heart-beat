@@ -27,6 +27,8 @@ export function PulseDashboard() {
   const [editing, setEditing] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [tickKey, setTickKey] = useState(0);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [buttonPulse, setButtonPulse] = useState(false);
 
   if (!p.hydrated) return <div className="min-h-screen" />;
 
