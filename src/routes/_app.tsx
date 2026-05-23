@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
-import { Home, Shield, History } from "lucide-react";
+import { Home, Shield, History, Settings } from "lucide-react";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
@@ -13,6 +13,7 @@ function AppLayout() {
     { to: "/" as const, label: "Home", icon: Home },
     { to: "/emergency-contact" as const, label: "Emergency", icon: Shield },
     { to: "/history" as const, label: "History", icon: History },
+    { to: "/settings" as const, label: "Settings", icon: Settings },
   ];
 
   return (
@@ -31,7 +32,7 @@ function AppLayout() {
               <Link
                 key={tab.to}
                 to={tab.to}
-                className={`flex flex-col items-center gap-1 py-2 px-4 rounded-xl transition-colors ${
+                className={`flex flex-col items-center gap-1 py-2 px-3 rounded-xl transition-colors ${
                   isActive
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground"

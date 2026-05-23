@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppHistoryRouteImport } from './routes/_app.history'
 import { Route as AppEmergencyContactRouteImport } from './routes/_app.emergency-contact'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -22,6 +23,11 @@ const AppRoute = AppRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AppRoute,
 } as any)
 const AppHistoryRoute = AppHistoryRouteImport.update({
@@ -45,11 +51,13 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/emergency-contact': typeof AppEmergencyContactRoute
   '/history': typeof AppHistoryRoute
+  '/settings': typeof AppSettingsRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/emergency-contact': typeof AppEmergencyContactRoute
   '/history': typeof AppHistoryRoute
+  '/settings': typeof AppSettingsRoute
   '/': typeof AppIndexRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
@@ -58,6 +66,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_app/emergency-contact': typeof AppEmergencyContactRoute
   '/_app/history': typeof AppHistoryRoute
+  '/_app/settings': typeof AppSettingsRoute
   '/_app/': typeof AppIndexRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
@@ -67,14 +76,21 @@ export interface FileRouteTypes {
     | '/'
     | '/emergency-contact'
     | '/history'
+    | '/settings'
     | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
-  to: '/emergency-contact' | '/history' | '/' | '/lovable/email/queue/process'
+  to:
+    | '/emergency-contact'
+    | '/history'
+    | '/settings'
+    | '/'
+    | '/lovable/email/queue/process'
   id:
     | '__root__'
     | '/_app'
     | '/_app/emergency-contact'
     | '/_app/history'
+    | '/_app/settings'
     | '/_app/'
     | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
@@ -98,6 +114,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/history': {
@@ -127,12 +150,14 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppEmergencyContactRoute: typeof AppEmergencyContactRoute
   AppHistoryRoute: typeof AppHistoryRoute
+  AppSettingsRoute: typeof AppSettingsRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppEmergencyContactRoute: AppEmergencyContactRoute,
   AppHistoryRoute: AppHistoryRoute,
+  AppSettingsRoute: AppSettingsRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
