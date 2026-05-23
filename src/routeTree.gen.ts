@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as AppHistoryRouteImport } from './routes/_app.history'
 import { Route as AppEmergencyContactRouteImport } from './routes/_app.emergency-contact'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
@@ -21,6 +22,11 @@ const AppRoute = AppRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHistoryRoute = AppHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
   getParentRoute: () => AppRoute,
 } as any)
 const AppEmergencyContactRoute = AppEmergencyContactRouteImport.update({
@@ -38,10 +44,12 @@ const LovableEmailQueueProcessRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/emergency-contact': typeof AppEmergencyContactRoute
+  '/history': typeof AppHistoryRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/emergency-contact': typeof AppEmergencyContactRoute
+  '/history': typeof AppHistoryRoute
   '/': typeof AppIndexRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
@@ -49,18 +57,24 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/_app/emergency-contact': typeof AppEmergencyContactRoute
+  '/_app/history': typeof AppHistoryRoute
   '/_app/': typeof AppIndexRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/emergency-contact' | '/lovable/email/queue/process'
+  fullPaths:
+    | '/'
+    | '/emergency-contact'
+    | '/history'
+    | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
-  to: '/emergency-contact' | '/' | '/lovable/email/queue/process'
+  to: '/emergency-contact' | '/history' | '/' | '/lovable/email/queue/process'
   id:
     | '__root__'
     | '/_app'
     | '/_app/emergency-contact'
+    | '/_app/history'
     | '/_app/'
     | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
@@ -86,6 +100,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/history': {
+      id: '/_app/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AppHistoryRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/emergency-contact': {
       id: '/_app/emergency-contact'
       path: '/emergency-contact'
@@ -105,11 +126,13 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppEmergencyContactRoute: typeof AppEmergencyContactRoute
+  AppHistoryRoute: typeof AppHistoryRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppEmergencyContactRoute: AppEmergencyContactRoute,
+  AppHistoryRoute: AppHistoryRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
