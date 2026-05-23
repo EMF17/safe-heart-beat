@@ -14,7 +14,115 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      pulse_accounts: {
+        Row: {
+          contact_email: string
+          contact_name: string
+          created_at: string
+          id: string
+          last_checkin: string | null
+          updated_at: string
+          user_name: string
+        }
+        Insert: {
+          contact_email: string
+          contact_name?: string
+          created_at?: string
+          id?: string
+          last_checkin?: string | null
+          updated_at?: string
+          user_name?: string
+        }
+        Update: {
+          contact_email?: string
+          contact_name?: string
+          created_at?: string
+          id?: string
+          last_checkin?: string | null
+          updated_at?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
+      pulse_challenges: {
+        Row: {
+          account_id: string | null
+          challenge: string
+          created_at: string
+          expires_at: string
+          id: string
+          kind: string
+          origin: string
+          rp_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          challenge: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          kind: string
+          origin: string
+          rp_id: string
+        }
+        Update: {
+          account_id?: string | null
+          challenge?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          kind?: string
+          origin?: string
+          rp_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pulse_challenges_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "pulse_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pulse_passkeys: {
+        Row: {
+          account_id: string
+          counter: number
+          created_at: string
+          credential_id: string
+          id: number
+          public_key: string
+          transports: string[]
+        }
+        Insert: {
+          account_id: string
+          counter?: number
+          created_at?: string
+          credential_id: string
+          id?: number
+          public_key: string
+          transports?: string[]
+        }
+        Update: {
+          account_id?: string
+          counter?: number
+          created_at?: string
+          credential_id?: string
+          id?: number
+          public_key?: string
+          transports?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pulse_passkeys_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "pulse_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
