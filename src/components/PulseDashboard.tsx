@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePulse, formatDuration, formatSince, CHECKIN_INTERVAL_MS, ALERT_THRESHOLD_MS, type Contact } from "@/lib/pulse";
 
 function CountdownRing({ progress, status }: { progress: number; status: string }) {
