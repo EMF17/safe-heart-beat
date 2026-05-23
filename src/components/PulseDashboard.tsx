@@ -52,7 +52,16 @@ export function PulseDashboard() {
   const handleCheckIn = () => {
     p.checkIn();
     setTickKey(k => k + 1);
+    setShowSuccess(true);
+    setButtonPulse(true);
+    setTimeout(() => setButtonPulse(false), 600);
   };
+
+  useEffect(() => {
+    if (!showSuccess) return;
+    const id = setTimeout(() => setShowSuccess(false), 4000);
+    return () => clearTimeout(id);
+  }, [showSuccess]);
 
   const totalWindow = p.status === "alert" ? ALERT_THRESHOLD_MS : CHECKIN_INTERVAL_MS;
   const progress = p.lastCheckIn ? Math.min(1, (Date.now() - p.lastCheckIn) / totalWindow) : 0;
