@@ -30,7 +30,7 @@ export function PulseDashboard() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [buttonPulse, setButtonPulse] = useState(false);
 
-  if (!p.hydrated) return <div className="min-h-screen" />;
+  if (!p.hydrated) return <div className="min-h-full" />;
 
   if (!p.contact || editing) {
     return (
@@ -79,7 +79,7 @@ export function PulseDashboard() {
     "You're safe";
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-full flex flex-col">
       <Header
         onEdit={() => setEditing(true)}
         onSettings={() => setShowSettings(true)}
@@ -390,7 +390,7 @@ function Onboarding({
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-full flex flex-col">
       <header className="flex items-center justify-between px-6 py-5">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2.5 w-2.5">
