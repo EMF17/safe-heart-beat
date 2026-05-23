@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PulseDashboard } from "@/components/PulseDashboard";
 
-export const Route = createFileRoute("/")({
-  component: Index,
+export const Route = createFileRoute("/_app/")({
+  component: HomePage,
   head: () => ({
     meta: [
       { title: "Pulse — Your quiet safety net" },
@@ -21,6 +21,6 @@ export const Route = createFileRoute("/")({
   }),
 });
 
-function Index() {
+function HomePage() {
   return <PulseDashboard />;
 }
