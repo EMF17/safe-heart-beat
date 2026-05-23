@@ -109,6 +109,10 @@ export function usePulse() {
     const t = Date.now();
     localStorage.setItem(CHECKIN_KEY, String(t));
     setLastCheckIn(t);
+    // Light haptic feedback if supported
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      navigator.vibrate(15);
+    }
   }, []);
 
   const saveContact = useCallback((c: Contact) => {

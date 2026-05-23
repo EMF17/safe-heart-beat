@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePulse, formatDuration, formatSince, CHECKIN_INTERVAL_MS, ALERT_THRESHOLD_MS, type Contact } from "@/lib/pulse";
 
 function CountdownRing({ progress, status }: { progress: number; status: string }) {
@@ -27,6 +27,8 @@ export function PulseDashboard() {
   const [editing, setEditing] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [tickKey, setTickKey] = useState(0);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [buttonPulse, setButtonPulse] = useState(false);
 
   if (!p.hydrated) return <div className="min-h-screen" />;
 
@@ -50,7 +52,16 @@ export function PulseDashboard() {
   const handleCheckIn = () => {
     p.checkIn();
     setTickKey(k => k + 1);
+    setShowSuccess(true);
+    setButtonPulse(true);
+    setTimeout(() => setButtonPulse(false), 600);
   };
+
+  useEffect(() => {
+    if (!showSuccess) return;
+    const id = setTimeout(() => setShowSuccess(false), 4000);
+    return () => clearTimeout(id);
+  }, [showSuccess]);
 
   const totalWindow = p.status === "alert" ? ALERT_THRESHOLD_MS : CHECKIN_INTERVAL_MS;
   const progress = p.lastCheckIn ? Math.min(1, (Date.now() - p.lastCheckIn) / totalWindow) : 0;
@@ -84,11 +95,17 @@ export function PulseDashboard() {
         <h1 className="font-display text-4xl md:text-5xl font-semibold text-center mb-2 leading-tight">
           {statusCopy}
         </h1>
-        <p className="text-muted-foreground text-sm md:text-base text-center max-w-sm mb-12">
+        <p className="text-muted-foreground text-sm md:text-base text-center max-w-sm mb-10">
           {p.lastCheckIn
-            ? `Last check-in ${formatSince(Date.now() - p.lastCheckIn)}.`
-            : "One tap every 48 hours keeps your safety net armed."}
+            ? `Next check-in due in: ${Math.max(0, Math.floor(p.msUntilDue / (1000 * 60 * 60)))} hours ${Math.max(0, Math.floor((p.msUntilDue % (1000 * 60 * 60)) / (1000 * 60)))} minutes`
+            : "First check-in ready. Tap the button to start."}
         </p>
+
+        {showSuccess && (
+          <div className="mb-6 px-5 py-3 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium animate-in fade-in slide-in-from-bottom-2">
+            ✓ Check-in recorded. See you in 48 hours!
+          </div>
+        )}
 
         <div className="relative w-[340px] h-[340px] md:w-[380px] md:h-[380px] flex items-center justify-center">
           {p.status !== "alert" && (
@@ -98,12 +115,12 @@ export function PulseDashboard() {
           <button
             key={tickKey}
             onClick={handleCheckIn}
-            className="animate-tick relative z-10 w-[260px] h-[260px] md:w-[280px] md:h-[280px] rounded-full
+            className={`${buttonPulse ? "animate-pulse-once" : ""} animate-tick relative z-10 w-[260px] h-[260px] md:w-[280px] md:h-[280px] rounded-full
                        bg-gradient-to-b from-[var(--color-primary-glow)] to-[var(--color-primary)]
                        text-primary-foreground font-display font-semibold text-3xl md:text-4xl
                        shadow-[var(--shadow-pulse)] transition-transform
                        hover:scale-[1.03] active:scale-[0.96] focus:outline-none
-                       focus-visible:ring-4 focus-visible:ring-primary/30"
+                       focus-visible:ring-4 focus-visible:ring-primary/30`}
             aria-label="I'm safe — check in now"
           >
             I'm Safe
