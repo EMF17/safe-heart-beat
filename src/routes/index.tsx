@@ -1,26 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { PulseDashboard } from "@/components/PulseDashboard";
 
 export const Route = createFileRoute("/")({
   component: Index,
+  head: () => ({
+    meta: [
+      { title: "Pulse — Your quiet safety net" },
+      {
+        name: "description",
+        content:
+          "Pulse is a privacy-first safety check-in for people who live alone. One tap every 48 hours keeps your emergency contact informed.",
+      },
+      { property: "og:title", content: "Pulse — Your quiet safety net" },
+      {
+        property: "og:description",
+        content:
+          "A simple 'I'm Safe' button. No accounts, no tracking. If you miss two check-ins, we email your emergency contact.",
+      },
+    ],
+  }),
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
-
 function Index() {
-  return <PlaceholderIndex />;
+  return <PulseDashboard />;
 }
