@@ -76,7 +76,7 @@ function EmergencyContactPage() {
     }
   };
 
-  if (!hydrated) return <div className="min-h-screen" />;
+  if (!hydrated) return <div className="min-h-full" />;
 
   return (
     <div className="min-h-[calc(100vh-64px)] flex flex-col px-6 py-8">
