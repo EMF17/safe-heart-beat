@@ -76,20 +76,21 @@ export function PulseDashboard() {
         syncStatus={p.syncStatus}
       />
 
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
-        <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-4">
+      {/* Hero Section */}
+      <section className="flex-1 flex flex-col items-center justify-center px-6 py-8">
+        <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">
           {p.userName ? `Hi, ${p.userName}` : "Pulse"}
         </p>
-        <h1 className="font-display text-3xl md:text-4xl font-semibold text-center mb-2">
+        <h1 className="font-display text-4xl md:text-5xl font-semibold text-center mb-2 leading-tight">
           {statusCopy}
         </h1>
-        <p className="text-muted-foreground text-sm md:text-base text-center max-w-sm mb-10">
+        <p className="text-muted-foreground text-sm md:text-base text-center max-w-sm mb-12">
           {p.lastCheckIn
             ? `Last check-in ${formatSince(Date.now() - p.lastCheckIn)}.`
             : "One tap every 48 hours keeps your safety net armed."}
         </p>
 
-        <div className="relative w-[320px] h-[320px] flex items-center justify-center">
+        <div className="relative w-[340px] h-[340px] md:w-[380px] md:h-[380px] flex items-center justify-center">
           {p.status !== "alert" && (
             <div className="absolute inset-6 rounded-full pulse-ring animate-breathe pointer-events-none" />
           )}
@@ -97,11 +98,11 @@ export function PulseDashboard() {
           <button
             key={tickKey}
             onClick={handleCheckIn}
-            className="animate-tick relative z-10 w-[240px] h-[240px] rounded-full
+            className="animate-tick relative z-10 w-[260px] h-[260px] md:w-[280px] md:h-[280px] rounded-full
                        bg-gradient-to-b from-[var(--color-primary-glow)] to-[var(--color-primary)]
-                       text-primary-foreground font-display font-semibold text-2xl
+                       text-primary-foreground font-display font-semibold text-3xl md:text-4xl
                        shadow-[var(--shadow-pulse)] transition-transform
-                       hover:scale-[1.02] active:scale-[0.97] focus:outline-none
+                       hover:scale-[1.03] active:scale-[0.96] focus:outline-none
                        focus-visible:ring-4 focus-visible:ring-primary/30"
             aria-label="I'm safe — check in now"
           >
@@ -109,12 +110,12 @@ export function PulseDashboard() {
           </button>
         </div>
 
-        <div className="mt-12 grid grid-cols-3 gap-4 md:gap-8 max-w-md w-full">
+        <div className="mt-14 grid grid-cols-3 gap-6 md:gap-10 max-w-md w-full">
           <Stat label={dueLabel} value={dur.primary} sub={dur.secondary} highlight={p.status === "alert" || p.status === "overdue"} />
           <Stat label="Interval" value="48h" sub="per check-in" />
           <Stat label="Alert after" value="96h" sub="2 missed" />
         </div>
-      </main>
+      </section>
 
       <Footer contact={p.contact} userName={p.userName} />
 
