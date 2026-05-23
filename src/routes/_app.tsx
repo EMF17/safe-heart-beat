@@ -1,5 +1,7 @@
 import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { Home, Shield, History, Settings } from "lucide-react";
+import { usePulse } from "@/lib/pulse";
+import { useCheckInNotifications } from "@/lib/notifications";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
@@ -8,6 +10,9 @@ export const Route = createFileRoute("/_app")({
 function AppLayout() {
   const location = useLocation();
   const current = location.pathname;
+  const { lastCheckIn } = usePulse();
+  useCheckInNotifications(lastCheckIn);
+
 
   const tabs = [
     { to: "/" as const, label: "Home", icon: Home },
