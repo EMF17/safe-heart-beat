@@ -132,7 +132,7 @@ function EmergencyContactPage() {
               type="email"
               value={confirmEmail}
               onChange={(e) => setConfirmEmail(e.target.value)}
-              placeholder="safeperson@example.com"
+              placeholder="emergency@example.com"
               className="w-full bg-card border border-border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
             />
           </div>
