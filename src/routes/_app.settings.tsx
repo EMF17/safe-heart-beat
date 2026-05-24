@@ -1,15 +1,20 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
+import { Switch } from "@/components/ui/switch";
+import { isReminderEnabled, requestNotificationPermission } from "@/lib/notifications";
+
+const NOTIF_KEY = "pulse:reminderEnabled";
+const ONBOARDING_KEY = "pulse:onboardingCompleted";
 import {
   MailWarning,
   Trash2,
   Info,
   AlertTriangle,
-  X,
   Check,
   ChevronRight,
   User,
   Mail,
+  Bell,
 } from "lucide-react";
 
 const CONTACT_KEY = "pulse:contact";
@@ -30,7 +35,9 @@ export const Route = createFileRoute("/_app/settings")({
 });
 
 function SettingsPage() {
+  const navigate = useNavigate();
   const [contact, setContact] = useState<Contact | null>(null);
+  const [notifEnabled, setNotifEnabled] = useState(true);
   const [hydrated, setHydrated] = useState(false);
 
   // Dialog states
@@ -54,8 +61,21 @@ function SettingsPage() {
         setContact(JSON.parse(raw));
       } catch {}
     }
+    setNotifEnabled(isReminderEnabled());
     setHydrated(true);
   }, []);
+
+  const handleNotifToggle = async (next: boolean) => {
+    setNotifEnabled(next);
+    window.localStorage.setItem(NOTIF_KEY, String(next));
+    window.localStorage.setItem("notifications_enabled", String(next));
+    if (next) {
+      const perm = await requestNotificationPermission();
+      if (perm !== "granted") {
+        showToast("Enable notifications in your browser to receive reminders.");
+      }
+    }
+  };
 
   useEffect(() => {
     if (toast) {
@@ -80,34 +100,27 @@ function SettingsPage() {
     openDialog({
       title: "Delete all data?",
       message:
-        "This will permanently remove your check-in history, emergency contact, and all settings. This action cannot be undone.",
+        "Are you sure? This removes all check-ins, history, and your emergency contact.",
       confirmLabel: "Delete All Data",
       destructive: true,
       onConfirm: () => {
-        const keysToRemove = [
-          "pulse:lastCheckIn",
-          "pulse:contact",
-          "pulse:name",
-          "pulse:syncToken",
-          "pulse:accountId",
-          "pulse:checkins",
-          "pulse:reminderEnabled",
-          "pulse:lastAlertSent",
-        ];
-        keysToRemove.forEach((k) => window.localStorage.removeItem(k));
+        try {
+          window.localStorage.clear();
+        } catch {}
+        window.localStorage.removeItem(ONBOARDING_KEY);
         setContact(null);
         closeDialog();
-        showToast("All data deleted. App has been reset.");
         if (typeof navigator !== "undefined" && "vibrate" in navigator) {
           navigator.vibrate([10, 50, 10]);
         }
+        navigate({ to: "/" });
       },
     });
   };
 
   const handleSendTestAlert = async () => {
     if (!contact?.email) {
-      showToast("Save an emergency contact first.");
+      showToast("Please save an emergency contact first.");
       return;
     }
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
@@ -126,10 +139,10 @@ function SettingsPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        showToast(`Failed: ${data?.error || res.statusText}`);
+        showToast(`Failed to send test alert: ${data?.error || res.statusText}`);
         return;
       }
-      showToast(`Test alert sent to ${contact.email}`);
+      showToast("Test alert sent! Check their inbox.");
     } catch (e) {
       showToast(`Failed: ${e instanceof Error ? e.message : "Network error"}`);
     }
@@ -179,6 +192,32 @@ function SettingsPage() {
           </div>
         </section>
 
+        {/* Notifications */}
+        <section className="mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <Bell className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-semibold uppercase tracking-[0.15em]">
+              Notifications
+            </h2>
+          </div>
+          <div className="bg-card border border-border/60 rounded-2xl p-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-sm">Enable reminder notifications</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  We'll remind you 4 hours before your check-in expires
+                </p>
+              </div>
+              <Switch
+                checked={notifEnabled}
+                onCheckedChange={handleNotifToggle}
+                className="mt-1"
+              />
+            </div>
+          </div>
+        </section>
+
+
         {/* Data */}
         <section className="mb-8">
           <div className="flex items-center gap-2 mb-3">
@@ -220,11 +259,22 @@ function SettingsPage() {
               <span className="text-sm text-muted-foreground">Version</span>
               <span className="text-sm font-medium">1.0.0</span>
             </div>
-            <button className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted/30 transition-colors">
+            <button
+              onClick={() => showToast("Privacy policy will appear here")}
+              className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted/30 transition-colors border-b border-border/40"
+            >
               <span className="text-sm">Privacy Policy</span>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </button>
+            <button
+              onClick={() => showToast("Terms of use will appear here")}
+              className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted/30 transition-colors"
+            >
+              <span className="text-sm">Terms of Use</span>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </button>
           </div>
+
         </section>
       </div>
 
