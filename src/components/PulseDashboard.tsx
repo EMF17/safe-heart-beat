@@ -103,7 +103,7 @@ export function PulseDashboard() {
 
         {showSuccess && (
           <div className="mb-6 px-5 py-3 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium animate-in fade-in slide-in-from-bottom-2">
-            ✓ Check-in recorded. See you in 48 hours!
+            ✓ Check-in recorded
           </div>
         )}
 
