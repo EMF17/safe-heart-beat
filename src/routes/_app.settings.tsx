@@ -61,8 +61,21 @@ function SettingsPage() {
         setContact(JSON.parse(raw));
       } catch {}
     }
+    setNotifEnabled(isReminderEnabled());
     setHydrated(true);
   }, []);
+
+  const handleNotifToggle = async (next: boolean) => {
+    setNotifEnabled(next);
+    window.localStorage.setItem(NOTIF_KEY, String(next));
+    window.localStorage.setItem("notifications_enabled", String(next));
+    if (next) {
+      const perm = await requestNotificationPermission();
+      if (perm !== "granted") {
+        showToast("Enable notifications in your browser to receive reminders.");
+      }
+    }
+  };
 
   useEffect(() => {
     if (toast) {
