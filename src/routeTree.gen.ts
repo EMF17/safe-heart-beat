@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as ApiSendAlertRouteImport } from './routes/api/send-alert'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppHistoryRouteImport } from './routes/_app.history'
 import { Route as AppEmergencyContactRouteImport } from './routes/_app.emergency-contact'
@@ -26,6 +27,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
+} as any)
+const ApiSendAlertRoute = ApiSendAlertRouteImport.update({
+  id: '/api/send-alert',
+  path: '/api/send-alert',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/emergency-contact': typeof AppEmergencyContactRoute
   '/history': typeof AppHistoryRoute
   '/settings': typeof AppSettingsRoute
+  '/api/send-alert': typeof ApiSendAlertRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByTo {
   '/emergency-contact': typeof AppEmergencyContactRoute
   '/history': typeof AppHistoryRoute
   '/settings': typeof AppSettingsRoute
+  '/api/send-alert': typeof ApiSendAlertRoute
   '/': typeof AppIndexRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   '/_app/emergency-contact': typeof AppEmergencyContactRoute
   '/_app/history': typeof AppHistoryRoute
   '/_app/settings': typeof AppSettingsRoute
+  '/api/send-alert': typeof ApiSendAlertRoute
   '/_app/': typeof AppIndexRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
     | '/emergency-contact'
     | '/history'
     | '/settings'
+    | '/api/send-alert'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -103,6 +113,7 @@ export interface FileRouteTypes {
     | '/emergency-contact'
     | '/history'
     | '/settings'
+    | '/api/send-alert'
     | '/'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -113,6 +124,7 @@ export interface FileRouteTypes {
     | '/_app/emergency-contact'
     | '/_app/history'
     | '/_app/settings'
+    | '/api/send-alert'
     | '/_app/'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -121,6 +133,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
+  ApiSendAlertRoute: typeof ApiSendAlertRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -141,6 +154,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/api/send-alert': {
+      id: '/api/send-alert'
+      path: '/api/send-alert'
+      fullPath: '/api/send-alert'
+      preLoaderRoute: typeof ApiSendAlertRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_app/settings': {
       id: '/_app/settings'
@@ -205,6 +225,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
+  ApiSendAlertRoute: ApiSendAlertRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
@@ -212,13 +233,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
