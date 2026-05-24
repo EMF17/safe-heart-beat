@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { isReminderEnabled, requestNotificationPermission } from "@/lib/notifications";
@@ -259,13 +259,13 @@ function SettingsPage() {
               <span className="text-sm text-muted-foreground">Version</span>
               <span className="text-sm font-medium">1.0.0</span>
             </div>
-            <button
-              onClick={() => showToast("Privacy policy will appear here")}
+            <Link
+              to="/privacy-policy"
               className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted/30 transition-colors border-b border-border/40"
             >
               <span className="text-sm">Privacy Policy</span>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
-            </button>
+            </Link>
             <button
               onClick={() => showToast("Terms of use will appear here")}
               className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted/30 transition-colors"
