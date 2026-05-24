@@ -120,7 +120,7 @@ function SettingsPage() {
 
   const handleSendTestAlert = async () => {
     if (!contact?.email) {
-      showToast("Save an emergency contact first.");
+      showToast("Please save an emergency contact first.");
       return;
     }
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
@@ -139,10 +139,10 @@ function SettingsPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        showToast(`Failed: ${data?.error || res.statusText}`);
+        showToast(`Failed to send test alert: ${data?.error || res.statusText}`);
         return;
       }
-      showToast(`Test alert sent to ${contact.email}`);
+      showToast("Test alert sent! Check their inbox.");
     } catch (e) {
       showToast(`Failed: ${e instanceof Error ? e.message : "Network error"}`);
     }
