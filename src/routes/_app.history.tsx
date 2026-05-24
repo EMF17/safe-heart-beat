@@ -80,7 +80,7 @@ function HistoryPage() {
               <History className="w-7 h-7 text-muted-foreground" />
             </div>
             <p className="text-muted-foreground text-sm max-w-xs mx-auto">
-              No check-ins yet. Tap "I'm Safe" on the Home tab to get started.
+              No check-ins yet. Tap the button to get started.
             </p>
           </div>
         ) : (
