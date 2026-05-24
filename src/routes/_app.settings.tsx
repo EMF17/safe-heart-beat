@@ -104,10 +104,33 @@ function SettingsPage() {
     });
   };
 
-  const handleSendTestAlert = () => {
-    showToast("Email system coming soon. Configure Resend in settings.");
+  const handleSendTestAlert = async () => {
+    if (!contact?.email) {
+      showToast("Save an emergency contact first.");
+      return;
+    }
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
       navigator.vibrate(15);
+    }
+    showToast("Sending test alert…");
+    try {
+      const res = await fetch("/api/send-alert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contactName: contact.name,
+          contactEmail: contact.email,
+          type: "test",
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        showToast(`Failed: ${data?.error || res.statusText}`);
+        return;
+      }
+      showToast(`Test alert sent to ${contact.email}`);
+    } catch (e) {
+      showToast(`Failed: ${e instanceof Error ? e.message : "Network error"}`);
     }
   };
 
