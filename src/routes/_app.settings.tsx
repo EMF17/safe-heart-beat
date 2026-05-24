@@ -35,7 +35,9 @@ export const Route = createFileRoute("/_app/settings")({
 });
 
 function SettingsPage() {
+  const navigate = useNavigate();
   const [contact, setContact] = useState<Contact | null>(null);
+  const [notifEnabled, setNotifEnabled] = useState(true);
   const [hydrated, setHydrated] = useState(false);
 
   // Dialog states
