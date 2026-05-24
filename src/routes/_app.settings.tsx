@@ -1,5 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
+import { Switch } from "@/components/ui/switch";
+import { isReminderEnabled, requestNotificationPermission } from "@/lib/notifications";
+
+const NOTIF_KEY = "pulse:reminderEnabled";
+const ONBOARDING_KEY = "pulse:onboardingCompleted";
 import {
   MailWarning,
   Trash2,
