@@ -102,7 +102,7 @@ function EmergencyContactPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Mom or Alex"
+              placeholder="Contact name, e.g., Mom"
               className="w-full bg-card border border-border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
             />
           </div>
@@ -117,7 +117,7 @@ function EmergencyContactPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="safeperson@example.com"
+              placeholder="emergency@example.com"
               className="w-full bg-card border border-border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
             />
           </div>
@@ -132,7 +132,7 @@ function EmergencyContactPage() {
               type="email"
               value={confirmEmail}
               onChange={(e) => setConfirmEmail(e.target.value)}
-              placeholder="safeperson@example.com"
+              placeholder="emergency@example.com"
               className="w-full bg-card border border-border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
             />
           </div>
@@ -158,7 +158,7 @@ function EmergencyContactPage() {
             type="submit"
             className="w-full h-12 rounded-full bg-primary text-primary-foreground font-medium shadow-[var(--shadow-soft)] hover:bg-primary/90 active:scale-[0.98] transition"
           >
-            Save Emergency Contact
+            Save Contact
           </button>
 
           {/* Warning */}
