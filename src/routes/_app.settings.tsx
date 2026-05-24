@@ -10,11 +10,11 @@ import {
   Trash2,
   Info,
   AlertTriangle,
-  X,
   Check,
   ChevronRight,
   User,
   Mail,
+  Bell,
 } from "lucide-react";
 
 const CONTACT_KEY = "pulse:contact";
