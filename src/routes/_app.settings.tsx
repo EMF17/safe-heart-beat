@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { isReminderEnabled, requestNotificationPermission } from "@/lib/notifications";
