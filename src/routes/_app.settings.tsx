@@ -192,6 +192,32 @@ function SettingsPage() {
           </div>
         </section>
 
+        {/* Notifications */}
+        <section className="mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <Bell className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-semibold uppercase tracking-[0.15em]">
+              Notifications
+            </h2>
+          </div>
+          <div className="bg-card border border-border/60 rounded-2xl p-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-sm">Enable reminder notifications</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  We'll remind you 4 hours before your check-in expires
+                </p>
+              </div>
+              <Switch
+                checked={notifEnabled}
+                onCheckedChange={handleNotifToggle}
+                className="mt-1"
+              />
+            </div>
+          </div>
+        </section>
+
+
         {/* Data */}
         <section className="mb-8">
           <div className="flex items-center gap-2 mb-3">
