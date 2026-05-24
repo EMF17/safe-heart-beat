@@ -100,27 +100,20 @@ function SettingsPage() {
     openDialog({
       title: "Delete all data?",
       message:
-        "This will permanently remove your check-in history, emergency contact, and all settings. This action cannot be undone.",
+        "Are you sure? This removes all check-ins, history, and your emergency contact.",
       confirmLabel: "Delete All Data",
       destructive: true,
       onConfirm: () => {
-        const keysToRemove = [
-          "pulse:lastCheckIn",
-          "pulse:contact",
-          "pulse:name",
-          "pulse:syncToken",
-          "pulse:accountId",
-          "pulse:checkins",
-          "pulse:reminderEnabled",
-          "pulse:lastAlertSent",
-        ];
-        keysToRemove.forEach((k) => window.localStorage.removeItem(k));
+        try {
+          window.localStorage.clear();
+        } catch {}
+        window.localStorage.removeItem(ONBOARDING_KEY);
         setContact(null);
         closeDialog();
-        showToast("All data deleted. App has been reset.");
         if (typeof navigator !== "undefined" && "vibrate" in navigator) {
           navigator.vibrate([10, 50, 10]);
         }
+        navigate({ to: "/" });
       },
     });
   };
