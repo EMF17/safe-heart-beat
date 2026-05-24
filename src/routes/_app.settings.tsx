@@ -92,6 +92,7 @@ function SettingsPage() {
           "pulse:accountId",
           "pulse:checkins",
           "pulse:reminderEnabled",
+          "pulse:lastAlertSent",
         ];
         keysToRemove.forEach((k) => window.localStorage.removeItem(k));
         setContact(null);
