@@ -102,7 +102,7 @@ function EmergencyContactPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Mom or Alex"
+              placeholder="Contact name, e.g., Mom"
               className="w-full bg-card border border-border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
             />
           </div>
