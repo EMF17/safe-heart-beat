@@ -158,7 +158,7 @@ function EmergencyContactPage() {
             type="submit"
             className="w-full h-12 rounded-full bg-primary text-primary-foreground font-medium shadow-[var(--shadow-soft)] hover:bg-primary/90 active:scale-[0.98] transition"
           >
-            Save Emergency Contact
+            Save Contact
           </button>
 
           {/* Warning */}
