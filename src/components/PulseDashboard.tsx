@@ -30,6 +30,12 @@ export function PulseDashboard() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [buttonPulse, setButtonPulse] = useState(false);
 
+  useEffect(() => {
+    if (!showSuccess) return;
+    const id = setTimeout(() => setShowSuccess(false), 4000);
+    return () => clearTimeout(id);
+  }, [showSuccess]);
+
   if (!p.hydrated) return <div className="min-h-full" />;
 
   if (!p.contact || editing) {
@@ -57,11 +63,6 @@ export function PulseDashboard() {
     setTimeout(() => setButtonPulse(false), 600);
   };
 
-  useEffect(() => {
-    if (!showSuccess) return;
-    const id = setTimeout(() => setShowSuccess(false), 4000);
-    return () => clearTimeout(id);
-  }, [showSuccess]);
 
   const totalWindow = p.status === "alert" ? ALERT_THRESHOLD_MS : CHECKIN_INTERVAL_MS;
   const progress = p.lastCheckIn ? Math.min(1, (Date.now() - p.lastCheckIn) / totalWindow) : 0;
