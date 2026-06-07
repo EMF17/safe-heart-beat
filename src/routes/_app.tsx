@@ -61,9 +61,9 @@ function AppLayout() {
         <Outlet />
       </div>
 
-      {/* Bottom Tab Navigation — Glass frost bar */}
-      <div className="shrink-0 z-50 px-4 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))] bg-gradient-to-t from-background/60 to-transparent backdrop-blur-sm">
-        <nav className="mx-auto flex h-16 max-w-sm items-center justify-around rounded-2xl border border-white/40 bg-card/60 px-2 shadow-[0_8px_32px_color-mix(in_oklab,var(--primary)_12%,transparent)] backdrop-blur-xl">
+      {/* Bottom Tab Navigation */}
+      <nav className="shrink-0 z-50 bg-card/80 backdrop-blur-lg border-t border-border/60">
+        <div className="flex items-center justify-around max-w-md mx-auto px-4 py-2">
           {tabs.map((tab) => {
             const isActive = current === tab.to;
             const Icon = tab.icon;
@@ -71,36 +71,21 @@ function AppLayout() {
               <Link
                 key={tab.to}
                 to={tab.to}
-                onClick={() => {
-                  if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-                    navigator.vibrate(8);
-                  }
-                }}
-                className={`relative flex flex-col items-center justify-center px-3 py-1.5 transition-all duration-200 active:scale-95 ${
-                  isActive ? "" : "opacity-40 hover:opacity-80"
+                className={`flex flex-col items-center gap-1 py-2 px-3 rounded-xl transition-colors ${
+                  isActive
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {isActive && (
-                  <span className="absolute -inset-x-2 -inset-y-1 rounded-xl bg-primary/10" />
-                )}
-                <Icon
-                  className={`relative z-10 w-[22px] h-[22px] ${
-                    isActive ? "text-primary" : "text-foreground"
-                  }`}
-                  strokeWidth={isActive ? 2.5 : 2}
-                />
-                <span
-                  className={`relative z-10 mt-1 text-[10px] tracking-tight ${
-                    isActive ? "font-bold text-primary" : "font-medium text-foreground"
-                  }`}
-                >
+                <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 2} />
+                <span className={`text-[10px] font-medium ${isActive ? "font-semibold" : ""}`}>
                   {tab.label}
                 </span>
               </Link>
             );
           })}
-        </nav>
-      </div>
+        </div>
+      </nav>
     </div>
   );
 }
