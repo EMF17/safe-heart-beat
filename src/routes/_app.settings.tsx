@@ -15,6 +15,7 @@ import {
   User,
   Mail,
   Bell,
+  Flag,
 } from "lucide-react";
 
 const CONTACT_KEY = "pulse:contact";
@@ -179,6 +180,13 @@ function SettingsPage() {
                   <Mail className="w-4 h-4 text-muted-foreground shrink-0" />
                   <span className="text-muted-foreground">{contact.email}</span>
                 </div>
+                <a
+                  href={`mailto:pulse.safety.fin@gmail.com?subject=${encodeURIComponent(`Pulse Abuse Report: ${contact.name}`)}&body=${encodeURIComponent("Please describe the issue:")}`}
+                  className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive transition-colors pt-1"
+                >
+                  <Flag className="w-3 h-3" />
+                  Report this contact
+                </a>
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">No contact saved</p>
