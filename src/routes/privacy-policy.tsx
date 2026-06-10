@@ -28,7 +28,7 @@ function PrivacyPolicyPage() {
           Privacy Policy for Pulse
         </h1>
         <p className="text-sm text-white/60 mb-10">
-          Last updated: May 24, 2026
+          Last updated: June 10, 2026
         </p>
 
         <section className="mb-8">
@@ -70,9 +70,9 @@ function PrivacyPolicyPage() {
           <h2 className="text-lg font-bold mb-3">Third-Party Services</h2>
           <p className="text-sm text-white/80 leading-relaxed">
             <span className="shrink-0">·</span>{" "}
-            <strong>Resend (resend.com):</strong> Used to send email alerts. Your emergency contact email is transmitted to Resend only when an alert is triggered. See{" "}
+            <strong>Resend (resend.com):</strong> Used to send email alerts. Your emergency contact email is transmitted to Resend only when an alert is triggered. Resend does not store email addresses or content longer than necessary to deliver the alert, and we have no access to those logs. See{" "}
             <a
-              href="https://resend.com/legal/privacy"
+              href="https://resend.com/privacy"
               target="_blank"
               rel="noopener noreferrer"
               className="underline text-white/90 hover:text-white"
@@ -148,10 +148,10 @@ function PrivacyPolicyPage() {
           <p className="text-sm text-white/80 leading-relaxed">
             For privacy questions or to request data deletion (though we store nothing server-side), contact:{" "}
             <a
-              href="mailto:support@pulse-checkin.app"
+              href="mailto:pulse.safety.fin@gmail.com"
               className="underline text-white/90 hover:text-white"
             >
-              support@pulse-checkin.app
+              pulse.safety.fin@gmail.com
             </a>
           </p>
         </section>
