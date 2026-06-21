@@ -1,7 +1,65 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
-import { Search, Phone, Copy, X, ArrowLeft, Globe } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { Search, Phone, Copy, X, ArrowLeft, Globe, MapPin } from "lucide-react";
 import { emergencyNumbers, type EmergencyService } from "@/lib/emergency-numbers";
+
+function useDetectedCountryCode() {
+  const [code, setCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof navigator === "undefined") return;
+
+    // Prefer language/locale region codes (e.g. "en-US" -> "US")
+    const locales = Array.isArray(navigator.languages)
+      ? navigator.languages
+      : [navigator.language];
+    for (const locale of locales) {
+      const match = locale?.match(/[-_]([a-zA-Z]{2})$/);
+      if (match) {
+        setCode(match[1].toUpperCase());
+        return;
+      }
+    }
+
+    // Fallback: map common timezones to country codes
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const timezoneToCountry: Record<string, string> = {
+        "America/New_York": "US",
+        "America/Detroit": "US",
+        "America/Chicago": "US",
+        "America/Denver": "US",
+        "America/Phoenix": "US",
+        "America/Los_Angeles": "US",
+        "America/Anchorage": "US",
+        "America/Toronto": "CA",
+        "America/Vancouver": "CA",
+        "Europe/London": "GB",
+        "Europe/Paris": "FR",
+        "Europe/Berlin": "DE",
+        "Europe/Madrid": "ES",
+        "Europe/Rome": "IT",
+        "Australia/Sydney": "AU",
+        "Australia/Melbourne": "AU",
+        "Australia/Brisbane": "AU",
+        "Australia/Perth": "AU",
+        "Pacific/Auckland": "NZ",
+        "Asia/Tokyo": "JP",
+        "Asia/Shanghai": "CN",
+        "Asia/Kolkata": "IN",
+        "America/Sao_Paulo": "BR",
+        "America/Mexico_City": "MX",
+        "Africa/Johannesburg": "ZA",
+      };
+      const mapped = timezoneToCountry[tz];
+      if (mapped) setCode(mapped);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  return code;
+}
 
 export const Route = createFileRoute("/_app/emergency-numbers")({
   component: EmergencyNumbersPage,
@@ -20,6 +78,12 @@ function EmergencyNumbersPage() {
   const [query, setQuery] = useState("");
   const [selectedService, setSelectedService] = useState<EmergencyService | null>(null);
   const [copied, setCopied] = useState(false);
+  const detectedCountryCode = useDetectedCountryCode();
+
+  const suggestedCountry = useMemo(() => {
+    if (!detectedCountryCode) return null;
+    return emergencyNumbers.find((c) => c.code === detectedCountryCode) ?? null;
+  }, [detectedCountryCode]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -81,6 +145,35 @@ function EmergencyNumbersPage() {
             </button>
           )}
         </div>
+
+        {/* Region suggestion */}
+        {suggestedCountry && (
+          <div className="mb-5 p-4 rounded-2xl bg-primary/5 border border-primary/10">
+            <div className="flex items-center gap-1.5 mb-2 text-muted-foreground">
+              <MapPin className="w-3 h-3" />
+              <p className="text-[11px] uppercase tracking-[0.15em]">Based on your region</p>
+            </div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-2xl" aria-hidden>
+                {suggestedCountry.flag}
+              </span>
+              <span className="font-medium">{suggestedCountry.country}</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {suggestedCountry.services.map((service) => (
+                <button
+                  key={service.label}
+                  onClick={() => setSelectedService(service)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background border border-border/60 text-sm hover:border-primary/40 hover:bg-primary/5 transition-colors"
+                  aria-label={`${service.label}: ${service.number}`}
+                >
+                  <span className="font-semibold tabular-nums">{service.number}</span>
+                  <span className="text-muted-foreground text-xs">{service.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* List */}
         <div className="space-y-3 mb-6">
