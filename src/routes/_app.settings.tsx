@@ -16,6 +16,7 @@ import {
   Mail,
   Bell,
   Flag,
+  Globe,
 } from "lucide-react";
 
 const CONTACT_KEY = "pulse:contact";
