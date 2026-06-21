@@ -40,8 +40,8 @@ export const Route = createFileRoute("/_app/settings")({
 
 function SettingsPage() {
   const navigate = useNavigate();
+  const prefs = usePreferences();
   const [contact, setContact] = useState<Contact | null>(null);
-  const [notifEnabled, setNotifEnabled] = useState(true);
   const [hydrated, setHydrated] = useState(false);
 
   // Dialog states
@@ -65,20 +65,38 @@ function SettingsPage() {
         setContact(JSON.parse(raw));
       } catch {}
     }
-    setNotifEnabled(isReminderEnabled());
     setHydrated(true);
   }, []);
 
-  const handleNotifToggle = async (next: boolean) => {
-    setNotifEnabled(next);
-    window.localStorage.setItem(NOTIF_KEY, String(next));
-    window.localStorage.setItem("notifications_enabled", String(next));
+  const handleReminderToggle = async (next: boolean) => {
+    prefs.setReminderEnabled(next);
     if (next) {
       const perm = await requestNotificationPermission();
       if (perm !== "granted") {
         showToast("Enable notifications in your browser to receive reminders.");
       }
     }
+  };
+
+  const handlePauseToggle = (next: boolean) => {
+    if (next) {
+      // Default to +1 day so the date picker has a value to nudge from.
+      prefs.setPauseUntil(Date.now() + 24 * 60 * 60 * 1000);
+    } else {
+      prefs.setPauseUntil(null);
+    }
+  };
+
+  const handlePauseQuick = (days: number) => {
+    prefs.setPauseUntil(Date.now() + days * 24 * 60 * 60 * 1000);
+  };
+
+  const handlePauseDateChange = (value: string) => {
+    if (!value) return;
+    // value is YYYY-MM-DD; treat as end-of-day local time
+    const [y, m, d] = value.split("-").map(Number);
+    const ts = new Date(y, (m ?? 1) - 1, d ?? 1, 23, 59, 59).getTime();
+    if (ts > Date.now()) prefs.setPauseUntil(ts);
   };
 
   useEffect(() => {
