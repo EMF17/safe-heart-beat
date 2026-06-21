@@ -1,9 +1,6 @@
 import { useEffect, useRef } from "react";
-import { CHECKIN_INTERVAL_MS, ALERT_THRESHOLD_MS } from "./pulse";
 
-const REMINDER_KEY = "pulse:reminderEnabled";
 const FIRED_KEY = "pulse:firedNotifications";
-const REMINDER_LEAD_MS = 4 * 60 * 60 * 1000; // 4h before due
 
 type FiredMap = Record<string, { reminder?: boolean; missed?: boolean }>;
 
@@ -20,11 +17,12 @@ function writeFired(map: FiredMap) {
   localStorage.setItem(FIRED_KEY, JSON.stringify(map));
 }
 
+// Re-export for backwards compatibility with Settings
+import { readReminderEnabled, REMINDER_KEY } from "./preferences";
 export function isReminderEnabled(): boolean {
-  if (typeof window === "undefined") return true;
-  const v = localStorage.getItem(REMINDER_KEY);
-  return v === null ? true : v === "true";
+  return readReminderEnabled();
 }
+export { REMINDER_KEY };
 
 export async function requestNotificationPermission(): Promise<NotificationPermission> {
   if (typeof window === "undefined" || !("Notification" in window)) {
@@ -43,7 +41,6 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
 function sendNotification(title: string, body: string) {
   if (typeof window === "undefined" || !("Notification" in window)) return;
   if (Notification.permission !== "granted") return;
-  if (!isReminderEnabled()) return;
   try {
     new Notification(title, { body, tag: title });
   } catch {
@@ -51,16 +48,25 @@ function sendNotification(title: string, body: string) {
   }
 }
 
-/**
- * Watches a lastCheckIn timestamp and fires local notifications:
- * - 4 hours before the 48h window expires
- * - When the user misses the first 48h window
- * Each notification fires only once per check-in cycle.
- */
-export function useCheckInNotifications(lastCheckIn: number | null) {
-  const intervalRef = useRef<number | null>(null);
+interface NotificationOpts {
+  intervalMs: number;
+  alertThresholdMs: number;
+  reminderEnabled: boolean;
+  isPaused: boolean;
+}
 
-  // Request permission on mount
+/**
+ * Watches a lastCheckIn timestamp and fires ONE local notification 12 hours
+ * before the alert would trigger (halfway through the second interval).
+ * Cancelled if the user checks in, pauses, or disables reminders.
+ */
+export function useCheckInNotifications(
+  lastCheckIn: number | null,
+  opts: NotificationOpts
+) {
+  const intervalRef = useRef<number | null>(null);
+  const { intervalMs, alertThresholdMs, reminderEnabled, isPaused } = opts;
+
   useEffect(() => {
     requestNotificationPermission();
   }, []);
@@ -68,42 +74,34 @@ export function useCheckInNotifications(lastCheckIn: number | null) {
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (lastCheckIn === null) return;
+    if (isPaused) return;
 
     const key = String(lastCheckIn);
 
     const check = () => {
-      if (!isReminderEnabled()) return;
+      if (!reminderEnabled) return;
       if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
 
       const elapsed = Date.now() - lastCheckIn;
       const fired = readFired();
       const entry = fired[key] ?? {};
 
-      // 4h-left reminder: fires once elapsed crosses (48h - 4h) = 44h
+      // 12h-before-alert reminder: fires once when halfway through second interval
+      // (i.e. elapsed >= 1.5 * intervalMs), only after first check-in is missed.
+      const reminderAt = intervalMs + intervalMs / 2;
       if (
         !entry.reminder &&
-        elapsed >= CHECKIN_INTERVAL_MS - REMINDER_LEAD_MS &&
-        elapsed < CHECKIN_INTERVAL_MS
+        elapsed >= reminderAt &&
+        elapsed < alertThresholdMs
       ) {
-        sendNotification("Pulse check-in", "⏰ 4 hours left — tap to check in.");
+        sendNotification(
+          "Pulse",
+          "Don't forget to check in. Your safety net is still armed."
+        );
         entry.reminder = true;
       }
 
-      // Missed first window: fires once elapsed crosses 48h (before 96h alert)
-      if (
-        !entry.missed &&
-        elapsed >= CHECKIN_INTERVAL_MS &&
-        elapsed < ALERT_THRESHOLD_MS
-      ) {
-        sendNotification(
-          "Pulse check-in missed",
-          "⚠️ You missed your check-in. You have 48 more hours before we alert your contact."
-        );
-        entry.missed = true;
-      }
-
       fired[key] = entry;
-      // Keep map small: only retain current cycle
       writeFired({ [key]: entry });
     };
 
@@ -112,5 +110,5 @@ export function useCheckInNotifications(lastCheckIn: number | null) {
     return () => {
       if (intervalRef.current) window.clearInterval(intervalRef.current);
     };
-  }, [lastCheckIn]);
+  }, [lastCheckIn, intervalMs, alertThresholdMs, reminderEnabled, isPaused]);
 }
