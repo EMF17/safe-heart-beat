@@ -15,6 +15,7 @@ import {
   pullSyncState,
   deleteSyncAccount,
 } from "./sync.functions";
+import { usePreferences } from "./preferences";
 
 const CHECKIN_KEY = "pulse:lastCheckIn";
 const CONTACT_KEY = "pulse:contact";
@@ -22,6 +23,7 @@ const NAME_KEY = "pulse:name";
 const TOKEN_KEY = "pulse:syncToken";
 const ACCOUNT_KEY = "pulse:accountId";
 
+// Legacy defaults — actual values are dynamic per the user's chosen interval.
 export const CHECKIN_INTERVAL_MS = 48 * 60 * 60 * 1000;
 export const ALERT_THRESHOLD_MS = 96 * 60 * 60 * 1000;
 
