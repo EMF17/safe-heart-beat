@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { PulseDashboard } from "@/components/PulseDashboard";
+import { WhatsNewScreen } from "@/components/WhatsNewScreen";
 import { Hand, Mail, ShieldCheck, ChevronRight } from "lucide-react";
 
 const ONBOARDING_KEY = "pulse:onboardingCompleted";
+const WHATS_NEW_V2_KEY = "pulse:hasSeenWhatsNewV2";
 
 export const Route = createFileRoute("/_app/")({
   component: HomePage,
@@ -27,11 +29,14 @@ export const Route = createFileRoute("/_app/")({
 
 function HomePage() {
   const [onboardingDone, setOnboardingDone] = useState<boolean | null>(null);
+  const [whatsNewDismissed, setWhatsNewDismissed] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const done = window.localStorage.getItem(ONBOARDING_KEY) === "true";
+    const whatsNew = window.localStorage.getItem(WHATS_NEW_V2_KEY) === "true";
     setOnboardingDone(done);
+    setWhatsNewDismissed(whatsNew);
   }, []);
 
   const dismissOnboarding = () => {
@@ -42,14 +47,27 @@ function HomePage() {
     }
   };
 
-  if (onboardingDone === null) return <div className="min-h-full" />;
+  const dismissWhatsNew = () => {
+    window.localStorage.setItem(WHATS_NEW_V2_KEY, "true");
+    setWhatsNewDismissed(true);
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      navigator.vibrate(15);
+    }
+  };
+
+  if (onboardingDone === null || whatsNewDismissed === null) return <div className="min-h-full" />;
 
   if (!onboardingDone) {
     return <OnboardingScreen onDismiss={dismissOnboarding} />;
   }
 
+  if (!whatsNewDismissed) {
+    return <WhatsNewScreen onDismiss={dismissWhatsNew} />;
+  }
+
   return <PulseDashboard />;
 }
+
 
 function OnboardingScreen({ onDismiss }: { onDismiss: () => void }) {
   const cards = [
