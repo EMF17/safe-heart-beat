@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { Link } from "@tanstack/react-router";
+import { Phone } from "lucide-react";
 import { usePulse, formatDuration, formatSince, CHECKIN_INTERVAL_MS, ALERT_THRESHOLD_MS, type Contact } from "@/lib/pulse";
 
 function CountdownRing({ progress, status }: { progress: number; status: string }) {
@@ -132,6 +134,17 @@ export function PulseDashboard() {
           <Stat label={dueLabel} value={dur.primary} sub={dur.secondary} highlight={p.status === "alert" || p.status === "overdue"} />
           <Stat label="Interval" value="48h" sub="per check-in" />
           <Stat label="Alert after" value="96h" sub="2 missed" />
+        </div>
+
+        <div className="mt-8 flex justify-center">
+          <Link
+            to="/emergency-numbers"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Open emergency numbers"
+          >
+            <Phone className="w-3.5 h-3.5" />
+            Emergency Numbers
+          </Link>
         </div>
       </section>
 
