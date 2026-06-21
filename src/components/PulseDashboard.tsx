@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { Phone } from "lucide-react";
-import { usePulse, formatDuration, formatSince, CHECKIN_INTERVAL_MS, ALERT_THRESHOLD_MS, type Contact } from "@/lib/pulse";
+import { usePulse, formatDuration, formatSince, type Contact } from "@/lib/pulse";
+import { formatPauseDate } from "@/lib/preferences";
 
 function CountdownRing({ progress, status }: { progress: number; status: string }) {
   const r = 140;
