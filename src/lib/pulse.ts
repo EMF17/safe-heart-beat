@@ -35,6 +35,7 @@ export interface Contact {
 export type SyncStatus = "off" | "ready" | "syncing" | "error";
 
 export function usePulse() {
+  const prefs = usePreferences();
   const [lastCheckIn, setLastCheckIn] = useState<number | null>(null);
   const [contact, setContact] = useState<Contact | null>(null);
   const [userName, setUserName] = useState<string>("");
