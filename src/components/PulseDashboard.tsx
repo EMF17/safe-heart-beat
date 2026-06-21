@@ -67,7 +67,7 @@ export function PulseDashboard() {
   };
 
 
-  const totalWindow = p.status === "alert" ? ALERT_THRESHOLD_MS : CHECKIN_INTERVAL_MS;
+  const totalWindow = p.status === "alert" ? p.alertThresholdMs : p.intervalMs;
   const progress = p.lastCheckIn ? Math.min(1, (Date.now() - p.lastCheckIn) / totalWindow) : 0;
   const dueLabel = p.status === "alert" ? "Alert sending soon" :
                    p.status === "overdue" ? "Check in to reset alert" :
@@ -76,6 +76,7 @@ export function PulseDashboard() {
   const dur = formatDuration(dueMs);
 
   const statusCopy =
+    p.status === "paused" ? "Check-ins paused" :
     p.status === "alert" ? "Alert window reached" :
     p.status === "overdue" ? "You're overdue" :
     p.status === "due" ? "Time to check in" :
