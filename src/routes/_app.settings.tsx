@@ -216,24 +216,135 @@ function SettingsPage() {
           </div>
         </section>
 
-        {/* Notifications */}
+        {/* Check-in Interval */}
+        <section className="mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <Clock className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-semibold uppercase tracking-[0.15em]">Check-in Rhythm</h2>
+          </div>
+          <div className="bg-card border border-border/60 rounded-2xl overflow-hidden">
+            {SUPPORTED_INTERVALS.map((h, i) => {
+              const isActive = prefs.intervalHours === h;
+              const label =
+                h === 24 ? "Every 24 hours" : h === 48 ? "Every 48 hours" : "Every 72 hours";
+              const hint =
+                h === 24 ? "For daily peace of mind"
+                : h === 48 ? "Balanced — recommended"
+                : "For travelers and independents";
+              return (
+                <button
+                  key={h}
+                  onClick={() => prefs.setIntervalHours(h as IntervalHours)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/30 transition-colors ${
+                    i < SUPPORTED_INTERVALS.length - 1 ? "border-b border-border/40" : ""
+                  }`}
+                >
+                  <span
+                    className={`shrink-0 w-4 h-4 rounded-full border-2 grid place-items-center transition-colors ${
+                      isActive ? "border-primary" : "border-muted-foreground/40"
+                    }`}
+                  >
+                    {isActive && <span className="w-2 h-2 rounded-full bg-primary" />}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium">{label}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{hint}</p>
+                  </div>
+                  <span className="text-xs text-muted-foreground">Alert after {h * 2}h</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Pause / Vacation Mode */}
+        <section className="mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <Pause className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-semibold uppercase tracking-[0.15em]">Pause Check-ins</h2>
+          </div>
+          <div className="bg-card border border-border/60 rounded-2xl p-4 space-y-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-sm">Vacation mode</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Temporarily pause check-ins and alerts. We'll quietly resume when the date arrives.
+                </p>
+              </div>
+              <Switch
+                checked={prefs.isPaused}
+                onCheckedChange={handlePauseToggle}
+                className="mt-1"
+              />
+            </div>
+
+            {prefs.isPaused && prefs.pauseUntil && (
+              <div className="pt-1 space-y-3 border-t border-border/40">
+                <p className="text-sm pt-3">
+                  Paused until{" "}
+                  <span className="font-medium">{formatPauseDate(prefs.pauseUntil)}</span>
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => handlePauseQuick(1)}
+                    className="px-3 h-8 rounded-full text-xs font-medium border border-border hover:bg-muted/40 transition-colors"
+                  >
+                    +1 day
+                  </button>
+                  <button
+                    onClick={() => handlePauseQuick(3)}
+                    className="px-3 h-8 rounded-full text-xs font-medium border border-border hover:bg-muted/40 transition-colors"
+                  >
+                    +3 days
+                  </button>
+                  <button
+                    onClick={() => handlePauseQuick(7)}
+                    className="px-3 h-8 rounded-full text-xs font-medium border border-border hover:bg-muted/40 transition-colors"
+                  >
+                    +7 days
+                  </button>
+                  <input
+                    type="date"
+                    min={new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10)}
+                    value={new Date(prefs.pauseUntil).toISOString().slice(0, 10)}
+                    onChange={(e) => handlePauseDateChange(e.target.value)}
+                    className="px-3 h-8 rounded-full text-xs font-medium border border-border bg-transparent hover:bg-muted/40 transition-colors"
+                  />
+                </div>
+                <button
+                  onClick={() => prefs.setPauseUntil(null)}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  End pause now
+                </button>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Reminders */}
         <section className="mb-8">
           <div className="flex items-center gap-2 mb-3">
             <Bell className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-semibold uppercase tracking-[0.15em]">Notifications</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.15em]">Reminders</h2>
           </div>
           <div className="bg-card border border-border/60 rounded-2xl p-4">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-sm">Enable reminder notifications</p>
+                <p className="font-medium text-sm">Remind me 12 hours before alert</p>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  We'll remind you 4 hours before your check-in expires
+                  A gentle local notification — nothing is sent to your contact.
                 </p>
               </div>
-              <Switch checked={notifEnabled} onCheckedChange={handleNotifToggle} className="mt-1" />
+              <Switch
+                checked={prefs.reminderEnabled}
+                onCheckedChange={handleReminderToggle}
+                className="mt-1"
+              />
             </div>
           </div>
         </section>
+
 
         {/* Data */}
         <section className="mb-8">
