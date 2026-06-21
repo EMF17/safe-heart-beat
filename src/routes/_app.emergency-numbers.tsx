@@ -130,7 +130,7 @@ function EmergencyNumbersPage() {
 
           {filtered.length === 0 && (
             <div className="text-center py-10 text-muted-foreground">
-              <Earth className="w-8 h-8 mx-auto mb-3 opacity-40" />
+              <Globe className="w-8 h-8 mx-auto mb-3 opacity-40" />
               <p className="text-sm">No countries match your search.</p>
             </div>
           )}
