@@ -1,0 +1,23 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2D5A3D"/>
+      <stop offset="100%" stop-color="#1A3A2A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="512" cy="512" r="512" fill="url(#bgGradient)"/>
+
+  <!-- Center white circle -->
+  <circle cx="512" cy="512" r="260" fill="#FFFFFF"/>
+
+  <!-- Inner thin pulse ring -->
+  <circle cx="512" cy="512" r="80" fill="none" stroke="#2D5A3D" stroke-width="8" opacity="0.35"/>
+
+  <!-- Outer thin pulse ring -->
+  <circle cx="512" cy="512" r="140" fill="none" stroke="#2D5A3D" stroke-width="8" opacity="0.25"/>
+
+  <!-- Center green dot -->
+  <circle cx="512" cy="512" r="28" fill="#2D5A3D"/>
+</svg>
