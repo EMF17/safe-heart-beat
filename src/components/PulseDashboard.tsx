@@ -101,7 +101,9 @@ export function PulseDashboard() {
           {statusCopy}
         </h1>
         <p className="text-muted-foreground text-sm md:text-base text-center max-w-sm mb-10">
-          {p.lastCheckIn
+          {p.isPaused && p.pauseUntil
+            ? `Paused until ${formatPauseDate(p.pauseUntil)}. No alerts will be sent.`
+            : p.lastCheckIn
             ? `Next check-in due in: ${Math.max(0, Math.floor(p.msUntilDue / (1000 * 60 * 60)))} hours ${Math.max(0, Math.floor((p.msUntilDue % (1000 * 60 * 60)) / (1000 * 60)))} minutes`
             : "First check-in ready. Tap the button to start."}
         </p>
@@ -113,29 +115,41 @@ export function PulseDashboard() {
         )}
 
         <div className="relative w-[340px] h-[340px] md:w-[380px] md:h-[380px] flex items-center justify-center">
-          {p.status !== "alert" && (
+          {p.status !== "alert" && p.status !== "paused" && (
             <div className="absolute inset-6 rounded-full pulse-ring animate-breathe pointer-events-none" />
           )}
-          <CountdownRing progress={progress} status={p.status} />
+          <CountdownRing progress={p.isPaused ? 0 : progress} status={p.status} />
           <button
             key={tickKey}
             onClick={handleCheckIn}
+            disabled={p.isPaused}
             className={`${buttonPulse ? "animate-pulse-once" : ""} animate-tick relative z-10 w-[260px] h-[260px] md:w-[280px] md:h-[280px] rounded-full
                        bg-gradient-to-b from-[var(--color-primary-glow)] to-[var(--color-primary)]
                        text-primary-foreground font-display font-semibold text-3xl md:text-4xl
                        shadow-[var(--shadow-pulse)] transition-transform
                        hover:scale-[1.03] active:scale-[0.96] focus:outline-none
-                       focus-visible:ring-4 focus-visible:ring-primary/30`}
+                       focus-visible:ring-4 focus-visible:ring-primary/30
+                       disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100`}
             aria-label="I'm safe — check in now"
           >
-            I'm Safe
+            {p.isPaused ? "Paused" : "I'm Safe"}
           </button>
         </div>
 
         <div className="mt-14 grid grid-cols-3 gap-6 md:gap-10 max-w-md w-full">
-          <Stat label={dueLabel} value={dur.primary} sub={dur.secondary} highlight={p.status === "alert" || p.status === "overdue"} />
-          <Stat label="Interval" value="48h" sub="per check-in" />
-          <Stat label="Alert after" value="96h" sub="2 missed" />
+          {p.isPaused && p.pauseUntil ? (
+            <div className="col-span-3 text-center">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground mb-1">Paused until</p>
+              <p className="font-display text-2xl font-semibold text-foreground">{formatPauseDate(p.pauseUntil)}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Resume anytime in Settings</p>
+            </div>
+          ) : (
+            <>
+              <Stat label={dueLabel} value={dur.primary} sub={dur.secondary} highlight={p.status === "alert" || p.status === "overdue"} />
+              <Stat label="Interval" value={`${p.intervalHours}h`} sub="per check-in" />
+              <Stat label="Alert after" value={`${p.intervalHours * 2}h`} sub="2 missed" />
+            </>
+          )}
         </div>
 
         <div className="mt-8 flex justify-center">
