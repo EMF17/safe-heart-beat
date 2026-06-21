@@ -146,6 +146,35 @@ function EmergencyNumbersPage() {
           )}
         </div>
 
+        {/* Region suggestion */}
+        {suggestedCountry && (
+          <div className="mb-5 p-4 rounded-2xl bg-primary/5 border border-primary/10">
+            <div className="flex items-center gap-1.5 mb-2 text-muted-foreground">
+              <MapPin className="w-3 h-3" />
+              <p className="text-[11px] uppercase tracking-[0.15em]">Based on your region</p>
+            </div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-2xl" aria-hidden>
+                {suggestedCountry.flag}
+              </span>
+              <span className="font-medium">{suggestedCountry.country}</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {suggestedCountry.services.map((service) => (
+                <button
+                  key={service.label}
+                  onClick={() => setSelectedService(service)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background border border-border/60 text-sm hover:border-primary/40 hover:bg-primary/5 transition-colors"
+                  aria-label={`${service.label}: ${service.number}`}
+                >
+                  <span className="font-semibold tabular-nums">{service.number}</span>
+                  <span className="text-muted-foreground text-xs">{service.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* List */}
         <div className="space-y-3 mb-6">
           {filtered.map((country) => (
