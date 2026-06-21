@@ -1,7 +1,65 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
-import { Search, Phone, Copy, X, ArrowLeft, Globe } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { Search, Phone, Copy, X, ArrowLeft, Globe, MapPin } from "lucide-react";
 import { emergencyNumbers, type EmergencyService } from "@/lib/emergency-numbers";
+
+function useDetectedCountryCode() {
+  const [code, setCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof navigator === "undefined") return;
+
+    // Prefer language/locale region codes (e.g. "en-US" -> "US")
+    const locales = Array.isArray(navigator.languages)
+      ? navigator.languages
+      : [navigator.language];
+    for (const locale of locales) {
+      const match = locale?.match(/[-_]([a-zA-Z]{2})$/);
+      if (match) {
+        setCode(match[1].toUpperCase());
+        return;
+      }
+    }
+
+    // Fallback: map common timezones to country codes
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const timezoneToCountry: Record<string, string> = {
+        "America/New_York": "US",
+        "America/Detroit": "US",
+        "America/Chicago": "US",
+        "America/Denver": "US",
+        "America/Phoenix": "US",
+        "America/Los_Angeles": "US",
+        "America/Anchorage": "US",
+        "America/Toronto": "CA",
+        "America/Vancouver": "CA",
+        "Europe/London": "GB",
+        "Europe/Paris": "FR",
+        "Europe/Berlin": "DE",
+        "Europe/Madrid": "ES",
+        "Europe/Rome": "IT",
+        "Australia/Sydney": "AU",
+        "Australia/Melbourne": "AU",
+        "Australia/Brisbane": "AU",
+        "Australia/Perth": "AU",
+        "Pacific/Auckland": "NZ",
+        "Asia/Tokyo": "JP",
+        "Asia/Shanghai": "CN",
+        "Asia/Kolkata": "IN",
+        "America/Sao_Paulo": "BR",
+        "America/Mexico_City": "MX",
+        "Africa/Johannesburg": "ZA",
+      };
+      const mapped = timezoneToCountry[tz];
+      if (mapped) setCode(mapped);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  return code;
+}
 
 export const Route = createFileRoute("/_app/emergency-numbers")({
   component: EmergencyNumbersPage,
