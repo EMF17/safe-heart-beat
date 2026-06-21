@@ -1,13 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
-import {
-  Search,
-  Phone,
-  Copy,
-  X,
-  ArrowLeft,
-  Globe,
-} from "lucide-react";
+import { Search, Phone, Copy, X, ArrowLeft, Globe } from "lucide-react";
 import { emergencyNumbers, type EmergencyService } from "@/lib/emergency-numbers";
 
 export const Route = createFileRoute("/_app/emergency-numbers")({
@@ -17,8 +10,7 @@ export const Route = createFileRoute("/_app/emergency-numbers")({
       { title: "Emergency Numbers — Pulse" },
       {
         name: "description",
-        content:
-          "Offline worldwide emergency numbers for Pulse. No internet required.",
+        content: "Offline worldwide emergency numbers for Pulse. No internet required.",
       },
     ],
   }),
@@ -35,10 +27,7 @@ function EmergencyNumbersPage() {
     return emergencyNumbers.filter(
       (c) =>
         c.country.toLowerCase().includes(q) ||
-        c.services.some(
-          (s) =>
-            s.number.includes(q) || s.label.toLowerCase().includes(q),
-        ),
+        c.services.some((s) => s.number.includes(q) || s.label.toLowerCase().includes(q)),
     );
   }, [query]);
 
@@ -65,9 +54,7 @@ function EmergencyNumbersPage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
-              Resources
-            </p>
+            <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Resources</p>
             <h1 className="font-display text-2xl md:text-3xl font-semibold leading-tight">
               Emergency Numbers
             </h1>
@@ -98,10 +85,7 @@ function EmergencyNumbersPage() {
         {/* List */}
         <div className="space-y-3 mb-6">
           {filtered.map((country) => (
-            <div
-              key={country.code}
-              className="bg-card border border-border/60 rounded-2xl p-4"
-            >
+            <div key={country.code} className="bg-card border border-border/60 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-xl" aria-hidden>
                   {country.flag}
@@ -116,12 +100,8 @@ function EmergencyNumbersPage() {
                     className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-background border border-border/60 text-sm hover:border-primary/40 hover:bg-primary/5 transition-colors"
                     aria-label={`${service.label}: ${service.number}`}
                   >
-                    <span className="text-muted-foreground text-xs">
-                      {service.label}
-                    </span>
-                    <span className="font-semibold tabular-nums">
-                      {service.number}
-                    </span>
+                    <span className="text-muted-foreground text-xs">{service.label}</span>
+                    <span className="font-semibold tabular-nums">{service.number}</span>
                   </button>
                 ))}
               </div>
@@ -138,8 +118,7 @@ function EmergencyNumbersPage() {
 
         {/* Footer note */}
         <p className="text-[11px] text-muted-foreground text-center leading-relaxed px-4">
-          Emergency numbers are stored locally on your device. No data is sent
-          anywhere.
+          Emergency numbers are stored locally on your device. No data is sent anywhere.
         </p>
       </div>
 

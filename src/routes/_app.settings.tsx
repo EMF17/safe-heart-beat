@@ -101,8 +101,7 @@ function SettingsPage() {
   const handleDeleteAllData = () => {
     openDialog({
       title: "Delete all data?",
-      message:
-        "Are you sure? This removes all check-ins, history, and your emergency contact.",
+      message: "Are you sure? This removes all check-ins, history, and your emergency contact.",
       confirmLabel: "Delete All Data",
       destructive: true,
       onConfirm: () => {
@@ -155,9 +154,7 @@ function SettingsPage() {
   return (
     <div className="min-h-full flex flex-col px-6 py-8">
       <div className="max-w-md mx-auto w-full">
-        <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">
-          Settings
-        </p>
+        <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">Settings</p>
         <h1 className="font-display text-3xl md:text-4xl font-semibold mb-8 leading-tight">
           Preferences
         </h1>
@@ -166,9 +163,7 @@ function SettingsPage() {
         <section className="mb-8">
           <div className="flex items-center gap-2 mb-3">
             <MailWarning className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-semibold uppercase tracking-[0.15em]">
-              Emergency Contact
-            </h2>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.15em]">Emergency Contact</h2>
           </div>
           <div className="bg-card border border-border/60 rounded-2xl p-4 space-y-4">
             {contact ? (
@@ -205,9 +200,7 @@ function SettingsPage() {
         <section className="mb-8">
           <div className="flex items-center gap-2 mb-3">
             <Bell className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-semibold uppercase tracking-[0.15em]">
-              Notifications
-            </h2>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.15em]">Notifications</h2>
           </div>
           <div className="bg-card border border-border/60 rounded-2xl p-4">
             <div className="flex items-start justify-between gap-4">
@@ -217,34 +210,22 @@ function SettingsPage() {
                   We'll remind you 4 hours before your check-in expires
                 </p>
               </div>
-              <Switch
-                checked={notifEnabled}
-                onCheckedChange={handleNotifToggle}
-                className="mt-1"
-              />
+              <Switch checked={notifEnabled} onCheckedChange={handleNotifToggle} className="mt-1" />
             </div>
           </div>
         </section>
-
 
         {/* Data */}
         <section className="mb-8">
           <div className="flex items-center gap-2 mb-3">
             <Trash2 className="w-4 h-4 text-destructive" />
-            <h2 className="text-sm font-semibold uppercase tracking-[0.15em]">
-              Data
-            </h2>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.15em]">Data</h2>
           </div>
           <div className="bg-card border border-border/60 rounded-2xl p-4">
-            <button
-              onClick={handleDeleteAllData}
-              className="w-full text-left"
-            >
+            <button onClick={handleDeleteAllData} className="w-full text-left">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-sm text-destructive">
-                    Delete All Data
-                  </p>
+                  <p className="font-medium text-sm text-destructive">Delete All Data</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     This removes your history, emergency contact, and settings
                   </p>
@@ -259,9 +240,7 @@ function SettingsPage() {
         <section className="mb-8">
           <div className="flex items-center gap-2 mb-3">
             <Info className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-semibold uppercase tracking-[0.15em]">
-              About
-            </h2>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.15em]">About</h2>
           </div>
           <div className="bg-card border border-border/60 rounded-2xl overflow-hidden">
             <div className="px-4 py-3 flex items-center justify-between border-b border-border/40">
@@ -293,7 +272,6 @@ function SettingsPage() {
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
-
         </section>
       </div>
 
@@ -311,13 +289,9 @@ function SettingsPage() {
               <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-destructive/10 text-destructive">
                 <AlertTriangle className="w-5 h-5" />
               </div>
-              <h3 className="font-display text-lg font-semibold">
-                {dialogConfig.title}
-              </h3>
+              <h3 className="font-display text-lg font-semibold">{dialogConfig.title}</h3>
             </div>
-            <p className="text-sm text-muted-foreground mb-6">
-              {dialogConfig.message}
-            </p>
+            <p className="text-sm text-muted-foreground mb-6">{dialogConfig.message}</p>
             <div className="flex gap-3">
               <button
                 onClick={closeDialog}
