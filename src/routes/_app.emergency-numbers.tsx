@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
-import { Search, Phone, Copy, X, ArrowLeft, Globe, MapPin } from "lucide-react";
+import { Search, Phone, Copy, X, ArrowLeft, Globe, MapPin, Plane } from "lucide-react";
 import { emergencyNumbers, type EmergencyService } from "@/lib/emergency-numbers";
+
+const TRAVEL_MODE_KEY = "pulse:travelMode";
+const TRAVEL_COUNTRY_KEY = "pulse:travelCountry";
 
 function useDetectedCountryCode() {
   const [code, setCode] = useState<string | null>(null);
@@ -80,10 +83,54 @@ function EmergencyNumbersPage() {
   const [copied, setCopied] = useState(false);
   const detectedCountryCode = useDetectedCountryCode();
 
-  const suggestedCountry = useMemo(() => {
+  const [travelMode, setTravelMode] = useState(false);
+  const [travelCountryCode, setTravelCountryCode] = useState<string | null>(null);
+  const [hydrated, setHydrated] = useState(false);
+
+  // Load persisted travel mode
+  useEffect(() => {
+    try {
+      setTravelMode(localStorage.getItem(TRAVEL_MODE_KEY) === "1");
+      setTravelCountryCode(localStorage.getItem(TRAVEL_COUNTRY_KEY));
+    } catch {
+      // ignore
+    }
+    setHydrated(true);
+  }, []);
+
+  // Persist changes
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(TRAVEL_MODE_KEY, travelMode ? "1" : "0");
+      if (travelCountryCode) {
+        localStorage.setItem(TRAVEL_COUNTRY_KEY, travelCountryCode);
+      } else {
+        localStorage.removeItem(TRAVEL_COUNTRY_KEY);
+      }
+    } catch {
+      // ignore
+    }
+  }, [travelMode, travelCountryCode, hydrated]);
+
+  const detectedCountry = useMemo(() => {
     if (!detectedCountryCode) return null;
     return emergencyNumbers.find((c) => c.code === detectedCountryCode) ?? null;
   }, [detectedCountryCode]);
+
+  const travelCountry = useMemo(() => {
+    if (!travelCountryCode) return null;
+    return emergencyNumbers.find((c) => c.code === travelCountryCode) ?? null;
+  }, [travelCountryCode]);
+
+  const suggestedCountry = travelMode ? travelCountry : detectedCountry;
+
+  // Auto-enable travel mode if region cannot be detected
+  useEffect(() => {
+    if (hydrated && !detectedCountryCode && !travelMode) {
+      setTravelMode(true);
+    }
+  }, [hydrated, detectedCountryCode, travelMode]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -146,12 +193,92 @@ function EmergencyNumbersPage() {
           )}
         </div>
 
+        {/* Travel Mode */}
+        <div className="mb-5 p-4 rounded-2xl bg-card border border-border/60">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Plane className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm font-medium">Travel Mode</span>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={travelMode}
+              aria-label="Toggle Travel Mode"
+              onClick={() => setTravelMode((v) => !v)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                travelMode ? "bg-primary" : "bg-muted"
+              }`}
+            >
+              <span
+                className={`inline-block h-5 w-5 transform rounded-full bg-background shadow transition-transform ${
+                  travelMode ? "translate-x-5" : "translate-x-0.5"
+                }`}
+              />
+            </button>
+          </div>
+
+          {travelMode && (
+            <div className="mt-3 pt-3 border-t border-border/60 space-y-3">
+              {!detectedCountryCode && (
+                <p className="text-xs text-muted-foreground">
+                  We couldn't detect your region. Please select a country below.
+                </p>
+              )}
+              {!travelCountry && detectedCountryCode && (
+                <p className="text-xs text-muted-foreground">Tap below to select a country.</p>
+              )}
+
+              <label className="block">
+                <span className="sr-only">Select country</span>
+                <select
+                  value={travelCountryCode ?? ""}
+                  onChange={(e) => setTravelCountryCode(e.target.value || null)}
+                  className="w-full h-10 px-3 rounded-full bg-background border border-border/60 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                >
+                  <option value="">
+                    {travelCountry ? "Change Country" : "Select Country"}
+                  </option>
+                  {emergencyNumbers.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.flag} {c.country}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              {travelCountry && (
+                <p className="text-xs text-muted-foreground">
+                  Currently set to:{" "}
+                  <span className="text-foreground font-medium">{travelCountry.country}</span> (
+                  {travelCountry.services.map((s) => s.number).join(" / ")})
+                </p>
+              )}
+
+              {detectedCountryCode && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTravelMode(false);
+                    setTravelCountryCode(null);
+                  }}
+                  className="text-xs text-primary hover:underline"
+                >
+                  Use Device Region
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Region suggestion */}
         {suggestedCountry && (
           <div className="mb-5 p-4 rounded-2xl bg-primary/5 border border-primary/10">
             <div className="flex items-center gap-1.5 mb-2 text-muted-foreground">
-              <MapPin className="w-3 h-3" />
-              <p className="text-[11px] uppercase tracking-[0.15em]">Based on your region</p>
+              {travelMode ? <Plane className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
+              <p className="text-[11px] uppercase tracking-[0.15em]">
+                {travelMode ? "Travel mode" : "Based on your region"}
+              </p>
             </div>
             <div className="flex items-center gap-2 mb-3">
               <span className="text-2xl" aria-hidden>
