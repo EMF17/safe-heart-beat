@@ -83,10 +83,54 @@ function EmergencyNumbersPage() {
   const [copied, setCopied] = useState(false);
   const detectedCountryCode = useDetectedCountryCode();
 
-  const suggestedCountry = useMemo(() => {
+  const [travelMode, setTravelMode] = useState(false);
+  const [travelCountryCode, setTravelCountryCode] = useState<string | null>(null);
+  const [hydrated, setHydrated] = useState(false);
+
+  // Load persisted travel mode
+  useEffect(() => {
+    try {
+      setTravelMode(localStorage.getItem(TRAVEL_MODE_KEY) === "1");
+      setTravelCountryCode(localStorage.getItem(TRAVEL_COUNTRY_KEY));
+    } catch {
+      // ignore
+    }
+    setHydrated(true);
+  }, []);
+
+  // Persist changes
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(TRAVEL_MODE_KEY, travelMode ? "1" : "0");
+      if (travelCountryCode) {
+        localStorage.setItem(TRAVEL_COUNTRY_KEY, travelCountryCode);
+      } else {
+        localStorage.removeItem(TRAVEL_COUNTRY_KEY);
+      }
+    } catch {
+      // ignore
+    }
+  }, [travelMode, travelCountryCode, hydrated]);
+
+  const detectedCountry = useMemo(() => {
     if (!detectedCountryCode) return null;
     return emergencyNumbers.find((c) => c.code === detectedCountryCode) ?? null;
   }, [detectedCountryCode]);
+
+  const travelCountry = useMemo(() => {
+    if (!travelCountryCode) return null;
+    return emergencyNumbers.find((c) => c.code === travelCountryCode) ?? null;
+  }, [travelCountryCode]);
+
+  const suggestedCountry = travelMode ? travelCountry : detectedCountry;
+
+  // Auto-enable travel mode if region cannot be detected
+  useEffect(() => {
+    if (hydrated && !detectedCountryCode && !travelMode) {
+      setTravelMode(true);
+    }
+  }, [hydrated, detectedCountryCode, travelMode]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
