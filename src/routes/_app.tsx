@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { Home, Shield, History, Settings } from "lucide-react";
 import { useEffect } from "react";
-import { usePulse, ALERT_THRESHOLD_MS } from "@/lib/pulse";
+import { usePulse } from "@/lib/pulse";
 import { useCheckInNotifications } from "@/lib/notifications";
 
 export const Route = createFileRoute("/_app")({
@@ -13,23 +13,34 @@ const LAST_ALERT_KEY = "pulse:lastAlertSent";
 function AppLayout() {
   const location = useLocation();
   const current = location.pathname;
-  const { lastCheckIn, contact, hydrated } = usePulse();
-  useCheckInNotifications(lastCheckIn);
+  const {
+    lastCheckIn,
+    contact,
+    hydrated,
+    intervalMs,
+    alertThresholdMs,
+    reminderEnabled,
+    isPaused,
+  } = usePulse();
+  useCheckInNotifications(lastCheckIn, {
+    intervalMs,
+    alertThresholdMs,
+    reminderEnabled,
+    isPaused,
+  });
 
-  // Missed check-in alert: send ONE email if last check-in > 96h ago
-  // and no alert has been sent since that check-in.
+  // Missed check-in alert: send ONE email if last check-in > alert threshold
+  // and no alert has been sent since that check-in. Skipped while paused.
   useEffect(() => {
     if (!hydrated || !lastCheckIn || !contact?.email) return;
+    if (isPaused) return;
     const elapsed = Date.now() - lastCheckIn;
-    if (elapsed < ALERT_THRESHOLD_MS) return;
+    if (elapsed < alertThresholdMs) return;
 
     const lastAlertRaw = localStorage.getItem(LAST_ALERT_KEY);
     const lastAlert = lastAlertRaw ? Number(lastAlertRaw) : 0;
-    // Only send if no alert yet for this missed-window (i.e. last alert
-    // was before the most recent check-in).
     if (lastAlert >= lastCheckIn) return;
 
-    // Mark immediately to prevent double-fire (e.g. StrictMode, remounts).
     const sentAt = Date.now();
     localStorage.setItem(LAST_ALERT_KEY, String(sentAt));
 
@@ -42,10 +53,9 @@ function AppLayout() {
         type: "missed",
       }),
     }).catch(() => {
-      // Roll back so we retry on next load if it failed.
       localStorage.removeItem(LAST_ALERT_KEY);
     });
-  }, [hydrated, lastCheckIn, contact?.email, contact?.name]);
+  }, [hydrated, lastCheckIn, contact?.email, contact?.name, alertThresholdMs, isPaused]);
 
 
   const tabs = [
