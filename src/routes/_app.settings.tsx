@@ -1,9 +1,9 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
-import { isReminderEnabled, requestNotificationPermission } from "@/lib/notifications";
+import { requestNotificationPermission } from "@/lib/notifications";
+import { usePreferences, SUPPORTED_INTERVALS, formatPauseDate, type IntervalHours } from "@/lib/preferences";
 
-const NOTIF_KEY = "pulse:reminderEnabled";
 const ONBOARDING_KEY = "pulse:onboardingCompleted";
 import {
   MailWarning,
@@ -17,6 +17,8 @@ import {
   Bell,
   Flag,
   Globe,
+  Clock,
+  Pause,
 } from "lucide-react";
 
 const CONTACT_KEY = "pulse:contact";
