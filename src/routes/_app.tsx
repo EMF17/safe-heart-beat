@@ -44,16 +44,20 @@ function AppLayout() {
     const sentAt = Date.now();
     localStorage.setItem(LAST_ALERT_KEY, String(sentAt));
 
-    fetch("/api/send-alert", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contactName: contact.name,
-        contactEmail: contact.email,
-        type: "missed",
-      }),
-    }).catch(() => {
-      localStorage.removeItem(LAST_ALERT_KEY);
+    import("@/lib/region").then(({ getActiveCountryCode }) => {
+      const countryCode = getActiveCountryCode();
+      fetch("/api/send-alert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contactName: contact.name,
+          contactEmail: contact.email,
+          type: "missed",
+          countryCode,
+        }),
+      }).catch(() => {
+        localStorage.removeItem(LAST_ALERT_KEY);
+      });
     });
   }, [hydrated, lastCheckIn, contact?.email, contact?.name, alertThresholdMs, isPaused]);
 

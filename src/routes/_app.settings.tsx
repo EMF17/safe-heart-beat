@@ -149,6 +149,8 @@ function SettingsPage() {
     }
     showToast("Sending test alert…");
     try {
+      const { getActiveCountryCode } = await import("@/lib/region");
+      const countryCode = getActiveCountryCode();
       const res = await fetch("/api/send-alert", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -156,6 +158,7 @@ function SettingsPage() {
           contactName: contact.name,
           contactEmail: contact.email,
           type: "test",
+          countryCode,
         }),
       });
       const data = await res.json().catch(() => ({}));
