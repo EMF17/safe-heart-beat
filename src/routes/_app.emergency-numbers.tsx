@@ -6,7 +6,7 @@ import {
   Copy,
   X,
   ArrowLeft,
-  Earth,
+  Globe,
 } from "lucide-react";
 import { emergencyNumbers, type EmergencyService } from "@/lib/emergency-numbers";
 
