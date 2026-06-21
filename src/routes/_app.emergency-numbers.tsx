@@ -78,6 +78,12 @@ function EmergencyNumbersPage() {
   const [query, setQuery] = useState("");
   const [selectedService, setSelectedService] = useState<EmergencyService | null>(null);
   const [copied, setCopied] = useState(false);
+  const detectedCountryCode = useDetectedCountryCode();
+
+  const suggestedCountry = useMemo(() => {
+    if (!detectedCountryCode) return null;
+    return emergencyNumbers.find((c) => c.code === detectedCountryCode) ?? null;
+  }, [detectedCountryCode]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
