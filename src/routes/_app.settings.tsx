@@ -275,6 +275,16 @@ function SettingsPage() {
               <span className="text-sm">Privacy Policy</span>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </Link>
+            <Link
+              to="/emergency-numbers"
+              className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted/30 transition-colors border-b border-border/40"
+            >
+              <span className="text-sm flex items-center gap-2">
+                <Globe className="w-4 h-4 text-muted-foreground" />
+                Emergency Numbers
+              </span>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </Link>
             <button
               onClick={() => showToast("Terms of use will appear here")}
               className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted/30 transition-colors"
