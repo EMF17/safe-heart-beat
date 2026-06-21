@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
-import { Search, Phone, Copy, X, ArrowLeft, Globe, MapPin } from "lucide-react";
+import { Search, Phone, Copy, X, ArrowLeft, Globe, MapPin, Plane } from "lucide-react";
 import { emergencyNumbers, type EmergencyService } from "@/lib/emergency-numbers";
+
+const TRAVEL_MODE_KEY = "pulse:travelMode";
+const TRAVEL_COUNTRY_KEY = "pulse:travelCountry";
 
 function useDetectedCountryCode() {
   const [code, setCode] = useState<string | null>(null);
