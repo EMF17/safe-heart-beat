@@ -219,20 +219,24 @@ export function usePulse() {
     setSyncError(null);
   }, [syncToken, callDelete]);
 
+  const intervalMs = prefs.intervalMs;
+  const alertThresholdMs = prefs.alertThresholdMs;
   const elapsed = lastCheckIn ? now - lastCheckIn : null;
-  const msUntilDue = lastCheckIn ? Math.max(0, CHECKIN_INTERVAL_MS - (now - lastCheckIn)) : 0;
-  const msUntilAlert = lastCheckIn ? Math.max(0, ALERT_THRESHOLD_MS - (now - lastCheckIn)) : 0;
+  const msUntilDue = lastCheckIn ? Math.max(0, intervalMs - (now - lastCheckIn)) : 0;
+  const msUntilAlert = lastCheckIn ? Math.max(0, alertThresholdMs - (now - lastCheckIn)) : 0;
 
-  let status: "fresh" | "due" | "overdue" | "alert" | "new" = "new";
-  if (lastCheckIn) {
-    if (elapsed! >= ALERT_THRESHOLD_MS) status = "alert";
-    else if (elapsed! >= CHECKIN_INTERVAL_MS) status = "overdue";
-    else if (elapsed! >= CHECKIN_INTERVAL_MS * 0.75) status = "due";
+  let status: "fresh" | "due" | "overdue" | "alert" | "new" | "paused" = "new";
+  if (prefs.isPaused) {
+    status = "paused";
+  } else if (lastCheckIn) {
+    if (elapsed! >= alertThresholdMs) status = "alert";
+    else if (elapsed! >= intervalMs) status = "overdue";
+    else if (elapsed! >= intervalMs * 0.75) status = "due";
     else status = "fresh";
   }
 
   return {
-    hydrated,
+    hydrated: hydrated && prefs.hydrated,
     lastCheckIn,
     contact,
     userName,
@@ -244,6 +248,16 @@ export function usePulse() {
     checkIn,
     saveContact,
     saveName,
+    // preferences
+    intervalHours: prefs.intervalHours,
+    intervalMs,
+    alertThresholdMs,
+    pauseUntil: prefs.pauseUntil,
+    isPaused: prefs.isPaused,
+    reminderEnabled: prefs.reminderEnabled,
+    setIntervalHours: prefs.setIntervalHours,
+    setPauseUntil: prefs.setPauseUntil,
+    setReminderEnabled: prefs.setReminderEnabled,
     // sync
     syncEnabled: !!syncToken,
     syncStatus,
