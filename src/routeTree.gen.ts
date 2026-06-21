@@ -15,6 +15,7 @@ import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as ApiSendAlertRouteImport } from './routes/api/send-alert'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppHistoryRouteImport } from './routes/_app.history'
+import { Route as AppEmergencyNumbersRouteImport } from './routes/_app.emergency-numbers'
 import { Route as AppEmergencyContactRouteImport } from './routes/_app.emergency-contact'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
@@ -49,6 +50,11 @@ const AppHistoryRoute = AppHistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => AppRoute,
 } as any)
+const AppEmergencyNumbersRoute = AppEmergencyNumbersRouteImport.update({
+  id: '/emergency-numbers',
+  path: '/emergency-numbers',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppEmergencyContactRoute = AppEmergencyContactRouteImport.update({
   id: '/emergency-contact',
   path: '/emergency-contact',
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/emergency-contact': typeof AppEmergencyContactRoute
+  '/emergency-numbers': typeof AppEmergencyNumbersRoute
   '/history': typeof AppHistoryRoute
   '/settings': typeof AppSettingsRoute
   '/api/send-alert': typeof ApiSendAlertRoute
@@ -85,6 +92,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/emergency-contact': typeof AppEmergencyContactRoute
+  '/emergency-numbers': typeof AppEmergencyNumbersRoute
   '/history': typeof AppHistoryRoute
   '/settings': typeof AppSettingsRoute
   '/api/send-alert': typeof ApiSendAlertRoute
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/_app/emergency-contact': typeof AppEmergencyContactRoute
+  '/_app/emergency-numbers': typeof AppEmergencyNumbersRoute
   '/_app/history': typeof AppHistoryRoute
   '/_app/settings': typeof AppSettingsRoute
   '/api/send-alert': typeof ApiSendAlertRoute
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
     | '/'
     | '/privacy-policy'
     | '/emergency-contact'
+    | '/emergency-numbers'
     | '/history'
     | '/settings'
     | '/api/send-alert'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
   to:
     | '/privacy-policy'
     | '/emergency-contact'
+    | '/emergency-numbers'
     | '/history'
     | '/settings'
     | '/api/send-alert'
@@ -134,6 +145,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/privacy-policy'
     | '/_app/emergency-contact'
+    | '/_app/emergency-numbers'
     | '/_app/history'
     | '/_app/settings'
     | '/api/send-alert'
@@ -196,6 +208,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHistoryRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/emergency-numbers': {
+      id: '/_app/emergency-numbers'
+      path: '/emergency-numbers'
+      fullPath: '/emergency-numbers'
+      preLoaderRoute: typeof AppEmergencyNumbersRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/emergency-contact': {
       id: '/_app/emergency-contact'
       path: '/emergency-contact'
@@ -229,6 +248,7 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppEmergencyContactRoute: typeof AppEmergencyContactRoute
+  AppEmergencyNumbersRoute: typeof AppEmergencyNumbersRoute
   AppHistoryRoute: typeof AppHistoryRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -236,6 +256,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppEmergencyContactRoute: AppEmergencyContactRoute,
+  AppEmergencyNumbersRoute: AppEmergencyNumbersRoute,
   AppHistoryRoute: AppHistoryRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppIndexRoute: AppIndexRoute,
@@ -254,13 +275,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
