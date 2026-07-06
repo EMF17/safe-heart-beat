@@ -21,6 +21,7 @@ function AppLayout() {
     alertThresholdMs,
     reminderEnabled,
     isPaused,
+    syncToken,
   } = usePulse();
   useCheckInNotifications(lastCheckIn, {
     intervalMs,
@@ -31,9 +32,12 @@ function AppLayout() {
 
   // Missed check-in alert: send ONE email if last check-in > alert threshold
   // and no alert has been sent since that check-in. Skipped while paused.
+  // Requires an active sync token so the server can resolve the contact
+  // email from the authenticated account (prevents anonymous email abuse).
   useEffect(() => {
     if (!hydrated || !lastCheckIn || !contact?.email) return;
     if (isPaused) return;
+    if (!syncToken) return;
     const elapsed = Date.now() - lastCheckIn;
     if (elapsed < alertThresholdMs) return;
 
@@ -50,8 +54,7 @@ function AppLayout() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contactName: contact.name,
-          contactEmail: contact.email,
+          token: syncToken,
           type: "missed",
           countryCode,
         }),
@@ -59,7 +62,7 @@ function AppLayout() {
         localStorage.removeItem(LAST_ALERT_KEY);
       });
     });
-  }, [hydrated, lastCheckIn, contact?.email, contact?.name, alertThresholdMs, isPaused]);
+  }, [hydrated, lastCheckIn, contact?.email, contact?.name, alertThresholdMs, isPaused, syncToken]);
 
 
   const tabs = [
