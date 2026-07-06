@@ -260,6 +260,7 @@ export function usePulse() {
     setReminderEnabled: prefs.setReminderEnabled,
     // sync
     syncEnabled: !!syncToken,
+    syncToken,
     syncStatus,
     syncError,
     enableSync,
