@@ -2,8 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { emergencyNumbers } from "@/lib/emergency-numbers";
 
 interface AlertPayload {
-  contactName?: string;
-  contactEmail?: string;
+  token?: string;
   type?: "test" | "missed";
   countryCode?: string;
 }
@@ -27,17 +26,52 @@ export const Route = createFileRoute("/api/send-alert")({
           return Response.json({ error: "Invalid JSON" }, { status: 400 });
         }
 
-        const contactName = (body.contactName ?? "").trim();
-        const contactEmail = (body.contactEmail ?? "").trim();
-        const type = body.type === "test" ? "test" : "missed";
-        const countryCode = (body.countryCode ?? "").trim().toUpperCase();
+        const token = (body.token ?? "").trim();
+        if (!token) {
+          return Response.json(
+            { error: "Authentication required" },
+            { status: 401 }
+          );
+        }
 
+        // Verify the caller's HMAC token and resolve their account.
+        // Both modules are server-only; import inside the handler so they
+        // never ship into the client bundle.
+        const { verifyToken } = await import("@/lib/sync.server");
+        const { supabaseAdmin } = await import(
+          "@/integrations/supabase/client.server"
+        );
+
+        let accountId: string;
+        try {
+          accountId = verifyToken(token);
+        } catch {
+          return Response.json(
+            { error: "Invalid or expired token" },
+            { status: 401 }
+          );
+        }
+
+        const { data: account, error: accErr } = await supabaseAdmin
+          .from("pulse_accounts")
+          .select("contact_email, contact_name")
+          .eq("id", accountId)
+          .single();
+        if (accErr || !account) {
+          return Response.json({ error: "Account not found" }, { status: 404 });
+        }
+
+        const contactEmail = (account.contact_email ?? "").trim();
+        const contactName = (account.contact_name ?? "").trim();
         if (!contactEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) {
           return Response.json(
-            { error: "Valid contact email is required" },
+            { error: "Account has no valid contact email" },
             { status: 400 }
           );
         }
+
+        const type = body.type === "test" ? "test" : "missed";
+        const countryCode = (body.countryCode ?? "").trim().toUpperCase();
         const name = contactName || "Your contact";
 
         const country = countryCode

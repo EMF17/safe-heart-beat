@@ -144,6 +144,14 @@ function SettingsPage() {
       showToast("Please save an emergency contact first.");
       return;
     }
+    const syncToken =
+      typeof window !== "undefined"
+        ? window.localStorage.getItem("pulse:syncToken")
+        : null;
+    if (!syncToken) {
+      showToast("Enable sync (passkey) first so alerts can be authenticated.");
+      return;
+    }
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
       navigator.vibrate(15);
     }
@@ -155,8 +163,7 @@ function SettingsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contactName: contact.name,
-          contactEmail: contact.email,
+          token: syncToken,
           type: "test",
           countryCode,
         }),
