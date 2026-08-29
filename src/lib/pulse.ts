@@ -334,10 +334,13 @@ export function usePulse() {
     }
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(ACCOUNT_KEY);
+    localStorage.removeItem(CODE_CREATED_KEY);
     setSyncToken(null);
+    setSyncCodeCreatedAt(null);
     setSyncStatus("off");
     setSyncError(null);
   }, [syncToken, callDelete]);
+
 
   const intervalMs = prefs.intervalMs;
   const alertThresholdMs = prefs.alertThresholdMs;
