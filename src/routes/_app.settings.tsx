@@ -34,8 +34,17 @@ export const Route = createFileRoute("/_app/settings")({
     meta: [
       { title: "Settings — Pulse" },
       { name: "description", content: "Pulse app settings and preferences." },
+      { property: "og:title", content: "Settings — Pulse" },
+      {
+        property: "og:description",
+        content:
+          "Manage your check-in rhythm, reminders, vacation mode, and emergency contact in Pulse.",
+      },
+      { property: "og:url", content: "https://pulse-checkin.app/settings" },
     ],
+    links: [{ rel: "canonical", href: "https://pulse-checkin.app/settings" }],
   }),
+
 });
 
 function SettingsPage() {

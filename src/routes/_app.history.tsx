@@ -13,10 +13,18 @@ export const Route = createFileRoute("/_app/history")({
   component: HistoryPage,
   head: () => ({
     meta: [
-      { title: "History — Pulse" },
+      { title: "Safety Check-in History — Pulse" },
       { name: "description", content: "View your Pulse check-in history and streaks." },
+      { property: "og:title", content: "Safety Check-in History — Pulse" },
+      {
+        property: "og:description",
+        content: "Every Pulse check-in you've logged, with streaks and totals at a glance.",
+      },
+      { property: "og:url", content: "https://pulse-checkin.app/history" },
     ],
+    links: [{ rel: "canonical", href: "https://pulse-checkin.app/history" }],
   }),
+
 });
 
 function HistoryPage() {
