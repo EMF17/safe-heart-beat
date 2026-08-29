@@ -236,7 +236,99 @@ export function usePulse() {
     }
   }, [callStartAuth, callFinishAuth, syncToken]);
 
+
+  // --- Sync code (account-free recovery) ---
+
+  /** Generate a new one-time sync code. Creates a backup record if needed. */
+  const generateSyncCode = useCallback(async () => {
+    setSyncError(null);
+    let token = syncToken;
+    try {
+      if (!token) {
+        const email = contact?.email;
+        if (!email) {
+          throw new Error("Save an emergency contact first, then create a sync code.");
+        }
+        const created = await callEnsureAccount({ data: { contactEmail: email } });
+        token = created.token;
+        localStorage.setItem(TOKEN_KEY, token);
+        localStorage.setItem(ACCOUNT_KEY, created.accountId);
+        setSyncToken(token);
+        setSyncStatus("ready");
+      }
+      const { code, createdAt } = await callCreateCode({ data: { token } });
+      localStorage.setItem(CODE_CREATED_KEY, createdAt);
+      setSyncCodeCreatedAt(createdAt);
+      return code;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Couldn't create a sync code";
+      setSyncError(msg);
+      throw new Error(msg);
+    }
+  }, [syncToken, contact, callEnsureAccount, callCreateCode]);
+
+  const deleteSyncCode = useCallback(async () => {
+    if (!syncToken) return;
+    await callRevokeCode({ data: { token: syncToken } });
+    localStorage.removeItem(CODE_CREATED_KEY);
+    setSyncCodeCreatedAt(null);
+  }, [syncToken, callRevokeCode]);
+
+  /** Restore everything (contact, name, check-in history) from a sync code. */
+  const restoreWithCode = useCallback(
+    async (code: string) => {
+      setSyncStatus("syncing");
+      setSyncError(null);
+      try {
+        const { token, account } = await callRedeemCode({ data: { code } });
+
+        localStorage.setItem(TOKEN_KEY, token);
+        localStorage.setItem(ACCOUNT_KEY, account.id);
+        setSyncToken(token);
+
+        localStorage.setItem(NAME_KEY, account.userName ?? "");
+        setUserName(account.userName ?? "");
+
+        const restoredContact = {
+          name: account.contactName ?? "",
+          email: account.contactEmail,
+        };
+        localStorage.setItem(CONTACT_KEY, JSON.stringify(restoredContact));
+        setContact(restoredContact);
+
+        // Merge remote history with anything already on this device.
+        const remote = (account.checkins ?? [])
+          .map((iso) => new Date(iso).getTime())
+          .filter((n) => Number.isFinite(n));
+        const merged = Array.from(new Set([...readLocalHistory(), ...remote])).sort(
+          (a, b) => a - b,
+        );
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(merged));
+        setHistoryCount(merged.length);
+
+        const last = account.lastCheckin
+          ? new Date(account.lastCheckin).getTime()
+          : merged[merged.length - 1] ?? null;
+        if (last) {
+          localStorage.setItem(CHECKIN_KEY, String(last));
+          setLastCheckIn(last);
+        }
+
+        localStorage.setItem("pulse:onboardingCompleted", "1");
+        setSyncStatus("ready");
+        return { restoredCheckins: merged.length };
+      } catch (e) {
+        setSyncStatus(syncToken ? "ready" : "off");
+        const msg = e instanceof Error ? e.message : "Couldn't restore from that code";
+        setSyncError(msg);
+        throw new Error(msg);
+      }
+    },
+    [callRedeemCode, syncToken],
+  );
+
   const disableSync = useCallback(async (alsoDeleteRemote: boolean) => {
+
     if (alsoDeleteRemote && syncToken) {
       try { await callDelete({ data: { token: syncToken } }); } catch {}
     }
