@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "@tanstack/react-router";
-import { Phone } from "lucide-react";
+import { Phone, Flame, Clock, ShieldCheck, AlertCircle, History } from "lucide-react";
 import { usePulse, formatDuration, formatSince, type Contact } from "@/lib/pulse";
 import { formatPauseDate } from "@/lib/preferences";
+import { ConfettiBurst } from "./Confetti";
 
 function CountdownRing({ progress, status }: { progress: number; status: string }) {
   const r = 140;
@@ -25,13 +26,76 @@ function CountdownRing({ progress, status }: { progress: number; status: string 
   );
 }
 
+function useCheckinStats(refreshKey = 0) {
+  const [history, setHistory] = useState<number[]>([]);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = window.localStorage.getItem("pulse:checkins");
+    if (!raw) {
+      setHistory([]);
+      return;
+    }
+    try {
+      const parsed: number[] = JSON.parse(raw);
+      setHistory(parsed.sort((a, b) => b - a));
+    } catch {}
+  }, [refreshKey]);
+
+  return useMemo(() => {
+    if (history.length === 0) return { total: 0, currentStreak: 0, bestStreak: 0 };
+    const uniqueDays = Array.from(
+      new Set(history.map((ts) => new Date(ts).toDateString()))
+    ).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+
+    const today = new Date().toDateString();
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+    let currentStreak = 0;
+    if (uniqueDays[0] === today) {
+      currentStreak = 1;
+      for (let i = 1; i < uniqueDays.length; i++) {
+        const prev = new Date(uniqueDays[i - 1]);
+        const curr = new Date(uniqueDays[i]);
+        if ((prev.getTime() - curr.getTime()) / 86400000 === 1) currentStreak++;
+        else break;
+      }
+    } else if (uniqueDays[0] === yesterday) {
+      currentStreak = 1;
+      for (let i = 1; i < uniqueDays.length; i++) {
+        const prev = new Date(uniqueDays[i - 1]);
+        const curr = new Date(uniqueDays[i]);
+        if ((prev.getTime() - curr.getTime()) / 86400000 === 1) currentStreak++;
+        else break;
+      }
+    }
+
+    let bestStreak = 1;
+    let run = 1;
+    for (let i = 1; i < uniqueDays.length; i++) {
+      const prev = new Date(uniqueDays[i - 1]);
+      const curr = new Date(uniqueDays[i]);
+      if ((prev.getTime() - curr.getTime()) / 86400000 === 1) {
+        run++;
+        bestStreak = Math.max(bestStreak, run);
+      } else {
+        run = 1;
+      }
+    }
+
+    return { total: history.length, currentStreak, bestStreak };
+  }, [history]);
+}
+
 export function PulseDashboard() {
   const p = usePulse();
+  const [statsRefresh, setStatsRefresh] = useState(0);
+  const stats = useCheckinStats(statsRefresh);
   const [editing, setEditing] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [tickKey, setTickKey] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
   const [buttonPulse, setButtonPulse] = useState(false);
+  const [confetti, setConfetti] = useState(false);
 
   useEffect(() => {
     if (!showSuccess) return;
@@ -61,8 +125,10 @@ export function PulseDashboard() {
   const handleCheckIn = () => {
     p.checkIn();
     setTickKey(k => k + 1);
+    setStatsRefresh(k => k + 1);
     setShowSuccess(true);
     setButtonPulse(true);
+    setConfetti(true);
     setTimeout(() => setButtonPulse(false), 600);
   };
 
@@ -83,6 +149,17 @@ export function PulseDashboard() {
     p.status === "new" ? "Tap to start your first check-in" :
     "You're safe";
 
+  const statusConfig = {
+    fresh: { label: "All good", tone: "primary", icon: ShieldCheck },
+    due: { label: "Due soon", tone: "warning", icon: Clock },
+    overdue: { label: "Overdue", tone: "destructive", icon: AlertCircle },
+    alert: { label: "Alert soon", tone: "destructive", icon: AlertCircle },
+    new: { label: "Ready", tone: "primary", icon: ShieldCheck },
+    paused: { label: "Paused", tone: "muted", icon: Clock },
+  }[p.status];
+
+  const StatusIcon = statusConfig.icon;
+
   return (
     <div className="min-h-full flex flex-col">
       <Header
@@ -93,28 +170,42 @@ export function PulseDashboard() {
       />
 
       {/* Hero Section */}
-      <section className="flex-1 flex flex-col items-center justify-center px-6 py-8">
-        <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">
+      <section className="flex-1 flex flex-col items-center justify-center px-6 py-6">
+        {/* Status badge */}
+        <div className={`mb-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border ${
+          statusConfig.tone === "destructive"
+            ? "bg-destructive/10 border-destructive/20 text-destructive"
+            : statusConfig.tone === "warning"
+            ? "bg-warning/10 border-warning/20 text-warning-foreground"
+            : statusConfig.tone === "muted"
+            ? "bg-muted border-border text-muted-foreground"
+            : "bg-primary/10 border-primary/20 text-primary"
+        }`}>
+          <StatusIcon className="w-3.5 h-3.5" />
+          {statusConfig.label}
+        </div>
+
+        <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">
           {p.userName ? `Hi, ${p.userName}` : "Pulse"}
         </p>
-        <h1 className="font-display text-4xl md:text-5xl font-semibold text-center mb-2 leading-tight">
+        <h1 className="font-display text-4xl md:text-5xl font-semibold text-center mb-3 leading-tight">
           {statusCopy}
         </h1>
-        <p className="text-muted-foreground text-sm md:text-base text-center max-w-sm mb-10">
+        <p className="text-muted-foreground text-sm md:text-base text-center max-w-sm mb-6">
           {p.isPaused && p.pauseUntil
             ? `Paused until ${formatPauseDate(p.pauseUntil)}. No alerts will be sent.`
             : p.lastCheckIn
-            ? `Next check-in due in: ${Math.max(0, Math.floor(p.msUntilDue / (1000 * 60 * 60)))} hours ${Math.max(0, Math.floor((p.msUntilDue % (1000 * 60 * 60)) / (1000 * 60)))} minutes`
+            ? `Next check-in due in ${Math.max(0, Math.floor(p.msUntilDue / (1000 * 60 * 60)))}h ${Math.max(0, Math.floor((p.msUntilDue % (1000 * 60 * 60)) / (1000 * 60)))}m`
             : "First check-in ready. Tap the button to start."}
         </p>
 
         {showSuccess && (
-          <div className="mb-6 px-5 py-3 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium animate-in fade-in slide-in-from-bottom-2">
+          <div className="mb-5 px-5 py-3 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium animate-in fade-in slide-in-from-bottom-2">
             ✓ Check-in recorded
           </div>
         )}
 
-        <div className="relative w-[340px] h-[340px] md:w-[380px] md:h-[380px] flex items-center justify-center">
+        <div className="relative w-[320px] h-[320px] md:w-[360px] md:h-[360px] flex items-center justify-center">
           {p.status !== "alert" && p.status !== "paused" && (
             <div className="absolute inset-6 rounded-full pulse-ring animate-breathe pointer-events-none" />
           )}
@@ -123,7 +214,7 @@ export function PulseDashboard() {
             key={tickKey}
             onClick={handleCheckIn}
             disabled={p.isPaused}
-            className={`${buttonPulse ? "animate-pulse-once" : ""} animate-tick relative z-10 w-[260px] h-[260px] md:w-[280px] md:h-[280px] rounded-full
+            className={`${buttonPulse ? "animate-pulse-once" : ""} animate-tick relative z-10 w-[240px] h-[240px] md:w-[270px] md:h-[270px] rounded-full
                        bg-gradient-to-b from-[var(--color-primary-glow)] to-[var(--color-primary)]
                        text-primary-foreground font-display font-semibold text-3xl md:text-4xl
                        shadow-[var(--shadow-pulse)] transition-transform
@@ -136,23 +227,54 @@ export function PulseDashboard() {
           </button>
         </div>
 
-        <div className="mt-14 grid grid-cols-3 gap-6 md:gap-10 max-w-md w-full">
+        {/* Quick stats row */}
+        <div className="mt-8 grid grid-cols-3 gap-3 max-w-md w-full">
           {p.isPaused && p.pauseUntil ? (
-            <div className="col-span-3 text-center">
+            <div className="col-span-3 text-center bg-card/60 border border-border/60 rounded-2xl p-4">
               <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground mb-1">Paused until</p>
               <p className="font-display text-2xl font-semibold text-foreground">{formatPauseDate(p.pauseUntil)}</p>
               <p className="text-xs text-muted-foreground mt-0.5">Resume anytime in Settings</p>
             </div>
           ) : (
             <>
-              <Stat label={dueLabel} value={dur.primary} sub={dur.secondary} highlight={p.status === "alert" || p.status === "overdue"} />
-              <Stat label="Interval" value={`${p.intervalHours}h`} sub="per check-in" />
-              <Stat label="Alert after" value={`${p.intervalHours * 2}h`} sub="2 missed" />
+              <Stat
+                icon={<Clock className="w-3.5 h-3.5" />}
+                label={dueLabel}
+                value={dur.primary}
+                sub={dur.secondary}
+                highlight={p.status === "alert" || p.status === "overdue"}
+              />
+              <Stat
+                icon={<History className="w-3.5 h-3.5" />}
+                label="Total"
+                value={`${stats.total}`}
+                sub="check-ins"
+              />
+              <Stat
+                icon={<Flame className="w-3.5 h-3.5" />}
+                label="Streak"
+                value={`${stats.currentStreak}`}
+                sub={stats.currentStreak === 1 ? "day" : "days"}
+                highlight={stats.currentStreak >= 7}
+              />
             </>
           )}
         </div>
 
-        <div className="mt-8 flex justify-center">
+        {/* Last check-in & interval summary */}
+        {!p.isPaused && (
+          <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
+            {p.lastCheckIn ? (
+              <>
+                <span>Last: {formatSince(Date.now() - p.lastCheckIn)}</span>
+                <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
+              </>
+            ) : null}
+            <span>{p.intervalHours}h rhythm · Alert after {p.intervalHours * 2}h</span>
+          </div>
+        )}
+
+        <div className="mt-6 flex justify-center">
           <Link
             to="/emergency-numbers"
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
@@ -179,14 +301,19 @@ export function PulseDashboard() {
           onDisableSync={(deleteRemote) => p.disableSync(deleteRemote)}
         />
       )}
+
+      <ConfettiBurst active={confetti} />
     </div>
   );
 }
 
-function Stat({ label, value, sub, highlight }: { label: string; value: string; sub?: string; highlight?: boolean }) {
+function Stat({ icon, label, value, sub, highlight }: { icon?: React.ReactNode; label: string; value: string; sub?: string; highlight?: boolean }) {
   return (
-    <div className="text-center">
-      <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground mb-1">{label}</p>
+    <div className="text-center bg-card/60 border border-border/60 rounded-2xl p-4">
+      <div className="flex items-center justify-center gap-1 text-[10px] uppercase tracking-[0.18em] text-muted-foreground mb-1.5">
+        {icon}
+        {label}
+      </div>
       <p className={`font-display text-2xl font-semibold tabular-nums ${highlight ? "text-destructive" : "text-foreground"}`}>
         {value}
       </p>
