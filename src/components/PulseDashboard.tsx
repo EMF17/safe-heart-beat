@@ -125,6 +125,7 @@ export function PulseDashboard() {
   const handleCheckIn = () => {
     p.checkIn();
     setTickKey(k => k + 1);
+    setStatsRefresh(k => k + 1);
     setShowSuccess(true);
     setButtonPulse(true);
     setConfetti(true);
