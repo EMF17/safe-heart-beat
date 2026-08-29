@@ -7,7 +7,7 @@ import { Hand, Mail, ShieldCheck, ChevronRight } from "lucide-react";
 const ONBOARDING_KEY = "pulse:onboardingCompleted";
 const WHATS_NEW_V2_KEY = "pulse:hasSeenWhatsNewV2";
 
-export const Route = createFileRoute("/_app/")({
+export const Route = createFileRoute("/_app/app")({
   component: HomePage,
   head: () => ({
     meta: [
