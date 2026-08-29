@@ -80,6 +80,7 @@ const stateSchema = z.object({
   contactName: z.string().max(80).default(""),
   contactEmail: z.string().email().max(255),
   lastCheckin: z.string().datetime().nullable(),
+  checkins: z.array(z.string()).max(1000).optional(),
 });
 
 export const pushSyncState = createServerFn({ method: "POST" })
@@ -104,3 +105,29 @@ export const deleteSyncAccount = createServerFn({ method: "POST" })
     z.object({ token: z.string().min(10).max(2048) }).parse(input),
   )
   .handler(async ({ data }) => sync.deleteAccount(data.token));
+
+// --- Sync codes (account-free recovery) ---
+
+export const ensureSyncAccount = createServerFn({ method: "POST" })
+  .inputValidator((input) =>
+    z.object({ contactEmail: z.string().email().max(255) }).parse(input),
+  )
+  .handler(async ({ data }) => sync.createBareAccount(data.contactEmail));
+
+export const createSyncCode = createServerFn({ method: "POST" })
+  .inputValidator((input) =>
+    z.object({ token: z.string().min(10).max(2048) }).parse(input),
+  )
+  .handler(async ({ data }) => sync.createRecoveryCode(data.token));
+
+export const revokeSyncCode = createServerFn({ method: "POST" })
+  .inputValidator((input) =>
+    z.object({ token: z.string().min(10).max(2048) }).parse(input),
+  )
+  .handler(async ({ data }) => sync.revokeRecoveryCode(data.token));
+
+export const redeemSyncCode = createServerFn({ method: "POST" })
+  .inputValidator((input) =>
+    z.object({ code: z.string().min(8).max(64) }).parse(input),
+  )
+  .handler(async ({ data }) => sync.redeemRecoveryCode(data.code));
