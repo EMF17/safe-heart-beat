@@ -88,7 +88,8 @@ function useCheckinStats(refreshKey = 0) {
 
 export function PulseDashboard() {
   const p = usePulse();
-  const stats = useCheckinStats();
+  const [statsRefresh, setStatsRefresh] = useState(0);
+  const stats = useCheckinStats(statsRefresh);
   const [editing, setEditing] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [tickKey, setTickKey] = useState(0);
