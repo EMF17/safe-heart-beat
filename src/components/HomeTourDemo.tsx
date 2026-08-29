@@ -78,7 +78,7 @@ export function HomeTourDemo() {
   };
 
   return (
-    <div className="mt-16 md:mt-20">
+    <div id="try-it" className="mt-16 md:mt-20 scroll-mt-24">
       <div className="text-center max-w-xl mx-auto">
         <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/70 px-4 py-1.5 text-xs font-medium text-muted-foreground">
           Interactive demo · nothing is saved
