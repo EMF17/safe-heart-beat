@@ -26,6 +26,63 @@ function CountdownRing({ progress, status }: { progress: number; status: string 
   );
 }
 
+function useCheckinStats() {
+  const [history, setHistory] = useState<number[]>([]);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = window.localStorage.getItem("pulse:checkins");
+    if (!raw) return;
+    try {
+      const parsed: number[] = JSON.parse(raw);
+      setHistory(parsed.sort((a, b) => b - a));
+    } catch {}
+  }, []);
+
+  return useMemo(() => {
+    if (history.length === 0) return { total: 0, currentStreak: 0, bestStreak: 0 };
+    const uniqueDays = Array.from(
+      new Set(history.map((ts) => new Date(ts).toDateString()))
+    ).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+
+    const today = new Date().toDateString();
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+    let currentStreak = 0;
+    if (uniqueDays[0] === today) {
+      currentStreak = 1;
+      for (let i = 1; i < uniqueDays.length; i++) {
+        const prev = new Date(uniqueDays[i - 1]);
+        const curr = new Date(uniqueDays[i]);
+        if ((prev.getTime() - curr.getTime()) / 86400000 === 1) currentStreak++;
+        else break;
+      }
+    } else if (uniqueDays[0] === yesterday) {
+      currentStreak = 1;
+      for (let i = 1; i < uniqueDays.length; i++) {
+        const prev = new Date(uniqueDays[i - 1]);
+        const curr = new Date(uniqueDays[i]);
+        if ((prev.getTime() - curr.getTime()) / 86400000 === 1) currentStreak++;
+        else break;
+      }
+    }
+
+    let bestStreak = 1;
+    let run = 1;
+    for (let i = 1; i < uniqueDays.length; i++) {
+      const prev = new Date(uniqueDays[i - 1]);
+      const curr = new Date(uniqueDays[i]);
+      if ((prev.getTime() - curr.getTime()) / 86400000 === 1) {
+        run++;
+        bestStreak = Math.max(bestStreak, run);
+      } else {
+        run = 1;
+      }
+    }
+
+    return { total: history.length, currentStreak, bestStreak };
+  }, [history]);
+}
+
 export function PulseDashboard() {
   const p = usePulse();
   const [editing, setEditing] = useState(false);
