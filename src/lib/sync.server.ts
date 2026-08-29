@@ -9,7 +9,7 @@ import type {
   RegistrationResponseJSON,
   AuthenticationResponseJSON,
 } from "@simplewebauthn/server";
-import { createHmac, timingSafeEqual } from "crypto";
+import { createHmac, timingSafeEqual, randomBytes } from "crypto";
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
@@ -258,10 +258,31 @@ export interface SyncedState {
   contactName: string;
   contactEmail: string;
   lastCheckin: string | null;
+  /** Full check-in history as ISO timestamps (most recent last). */
+  checkins?: string[];
+}
+
+const MAX_HISTORY = 500;
+
+function sanitizeHistory(list: string[] | undefined): string[] | null {
+  if (!Array.isArray(list)) return null;
+  const cleaned = list
+    .map((v) => new Date(v).getTime())
+    .filter((n) => Number.isFinite(n) && n > 0)
+    .sort((a, b) => a - b)
+    .slice(-MAX_HISTORY)
+    .map((n) => new Date(n).toISOString());
+  return cleaned;
+}
+
+function readHistory(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((v): v is string => typeof v === "string");
 }
 
 export async function pushState(token: string, state: SyncedState) {
   const accountId = verifyToken(token);
+  const history = sanitizeHistory(state.checkins);
   const { error } = await supabaseAdmin
     .from("pulse_accounts")
     .update({
@@ -269,6 +290,7 @@ export async function pushState(token: string, state: SyncedState) {
       contact_name: state.contactName,
       contact_email: state.contactEmail,
       last_checkin: state.lastCheckin,
+      ...(history ? { checkins: history } : {}),
     })
     .eq("id", accountId);
   if (error) throw new Error(error.message);
@@ -289,12 +311,121 @@ export async function pullState(token: string) {
     contactName: data.contact_name,
     contactEmail: data.contact_email,
     lastCheckin: data.last_checkin,
+    checkins: readHistory(data.checkins),
+    hasRecoveryCode: !!data.recovery_code_hash,
   };
 }
+
+// --- Recovery ("sync") codes ---
+// A sync code is a high-entropy, human-typable secret shown once. Only an
+// HMAC fingerprint is stored, so the code cannot be recovered from the database.
+
+const ALPHABET = "ABCDEFGHJKMNPQRSTVWXYZ0123456789"; // Crockford-ish, no I L O U
+
+export function normalizeRecoveryCode(input: string): string {
+  return input
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")
+    .replace(/^PULSE/, "")
+    .replace(/I|L/g, "1")
+    .replace(/O/g, "0")
+    .replace(/U/g, "V");
+}
+
+function formatRecoveryCode(raw: string): string {
+  return `PULSE-${raw.slice(0, 4)}-${raw.slice(4, 8)}-${raw.slice(8, 12)}-${raw.slice(12, 16)}`;
+}
+
+function hashRecoveryCode(normalized: string): string {
+  return createHmac("sha256", getSecret())
+    .update(`recovery:${normalized}`)
+    .digest("base64url");
+}
+
+function randomCode(length = 16): string {
+  const bytes = randomBytes(length);
+  let out = "";
+  for (let i = 0; i < length; i++) {
+    out += ALPHABET[bytes[i] % ALPHABET.length];
+  }
+  return out;
+}
+
+/** Create (or replace) the account's sync code. Returns the code once. */
+export async function createRecoveryCode(token: string) {
+  const accountId = verifyToken(token);
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const raw = randomCode();
+    const normalized = normalizeRecoveryCode(raw);
+    const hash = hashRecoveryCode(normalized);
+    const { error } = await supabaseAdmin
+      .from("pulse_accounts")
+      .update({ recovery_code_hash: hash, recovery_code_created_at: new Date().toISOString() })
+      .eq("id", accountId);
+    if (!error) {
+      return { code: formatRecoveryCode(normalized), createdAt: new Date().toISOString() };
+    }
+    // Unique-index collision: try again with a fresh code.
+    if (!/duplicate key/i.test(error.message)) throw new Error(error.message);
+  }
+  throw new Error("Couldn't generate a sync code, please try again");
+}
+
+export async function revokeRecoveryCode(token: string) {
+  const accountId = verifyToken(token);
+  const { error } = await supabaseAdmin
+    .from("pulse_accounts")
+    .update({ recovery_code_hash: null, recovery_code_created_at: null })
+    .eq("id", accountId);
+  if (error) throw new Error(error.message);
+  return { ok: true };
+}
+
+/** Exchange a sync code for a token + the account's synced state. */
+export async function redeemRecoveryCode(code: string) {
+  const normalized = normalizeRecoveryCode(code);
+  if (normalized.length !== 16) throw new Error("That sync code doesn't look right");
+  const hash = hashRecoveryCode(normalized);
+
+  const { data, error } = await supabaseAdmin
+    .from("pulse_accounts")
+    .select("*")
+    .eq("recovery_code_hash", hash)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("No account found for that sync code");
+
+  return {
+    token: issueToken(data.id),
+    account: {
+      id: data.id,
+      userName: data.user_name,
+      contactName: data.contact_name,
+      contactEmail: data.contact_email,
+      lastCheckin: data.last_checkin,
+      checkins: readHistory(data.checkins),
+    },
+  };
+}
+
 
 export async function deleteAccount(token: string) {
   const accountId = verifyToken(token);
   const { error } = await supabaseAdmin.from("pulse_accounts").delete().eq("id", accountId);
   if (error) throw new Error(error.message);
   return { ok: true };
+}
+
+/**
+ * Create a bare (passkey-less) account so a sync code can be issued on devices
+ * without WebAuthn support. Returns a bearer token for that account.
+ */
+export async function createBareAccount(contactEmail: string) {
+  const { data, error } = await supabaseAdmin
+    .from("pulse_accounts")
+    .insert({ contact_email: contactEmail })
+    .select("id")
+    .single();
+  if (error) throw new Error(error.message);
+  return { token: issueToken(data.id), accountId: data.id };
 }

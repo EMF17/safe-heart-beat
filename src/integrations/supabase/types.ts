@@ -103,29 +103,38 @@ export type Database = {
       }
       pulse_accounts: {
         Row: {
+          checkins: Json
           contact_email: string
           contact_name: string
           created_at: string
           id: string
           last_checkin: string | null
+          recovery_code_created_at: string | null
+          recovery_code_hash: string | null
           updated_at: string
           user_name: string
         }
         Insert: {
+          checkins?: Json
           contact_email: string
           contact_name?: string
           created_at?: string
           id?: string
           last_checkin?: string | null
+          recovery_code_created_at?: string | null
+          recovery_code_hash?: string | null
           updated_at?: string
           user_name?: string
         }
         Update: {
+          checkins?: Json
           contact_email?: string
           contact_name?: string
           created_at?: string
           id?: string
           last_checkin?: string | null
+          recovery_code_created_at?: string | null
+          recovery_code_hash?: string | null
           updated_at?: string
           user_name?: string
         }

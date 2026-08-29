@@ -14,14 +14,31 @@ import {
   pushSyncState,
   pullSyncState,
   deleteSyncAccount,
+  ensureSyncAccount,
+  createSyncCode,
+  revokeSyncCode,
+  redeemSyncCode,
 } from "./sync.functions";
 import { usePreferences } from "./preferences";
 
 const CHECKIN_KEY = "pulse:lastCheckIn";
+const HISTORY_KEY = "pulse:checkins";
 const CONTACT_KEY = "pulse:contact";
 const NAME_KEY = "pulse:name";
 const TOKEN_KEY = "pulse:syncToken";
 const ACCOUNT_KEY = "pulse:accountId";
+const CODE_CREATED_KEY = "pulse:syncCodeCreatedAt";
+
+function readLocalHistory(): number[] {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    const list = raw ? (JSON.parse(raw) as unknown[]) : [];
+    return Array.isArray(list) ? list.map(Number).filter((n) => Number.isFinite(n)) : [];
+  } catch {
+    return [];
+  }
+}
+
 
 // Legacy defaults — actual values are dynamic per the user's chosen interval.
 export const CHECKIN_INTERVAL_MS = 48 * 60 * 60 * 1000;
@@ -42,6 +59,8 @@ export function usePulse() {
   const [syncToken, setSyncToken] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("off");
   const [syncError, setSyncError] = useState<string | null>(null);
+  const [syncCodeCreatedAt, setSyncCodeCreatedAt] = useState<string | null>(null);
+  const [historyCount, setHistoryCount] = useState(0);
   const [now, setNow] = useState(() => Date.now());
   const [hydrated, setHydrated] = useState(false);
 
@@ -53,6 +72,10 @@ export function usePulse() {
   const callPush = useServerFn(pushSyncState);
   const callPull = useServerFn(pullSyncState);
   const callDelete = useServerFn(deleteSyncAccount);
+  const callEnsureAccount = useServerFn(ensureSyncAccount);
+  const callCreateCode = useServerFn(createSyncCode);
+  const callRevokeCode = useServerFn(revokeSyncCode);
+  const callRedeemCode = useServerFn(redeemSyncCode);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -69,8 +92,11 @@ export function usePulse() {
       setSyncToken(t);
       setSyncStatus("ready");
     }
+    setSyncCodeCreatedAt(ls.getItem(CODE_CREATED_KEY));
+    setHistoryCount(readLocalHistory().length);
     setHydrated(true);
   }, []);
+
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -93,6 +119,7 @@ export function usePulse() {
               contactName: contact.name,
               contactEmail: contact.email,
               lastCheckin: lastCheckIn ? new Date(lastCheckIn).toISOString() : null,
+              checkins: readLocalHistory().map((n) => new Date(n).toISOString()),
             },
           },
         });
@@ -106,22 +133,23 @@ export function usePulse() {
     return () => {
       if (pushTimer.current) window.clearTimeout(pushTimer.current);
     };
-  }, [hydrated, syncToken, userName, contact, lastCheckIn, callPush]);
+  }, [hydrated, syncToken, userName, contact, lastCheckIn, historyCount, callPush]);
 
   const checkIn = useCallback(() => {
     const t = Date.now();
     localStorage.setItem(CHECKIN_KEY, String(t));
     setLastCheckIn(t);
     // Append to check-in history
-    const raw = localStorage.getItem("pulse:checkins");
-    const history: number[] = raw ? JSON.parse(raw) : [];
+    const history = readLocalHistory();
     history.push(t);
-    localStorage.setItem("pulse:checkins", JSON.stringify(history));
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    setHistoryCount(history.length);
     // Light haptic feedback if supported
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
       navigator.vibrate(15);
     }
   }, []);
+
 
   const saveContact = useCallback((c: Contact) => {
     localStorage.setItem(CONTACT_KEY, JSON.stringify(c));
@@ -208,16 +236,111 @@ export function usePulse() {
     }
   }, [callStartAuth, callFinishAuth, syncToken]);
 
+
+  // --- Sync code (account-free recovery) ---
+
+  /** Generate a new one-time sync code. Creates a backup record if needed. */
+  const generateSyncCode = useCallback(async () => {
+    setSyncError(null);
+    let token = syncToken;
+    try {
+      if (!token) {
+        const email = contact?.email;
+        if (!email) {
+          throw new Error("Save an emergency contact first, then create a sync code.");
+        }
+        const created = await callEnsureAccount({ data: { contactEmail: email } });
+        token = created.token;
+        localStorage.setItem(TOKEN_KEY, token);
+        localStorage.setItem(ACCOUNT_KEY, created.accountId);
+        setSyncToken(token);
+        setSyncStatus("ready");
+      }
+      const { code, createdAt } = await callCreateCode({ data: { token } });
+      localStorage.setItem(CODE_CREATED_KEY, createdAt);
+      setSyncCodeCreatedAt(createdAt);
+      return code;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Couldn't create a sync code";
+      setSyncError(msg);
+      throw new Error(msg);
+    }
+  }, [syncToken, contact, callEnsureAccount, callCreateCode]);
+
+  const deleteSyncCode = useCallback(async () => {
+    if (!syncToken) return;
+    await callRevokeCode({ data: { token: syncToken } });
+    localStorage.removeItem(CODE_CREATED_KEY);
+    setSyncCodeCreatedAt(null);
+  }, [syncToken, callRevokeCode]);
+
+  /** Restore everything (contact, name, check-in history) from a sync code. */
+  const restoreWithCode = useCallback(
+    async (code: string) => {
+      setSyncStatus("syncing");
+      setSyncError(null);
+      try {
+        const { token, account } = await callRedeemCode({ data: { code } });
+
+        localStorage.setItem(TOKEN_KEY, token);
+        localStorage.setItem(ACCOUNT_KEY, account.id);
+        setSyncToken(token);
+
+        localStorage.setItem(NAME_KEY, account.userName ?? "");
+        setUserName(account.userName ?? "");
+
+        const restoredContact = {
+          name: account.contactName ?? "",
+          email: account.contactEmail,
+        };
+        localStorage.setItem(CONTACT_KEY, JSON.stringify(restoredContact));
+        setContact(restoredContact);
+
+        // Merge remote history with anything already on this device.
+        const remote = (account.checkins ?? [])
+          .map((iso) => new Date(iso).getTime())
+          .filter((n) => Number.isFinite(n));
+        const merged = Array.from(new Set([...readLocalHistory(), ...remote])).sort(
+          (a, b) => a - b,
+        );
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(merged));
+        setHistoryCount(merged.length);
+
+        const last = account.lastCheckin
+          ? new Date(account.lastCheckin).getTime()
+          : merged[merged.length - 1] ?? null;
+        if (last) {
+          localStorage.setItem(CHECKIN_KEY, String(last));
+          setLastCheckIn(last);
+        }
+
+        localStorage.setItem("pulse:onboardingCompleted", "1");
+        setSyncStatus("ready");
+        return { restoredCheckins: merged.length };
+      } catch (e) {
+        setSyncStatus(syncToken ? "ready" : "off");
+        const msg = e instanceof Error ? e.message : "Couldn't restore from that code";
+        setSyncError(msg);
+        throw new Error(msg);
+      }
+    },
+    [callRedeemCode, syncToken],
+  );
+
   const disableSync = useCallback(async (alsoDeleteRemote: boolean) => {
+
     if (alsoDeleteRemote && syncToken) {
       try { await callDelete({ data: { token: syncToken } }); } catch {}
     }
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(ACCOUNT_KEY);
+    localStorage.removeItem(CODE_CREATED_KEY);
     setSyncToken(null);
+    setSyncCodeCreatedAt(null);
     setSyncStatus("off");
     setSyncError(null);
   }, [syncToken, callDelete]);
+
 
   const intervalMs = prefs.intervalMs;
   const alertThresholdMs = prefs.alertThresholdMs;
@@ -267,8 +390,16 @@ export function usePulse() {
     restoreFromPasskey,
     disableSync,
     webAuthnSupported: typeof window !== "undefined" && browserSupportsWebAuthn(),
+    // sync code (no account needed)
+    syncCodeCreatedAt,
+    hasSyncCode: !!syncCodeCreatedAt,
+    generateSyncCode,
+    deleteSyncCode,
+    restoreWithCode,
+    historyCount,
   };
 }
+
 
 export function formatDuration(ms: number): { primary: string; secondary: string } {
   if (ms <= 0) return { primary: "0h", secondary: "0m" };
