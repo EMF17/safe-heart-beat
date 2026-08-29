@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { emergencyNumbers } from "@/lib/emergency-numbers";
+import { emergencyNumbers, GLOBAL_FALLBACKS } from "@/lib/emergency-numbers";
 
 interface AlertPayload {
   token?: string;

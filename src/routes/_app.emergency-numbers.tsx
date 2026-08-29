@@ -77,7 +77,7 @@ export const Route = createFileRoute("/_app/emergency-numbers")({
       {
         property: "og:description",
         content:
-          "Police, ambulance, and fire numbers for 35+ countries, available offline inside Pulse.",
+          "Police, ambulance, and fire numbers for 165+ countries, available offline inside Pulse.",
       },
       { property: "og:url", content: "https://pulse-checkin.app/emergency-numbers" },
     ],
