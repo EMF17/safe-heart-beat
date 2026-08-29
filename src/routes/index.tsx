@@ -12,6 +12,7 @@ import {
   Lock,
   HeartPulse,
 } from "lucide-react";
+import { HomeTourDemo } from "@/components/HomeTourDemo";
 
 export const Route = createFileRoute("/")({
   component: LandingPage,
@@ -142,7 +143,7 @@ function Hero({ returning }: { returning: boolean }) {
             <ChevronRight className="w-4 h-4" />
           </Link>
           <a
-            href="#how-it-works"
+            href="#try-it"
             className="w-full sm:w-auto inline-flex items-center justify-center h-13 px-8 py-3.5 rounded-full border border-border/70 bg-card/60 font-medium hover:bg-card transition"
           >
             See how it works
@@ -154,35 +155,9 @@ function Hero({ returning }: { returning: boolean }) {
           alert is needed.
         </p>
 
-        <PulseVisual />
+        <HomeTourDemo />
       </div>
     </section>
-  );
-}
-
-function PulseVisual() {
-  return (
-    <div className="mt-16 md:mt-20 flex justify-center">
-      <div className="relative w-full max-w-sm rounded-4xl border border-border/60 bg-card/80 backdrop-blur-sm p-8 shadow-[var(--shadow-soft)]">
-        <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-          Next check-in due in
-        </p>
-        <p className="mt-2 font-display text-3xl font-semibold">41h 12m</p>
-
-        <div className="relative mt-9 mb-4 flex items-center justify-center">
-          <span className="absolute w-52 h-52 rounded-full pulse-ring animate-breathe" />
-          <span className="relative flex flex-col items-center justify-center w-36 h-36 rounded-full bg-primary text-primary-foreground shadow-[var(--shadow-pulse)]">
-            <span className="font-display text-lg font-semibold">I’m Safe</span>
-            <span className="text-[10px] opacity-80 mt-0.5">tap once</span>
-          </span>
-        </div>
-
-        <div className="mt-8 flex items-center justify-center gap-2 text-xs text-primary">
-          <ShieldCheck className="w-4 h-4" />
-          Safety net armed
-        </div>
-      </div>
-    </div>
   );
 }
 
