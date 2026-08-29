@@ -302,10 +302,13 @@ export function PulseDashboard() {
   );
 }
 
-function Stat({ label, value, sub, highlight }: { label: string; value: string; sub?: string; highlight?: boolean }) {
+function Stat({ icon, label, value, sub, highlight }: { icon?: React.ReactNode; label: string; value: string; sub?: string; highlight?: boolean }) {
   return (
-    <div className="text-center">
-      <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground mb-1">{label}</p>
+    <div className="text-center bg-card/60 border border-border/60 rounded-2xl p-4">
+      <div className="flex items-center justify-center gap-1 text-[10px] uppercase tracking-[0.18em] text-muted-foreground mb-1.5">
+        {icon}
+        {label}
+      </div>
       <p className={`font-display text-2xl font-semibold tabular-nums ${highlight ? "text-destructive" : "text-foreground"}`}>
         {value}
       </p>
