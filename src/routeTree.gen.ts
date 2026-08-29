@@ -12,12 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as AppRouteImport } from './routes/_app'
-import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiSendAlertRouteImport } from './routes/api/send-alert'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppHistoryRouteImport } from './routes/_app.history'
 import { Route as AppEmergencyNumbersRouteImport } from './routes/_app.emergency-numbers'
 import { Route as AppEmergencyContactRouteImport } from './routes/_app.emergency-contact'
+import { Route as AppAppRouteImport } from './routes/_app.app'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -36,10 +37,10 @@ const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppIndexRoute = AppIndexRouteImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSendAlertRoute = ApiSendAlertRouteImport.update({
   id: '/api/send-alert',
@@ -66,6 +67,11 @@ const AppEmergencyContactRoute = AppEmergencyContactRouteImport.update({
   path: '/emergency-contact',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAppRoute = AppAppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => AppRoute,
+} as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -84,9 +90,10 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AppIndexRoute
+  '/': typeof IndexRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/app': typeof AppAppRoute
   '/emergency-contact': typeof AppEmergencyContactRoute
   '/emergency-numbers': typeof AppEmergencyNumbersRoute
   '/history': typeof AppHistoryRoute
@@ -97,29 +104,31 @@ export interface FileRoutesByFullPath {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/app': typeof AppAppRoute
   '/emergency-contact': typeof AppEmergencyContactRoute
   '/emergency-numbers': typeof AppEmergencyNumbersRoute
   '/history': typeof AppHistoryRoute
   '/settings': typeof AppSettingsRoute
   '/api/send-alert': typeof ApiSendAlertRoute
-  '/': typeof AppIndexRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_app/app': typeof AppAppRoute
   '/_app/emergency-contact': typeof AppEmergencyContactRoute
   '/_app/emergency-numbers': typeof AppEmergencyNumbersRoute
   '/_app/history': typeof AppHistoryRoute
   '/_app/settings': typeof AppSettingsRoute
   '/api/send-alert': typeof ApiSendAlertRoute
-  '/_app/': typeof AppIndexRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/'
     | '/privacy-policy'
     | '/sitemap.xml'
+    | '/app'
     | '/emergency-contact'
     | '/emergency-numbers'
     | '/history'
@@ -140,34 +150,37 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/privacy-policy'
     | '/sitemap.xml'
+    | '/app'
     | '/emergency-contact'
     | '/emergency-numbers'
     | '/history'
     | '/settings'
     | '/api/send-alert'
-    | '/'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
   id:
     | '__root__'
+    | '/'
     | '/_app'
     | '/privacy-policy'
     | '/sitemap.xml'
+    | '/_app/app'
     | '/_app/emergency-contact'
     | '/_app/emergency-numbers'
     | '/_app/history'
     | '/_app/settings'
     | '/api/send-alert'
-    | '/_app/'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -200,12 +213,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/': {
-      id: '/_app/'
+    '/': {
+      id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof AppIndexRouteImport
-      parentRoute: typeof AppRoute
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/send-alert': {
       id: '/api/send-alert'
@@ -242,6 +255,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEmergencyContactRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/app': {
+      id: '/_app/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppAppRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
       path: '/lovable/email/queue/process'
@@ -267,24 +287,25 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppAppRoute: typeof AppAppRoute
   AppEmergencyContactRoute: typeof AppEmergencyContactRoute
   AppEmergencyNumbersRoute: typeof AppEmergencyNumbersRoute
   AppHistoryRoute: typeof AppHistoryRoute
   AppSettingsRoute: typeof AppSettingsRoute
-  AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAppRoute: AppAppRoute,
   AppEmergencyContactRoute: AppEmergencyContactRoute,
   AppEmergencyNumbersRoute: AppEmergencyNumbersRoute,
   AppHistoryRoute: AppHistoryRoute,
   AppSettingsRoute: AppSettingsRoute,
-  AppIndexRoute: AppIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

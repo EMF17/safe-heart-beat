@@ -7,23 +7,25 @@ import { Hand, Mail, ShieldCheck, ChevronRight } from "lucide-react";
 const ONBOARDING_KEY = "pulse:onboardingCompleted";
 const WHATS_NEW_V2_KEY = "pulse:hasSeenWhatsNewV2";
 
-export const Route = createFileRoute("/_app/")({
+export const Route = createFileRoute("/_app/app")({
   component: HomePage,
   head: () => ({
     meta: [
-      { title: "Pulse — Your quiet safety net" },
+      { title: "Your check-in — Pulse" },
       {
         name: "description",
         content:
-          "Pulse is a privacy-first safety check-in for people who live alone. One tap every 48 hours keeps your emergency contact informed.",
+          "Tap I'm Safe to record your check-in and see how long until your next one is due.",
       },
-      { property: "og:title", content: "Pulse — Your quiet safety net" },
+      { property: "og:title", content: "Your check-in — Pulse" },
       {
         property: "og:description",
         content:
           "A simple 'I'm Safe' button. No accounts, no tracking. If you miss two check-ins, we email your emergency contact.",
       },
+      { property: "og:url", content: "https://pulse-checkin.app/app" },
     ],
+    links: [{ rel: "canonical", href: "https://pulse-checkin.app/app" }],
   }),
 });
 

@@ -66,7 +66,7 @@ function AppLayout() {
 
 
   const tabs = [
-    { to: "/" as const, label: "Home", icon: Home },
+    { to: "/app" as const, label: "Home", icon: Home },
     { to: "/emergency-contact" as const, label: "Contact", icon: Shield },
     { to: "/history" as const, label: "History", icon: History },
     { to: "/settings" as const, label: "Settings", icon: Settings },
