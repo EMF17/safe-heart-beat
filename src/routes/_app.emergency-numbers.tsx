@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import { Search, Phone, Copy, X, ArrowLeft, Globe, MapPin, Plane } from "lucide-react";
-import { emergencyNumbers, type EmergencyService } from "@/lib/emergency-numbers";
+import { emergencyNumbers, GLOBAL_FALLBACKS, COUNTRY_COUNT, type EmergencyService } from "@/lib/emergency-numbers";
 
 const TRAVEL_MODE_KEY = "pulse:travelMode";
 const TRAVEL_COUNTRY_KEY = "pulse:travelCountry";
@@ -375,7 +375,7 @@ function EmergencyNumbersPage() {
 
         {/* Footer note */}
         <p className="text-[11px] text-muted-foreground text-center leading-relaxed px-4">
-          Emergency numbers are stored locally on your device. No data is sent anywhere.
+          {COUNTRY_COUNT} countries covered. Emergency numbers are stored locally on your device and work offline — no data is sent anywhere.
         </p>
       </div>
 
