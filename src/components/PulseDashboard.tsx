@@ -123,6 +123,7 @@ export function PulseDashboard() {
     setTickKey(k => k + 1);
     setShowSuccess(true);
     setButtonPulse(true);
+    setConfetti(true);
     setTimeout(() => setButtonPulse(false), 600);
   };
 
