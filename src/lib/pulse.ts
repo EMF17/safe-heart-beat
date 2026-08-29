@@ -119,6 +119,7 @@ export function usePulse() {
               contactName: contact.name,
               contactEmail: contact.email,
               lastCheckin: lastCheckIn ? new Date(lastCheckIn).toISOString() : null,
+              checkins: readLocalHistory().map((n) => new Date(n).toISOString()),
             },
           },
         });
@@ -132,22 +133,23 @@ export function usePulse() {
     return () => {
       if (pushTimer.current) window.clearTimeout(pushTimer.current);
     };
-  }, [hydrated, syncToken, userName, contact, lastCheckIn, callPush]);
+  }, [hydrated, syncToken, userName, contact, lastCheckIn, historyCount, callPush]);
 
   const checkIn = useCallback(() => {
     const t = Date.now();
     localStorage.setItem(CHECKIN_KEY, String(t));
     setLastCheckIn(t);
     // Append to check-in history
-    const raw = localStorage.getItem("pulse:checkins");
-    const history: number[] = raw ? JSON.parse(raw) : [];
+    const history = readLocalHistory();
     history.push(t);
-    localStorage.setItem("pulse:checkins", JSON.stringify(history));
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    setHistoryCount(history.length);
     // Light haptic feedback if supported
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
       navigator.vibrate(15);
     }
   }, []);
+
 
   const saveContact = useCallback((c: Contact) => {
     localStorage.setItem(CONTACT_KEY, JSON.stringify(c));
