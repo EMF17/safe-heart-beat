@@ -364,6 +364,9 @@ function SettingsPage() {
           </div>
         </section>
 
+        {/* Sync code */}
+        <SyncCodeCard />
+
 
         {/* Data */}
         <section className="mb-8">
