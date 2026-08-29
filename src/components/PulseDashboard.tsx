@@ -85,11 +85,13 @@ function useCheckinStats() {
 
 export function PulseDashboard() {
   const p = usePulse();
+  const stats = useCheckinStats();
   const [editing, setEditing] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [tickKey, setTickKey] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
   const [buttonPulse, setButtonPulse] = useState(false);
+  const [confetti, setConfetti] = useState(false);
 
   useEffect(() => {
     if (!showSuccess) return;
