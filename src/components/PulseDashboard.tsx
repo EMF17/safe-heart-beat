@@ -26,17 +26,20 @@ function CountdownRing({ progress, status }: { progress: number; status: string 
   );
 }
 
-function useCheckinStats() {
+function useCheckinStats(refreshKey = 0) {
   const [history, setHistory] = useState<number[]>([]);
   useEffect(() => {
     if (typeof window === "undefined") return;
     const raw = window.localStorage.getItem("pulse:checkins");
-    if (!raw) return;
+    if (!raw) {
+      setHistory([]);
+      return;
+    }
     try {
       const parsed: number[] = JSON.parse(raw);
       setHistory(parsed.sort((a, b) => b - a));
     } catch {}
-  }, []);
+  }, [refreshKey]);
 
   return useMemo(() => {
     if (history.length === 0) return { total: 0, currentStreak: 0, bestStreak: 0 };
