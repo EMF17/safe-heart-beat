@@ -9,7 +9,7 @@ import type {
   RegistrationResponseJSON,
   AuthenticationResponseJSON,
 } from "@simplewebauthn/server";
-import { createHmac, timingSafeEqual } from "crypto";
+import { createHmac, timingSafeEqual, randomBytes } from "crypto";
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
@@ -414,4 +414,18 @@ export async function deleteAccount(token: string) {
   const { error } = await supabaseAdmin.from("pulse_accounts").delete().eq("id", accountId);
   if (error) throw new Error(error.message);
   return { ok: true };
+}
+
+/**
+ * Create a bare (passkey-less) account so a sync code can be issued on devices
+ * without WebAuthn support. Returns a bearer token for that account.
+ */
+export async function createBareAccount(contactEmail: string) {
+  const { data, error } = await supabaseAdmin
+    .from("pulse_accounts")
+    .insert({ contact_email: contactEmail })
+    .select("id")
+    .single();
+  if (error) throw new Error(error.message);
+  return { token: issueToken(data.id), accountId: data.id };
 }
