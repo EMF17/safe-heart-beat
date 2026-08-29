@@ -113,13 +113,20 @@ export const Route = createFileRoute("/api/send-alert")({
     <div style="margin-top:8px">${serviceRows}</div>
   </div>`;
         } else {
+          const fallbackLines = GLOBAL_FALLBACKS.map((s) => `${s.label}: ${s.number}`);
           emergencyText =
-            "\n\nIf you cannot reach them, please contact your local emergency services.";
+            "\n\nIf you cannot reach them, please contact your local emergency services.\n" +
+            `Widely-used emergency numbers:\n  ${fallbackLines.join("\n  ")}`;
           emergencyHtml = `
   <div style="margin:20px 0;padding:16px 18px;background:#f5f9f6;border:1px solid #dbe7df;border-radius:10px">
-    <p style="margin:0;font-size:14px;color:#3a5a48">If you cannot reach them, please contact your local emergency services.</p>
+    <p style="margin:0 0 10px;font-size:14px;color:#3a5a48">If you cannot reach them, please contact your local emergency services.</p>
+    ${GLOBAL_FALLBACKS.map(
+      (s) =>
+        `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee"><span style="color:#555">${s.label}</span><span style="font-weight:600;color:#1a1a1a">${s.number}</span></div>`
+    ).join("")}
   </div>`;
         }
+
 
         const footerText =
           "\n\nNo location tracking. No automatic 911. This is an automated safety alert from Pulse.";
