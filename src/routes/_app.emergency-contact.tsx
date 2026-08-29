@@ -18,8 +18,17 @@ export const Route = createFileRoute("/_app/emergency-contact")({
         name: "description",
         content: "Set your emergency contact for Pulse safety check-ins.",
       },
+      { property: "og:title", content: "Emergency Contact — Pulse" },
+      {
+        property: "og:description",
+        content:
+          "Choose the trusted person Pulse emails if you miss two safety check-ins in a row.",
+      },
+      { property: "og:url", content: "https://pulse-checkin.app/emergency-contact" },
     ],
+    links: [{ rel: "canonical", href: "https://pulse-checkin.app/emergency-contact" }],
   }),
+
 });
 
 function EmergencyContactPage() {
