@@ -59,6 +59,8 @@ export function usePulse() {
   const [syncToken, setSyncToken] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("off");
   const [syncError, setSyncError] = useState<string | null>(null);
+  const [syncCodeCreatedAt, setSyncCodeCreatedAt] = useState<string | null>(null);
+  const [historyCount, setHistoryCount] = useState(0);
   const [now, setNow] = useState(() => Date.now());
   const [hydrated, setHydrated] = useState(false);
 
@@ -70,6 +72,10 @@ export function usePulse() {
   const callPush = useServerFn(pushSyncState);
   const callPull = useServerFn(pullSyncState);
   const callDelete = useServerFn(deleteSyncAccount);
+  const callEnsureAccount = useServerFn(ensureSyncAccount);
+  const callCreateCode = useServerFn(createSyncCode);
+  const callRevokeCode = useServerFn(revokeSyncCode);
+  const callRedeemCode = useServerFn(redeemSyncCode);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -86,8 +92,11 @@ export function usePulse() {
       setSyncToken(t);
       setSyncStatus("ready");
     }
+    setSyncCodeCreatedAt(ls.getItem(CODE_CREATED_KEY));
+    setHistoryCount(readLocalHistory().length);
     setHydrated(true);
   }, []);
+
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
