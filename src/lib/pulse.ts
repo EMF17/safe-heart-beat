@@ -14,14 +14,31 @@ import {
   pushSyncState,
   pullSyncState,
   deleteSyncAccount,
+  ensureSyncAccount,
+  createSyncCode,
+  revokeSyncCode,
+  redeemSyncCode,
 } from "./sync.functions";
 import { usePreferences } from "./preferences";
 
 const CHECKIN_KEY = "pulse:lastCheckIn";
+const HISTORY_KEY = "pulse:checkins";
 const CONTACT_KEY = "pulse:contact";
 const NAME_KEY = "pulse:name";
 const TOKEN_KEY = "pulse:syncToken";
 const ACCOUNT_KEY = "pulse:accountId";
+const CODE_CREATED_KEY = "pulse:syncCodeCreatedAt";
+
+function readLocalHistory(): number[] {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    const list = raw ? (JSON.parse(raw) as unknown[]) : [];
+    return Array.isArray(list) ? list.map(Number).filter((n) => Number.isFinite(n)) : [];
+  } catch {
+    return [];
+  }
+}
+
 
 // Legacy defaults — actual values are dynamic per the user's chosen interval.
 export const CHECKIN_INTERVAL_MS = 48 * 60 * 60 * 1000;
