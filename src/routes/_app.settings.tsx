@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { requestNotificationPermission } from "@/lib/notifications";
 import { usePreferences, SUPPORTED_INTERVALS, formatPauseDate, type IntervalHours } from "@/lib/preferences";
+import { SyncCodeCard } from "@/components/SyncCodeCard";
+
 
 const ONBOARDING_KEY = "pulse:onboardingCompleted";
 import {
