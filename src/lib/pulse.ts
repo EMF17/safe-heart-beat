@@ -390,8 +390,16 @@ export function usePulse() {
     restoreFromPasskey,
     disableSync,
     webAuthnSupported: typeof window !== "undefined" && browserSupportsWebAuthn(),
+    // sync code (no account needed)
+    syncCodeCreatedAt,
+    hasSyncCode: !!syncCodeCreatedAt,
+    generateSyncCode,
+    deleteSyncCode,
+    restoreWithCode,
+    historyCount,
   };
 }
+
 
 export function formatDuration(ms: number): { primary: string; secondary: string } {
   if (ms <= 0) return { primary: "0h", secondary: "0m" };
