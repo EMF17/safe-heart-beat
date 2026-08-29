@@ -68,13 +68,22 @@ export const Route = createFileRoute("/_app/emergency-numbers")({
   component: EmergencyNumbersPage,
   head: () => ({
     meta: [
-      { title: "Emergency Numbers — Pulse" },
+      { title: "Worldwide Emergency Numbers — Pulse" },
       {
         name: "description",
         content: "Offline worldwide emergency numbers for Pulse. No internet required.",
       },
+      { property: "og:title", content: "Worldwide Emergency Numbers — Pulse" },
+      {
+        property: "og:description",
+        content:
+          "Police, ambulance, and fire numbers for 35+ countries, available offline inside Pulse.",
+      },
+      { property: "og:url", content: "https://pulse-checkin.app/emergency-numbers" },
     ],
+    links: [{ rel: "canonical", href: "https://pulse-checkin.app/emergency-numbers" }],
   }),
+
 });
 
 function EmergencyNumbersPage() {
