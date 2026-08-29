@@ -67,7 +67,7 @@ function AppLayout() {
 
   const tabs = [
     { to: "/" as const, label: "Home", icon: Home },
-    { to: "/emergency-contact" as const, label: "Emergency", icon: Shield },
+    { to: "/emergency-contact" as const, label: "Contact", icon: Shield },
     { to: "/history" as const, label: "History", icon: History },
     { to: "/settings" as const, label: "Settings", icon: Settings },
   ];
@@ -79,8 +79,8 @@ function AppLayout() {
       </div>
 
       {/* Bottom Tab Navigation */}
-      <nav className="shrink-0 z-50 bg-card/80 backdrop-blur-lg border-t border-border/60">
-        <div className="flex items-center justify-around max-w-md mx-auto px-4 py-2">
+      <nav className="shrink-0 z-50 bg-card/85 backdrop-blur-xl border-t border-border/60 safe-area-pb">
+        <div className="flex items-center justify-around max-w-md mx-auto px-2 py-2">
           {tabs.map((tab) => {
             const isActive = current === tab.to;
             const Icon = tab.icon;
@@ -88,14 +88,17 @@ function AppLayout() {
               <Link
                 key={tab.to}
                 to={tab.to}
-                className={`flex flex-col items-center gap-1 py-2 px-3 rounded-xl transition-colors ${
+                className={`relative flex flex-col items-center gap-1 py-2 px-4 rounded-2xl transition-all duration-200 ${
                   isActive
                     ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
                 }`}
               >
-                <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 2} />
-                <span className={`text-[10px] font-medium ${isActive ? "font-semibold" : ""}`}>
+                {isActive && (
+                  <span className="absolute inset-0 rounded-2xl bg-primary/10" />
+                )}
+                <Icon className="relative w-5 h-5" strokeWidth={isActive ? 2.5 : 2} />
+                <span className={`relative text-[10px] font-medium ${isActive ? "font-semibold" : ""}`}>
                   {tab.label}
                 </span>
               </Link>
