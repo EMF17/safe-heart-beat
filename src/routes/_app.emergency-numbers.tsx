@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import { Search, Phone, Copy, X, ArrowLeft, Globe, MapPin, Plane } from "lucide-react";
-import { emergencyNumbers, type EmergencyService } from "@/lib/emergency-numbers";
+import { emergencyNumbers, GLOBAL_FALLBACKS, COUNTRY_COUNT, type EmergencyService } from "@/lib/emergency-numbers";
 
 const TRAVEL_MODE_KEY = "pulse:travelMode";
 const TRAVEL_COUNTRY_KEY = "pulse:travelCountry";
@@ -77,7 +77,7 @@ export const Route = createFileRoute("/_app/emergency-numbers")({
       {
         property: "og:description",
         content:
-          "Police, ambulance, and fire numbers for 35+ countries, available offline inside Pulse.",
+          "Police, ambulance, and fire numbers for 165+ countries, available offline inside Pulse.",
       },
       { property: "og:url", content: "https://pulse-checkin.app/emergency-numbers" },
     ],
@@ -311,6 +311,34 @@ function EmergencyNumbersPage() {
           </div>
         )}
 
+        {/* Universal fallbacks when we can't match a region */}
+        {!suggestedCountry && (
+          <div className="mb-5 p-4 rounded-2xl bg-card border border-border/60">
+            <div className="flex items-center gap-1.5 mb-2 text-muted-foreground">
+              <Globe className="w-3 h-3" />
+              <p className="text-[11px] uppercase tracking-[0.15em]">Works almost anywhere</p>
+            </div>
+            <p className="text-xs text-muted-foreground mb-3">
+              If your country isn't listed, these numbers connect to emergency services on most
+              mobile networks.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {GLOBAL_FALLBACKS.map((service) => (
+                <button
+                  key={service.number}
+                  onClick={() => setSelectedService(service)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background border border-border/60 text-sm hover:border-primary/40 hover:bg-primary/5 transition-colors"
+                  aria-label={`${service.label}: ${service.number}`}
+                >
+                  <span className="font-semibold tabular-nums">{service.number}</span>
+                  <span className="text-muted-foreground text-xs">{service.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+
         {/* List */}
         <div className="space-y-3 mb-6">
           {filtered.map((country) => (
@@ -347,7 +375,7 @@ function EmergencyNumbersPage() {
 
         {/* Footer note */}
         <p className="text-[11px] text-muted-foreground text-center leading-relaxed px-4">
-          Emergency numbers are stored locally on your device. No data is sent anywhere.
+          {COUNTRY_COUNT} countries covered. Emergency numbers are stored locally on your device and work offline — no data is sent anywhere.
         </p>
       </div>
 

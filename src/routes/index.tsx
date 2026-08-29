@@ -237,7 +237,7 @@ function Features() {
     {
       icon: <Globe2 className="w-5 h-5" />,
       title: "Worldwide emergency numbers",
-      body: "Searchable numbers for 35+ countries, stored offline and included in every alert email.",
+      body: "Searchable numbers for 165+ countries, stored offline and included in every alert email.",
     },
     {
       icon: <Lock className="w-5 h-5" />,
