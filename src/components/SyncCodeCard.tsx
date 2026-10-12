@@ -1,6 +1,8 @@
-import { useState } from "react";
-import { KeyRound, Copy, Check, RefreshCw } from "lucide-react";
+import { useEffect, useState } from "react";
+import { KeyRound, Copy, Check, RefreshCw, QrCode, ScanLine } from "lucide-react";
+import QRCode from "qrcode";
 import { usePulse } from "@/lib/pulse";
+import { QrScannerView } from "./QrScanner";
 
 /**
  * Optional "Sync code" — a one-time code the user can save to restore their
