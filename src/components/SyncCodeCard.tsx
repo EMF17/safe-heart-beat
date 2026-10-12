@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { KeyRound, Copy, Check, RefreshCw, QrCode, ScanLine } from "lucide-react";
+import { KeyRound, Copy, Check, RefreshCw, ScanLine } from "lucide-react";
 import QRCode from "qrcode";
 import { usePulse } from "@/lib/pulse";
 import { QrScannerView } from "./QrScanner";
