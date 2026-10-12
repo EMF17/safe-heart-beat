@@ -123,6 +123,7 @@ export function SyncCodeCard() {
               <button
                 onClick={() => {
                   setCode(null);
+                  setQrDataUrl(null);
                   setMode("idle");
                 }}
                 className="text-xs text-muted-foreground px-3 py-2 hover:text-foreground"
@@ -130,6 +131,31 @@ export function SyncCodeCard() {
                 I've saved it
               </button>
             </div>
+          </div>
+        )}
+
+        {mode === "scan" && (
+          <div className="mt-4">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground mb-2">
+              Scan the QR code shown on your other device
+            </p>
+            <QrScannerView
+              onScan={(text) => {
+                const cleaned = text.trim().toUpperCase();
+                setInput(cleaned);
+                setMode("restore");
+              }}
+              onError={(msg) => {
+                setError(msg);
+                setMode("restore");
+              }}
+            />
+            <button
+              onClick={() => setMode("restore")}
+              className="text-xs text-muted-foreground px-1 mt-3 hover:text-foreground"
+            >
+              Type the code instead
+            </button>
           </div>
         )}
 
@@ -189,6 +215,17 @@ export function SyncCodeCard() {
               className="text-xs font-medium rounded-lg border border-border px-3 py-2 hover:bg-background"
             >
               I have a code
+            </button>
+            <button
+              onClick={() => {
+                setMode("scan");
+                setNotice(null);
+                setError(null);
+              }}
+              className="flex items-center gap-1.5 text-xs font-medium rounded-lg border border-border px-3 py-2 hover:bg-background"
+            >
+              <ScanLine className="w-3.5 h-3.5" />
+              Scan a QR code
             </button>
             {p.hasSyncCode && (
               <button
