@@ -1,6 +1,8 @@
-import { useState } from "react";
-import { KeyRound, Copy, Check, RefreshCw } from "lucide-react";
+import { useEffect, useState } from "react";
+import { KeyRound, Copy, Check, RefreshCw, ScanLine } from "lucide-react";
+import QRCode from "qrcode";
 import { usePulse } from "@/lib/pulse";
+import { QrScannerView } from "./QrScanner";
 
 /**
  * Optional "Sync code" — a one-time code the user can save to restore their
@@ -8,7 +10,8 @@ import { usePulse } from "@/lib/pulse";
  */
 export function SyncCodeCard() {
   const p = usePulse();
-  const [mode, setMode] = useState<"idle" | "code" | "restore">("idle");
+  const [mode, setMode] = useState<"idle" | "code" | "restore" | "scan">("idle");
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [code, setCode] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -24,6 +27,13 @@ export function SyncCodeCard() {
       const c = await p.generateSyncCode();
       setCode(c);
       setMode("code");
+      try {
+        setQrDataUrl(
+          await QRCode.toDataURL(c, { margin: 1, width: 220, color: { dark: "#1f2e22", light: "#ffffff" } }),
+        );
+      } catch {
+        setQrDataUrl(null);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Couldn't create a sync code");
     } finally {
@@ -90,6 +100,18 @@ export function SyncCodeCard() {
               This is shown once. Store it somewhere safe — anyone with this code can restore your
               data.
             </p>
+            {qrDataUrl && (
+              <div className="mt-3 flex flex-col items-center gap-1.5">
+                <img
+                  src={qrDataUrl}
+                  alt="QR code for your sync code"
+                  className="w-40 h-40 rounded-lg border border-border bg-white p-2"
+                />
+                <p className="text-[11px] text-muted-foreground">
+                  On your new device, choose “Scan a QR code” and point it here.
+                </p>
+              </div>
+            )}
             <div className="flex gap-2 mt-3">
               <button
                 onClick={copy}
@@ -101,6 +123,7 @@ export function SyncCodeCard() {
               <button
                 onClick={() => {
                   setCode(null);
+                  setQrDataUrl(null);
                   setMode("idle");
                 }}
                 className="text-xs text-muted-foreground px-3 py-2 hover:text-foreground"
@@ -108,6 +131,31 @@ export function SyncCodeCard() {
                 I've saved it
               </button>
             </div>
+          </div>
+        )}
+
+        {mode === "scan" && (
+          <div className="mt-4">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground mb-2">
+              Scan the QR code shown on your other device
+            </p>
+            <QrScannerView
+              onScan={(text) => {
+                const cleaned = text.trim().toUpperCase();
+                setInput(cleaned);
+                setMode("restore");
+              }}
+              onError={(msg) => {
+                setError(msg);
+                setMode("restore");
+              }}
+            />
+            <button
+              onClick={() => setMode("restore")}
+              className="text-xs text-muted-foreground px-1 mt-3 hover:text-foreground"
+            >
+              Type the code instead
+            </button>
           </div>
         )}
 
@@ -167,6 +215,17 @@ export function SyncCodeCard() {
               className="text-xs font-medium rounded-lg border border-border px-3 py-2 hover:bg-background"
             >
               I have a code
+            </button>
+            <button
+              onClick={() => {
+                setMode("scan");
+                setNotice(null);
+                setError(null);
+              }}
+              className="flex items-center gap-1.5 text-xs font-medium rounded-lg border border-border px-3 py-2 hover:bg-background"
+            >
+              <ScanLine className="w-3.5 h-3.5" />
+              Scan a QR code
             </button>
             {p.hasSyncCode && (
               <button
