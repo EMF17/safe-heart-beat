@@ -1,0 +1,1 @@
+ALTER TABLE public.pulse_accounts ADD COLUMN IF NOT EXISTS recovery_code_expires_at timestamptz;

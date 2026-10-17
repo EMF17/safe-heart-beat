@@ -110,6 +110,7 @@ export type Database = {
           id: string
           last_checkin: string | null
           recovery_code_created_at: string | null
+          recovery_code_expires_at: string | null
           recovery_code_hash: string | null
           updated_at: string
           user_name: string
@@ -122,6 +123,7 @@ export type Database = {
           id?: string
           last_checkin?: string | null
           recovery_code_created_at?: string | null
+          recovery_code_expires_at?: string | null
           recovery_code_hash?: string | null
           updated_at?: string
           user_name?: string
@@ -134,6 +136,7 @@ export type Database = {
           id?: string
           last_checkin?: string | null
           recovery_code_created_at?: string | null
+          recovery_code_expires_at?: string | null
           recovery_code_hash?: string | null
           updated_at?: string
           user_name?: string
