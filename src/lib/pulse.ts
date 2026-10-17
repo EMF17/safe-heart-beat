@@ -240,7 +240,7 @@ export function usePulse() {
   // --- Sync code (account-free recovery) ---
 
   /** Generate a new one-time sync code. Creates a backup record if needed. */
-  const generateSyncCode = useCallback(async () => {
+  const generateSyncCode = useCallback(async (ttlHours: number | null = null) => {
     setSyncError(null);
     let token = syncToken;
     try {
@@ -256,10 +256,10 @@ export function usePulse() {
         setSyncToken(token);
         setSyncStatus("ready");
       }
-      const { code, createdAt } = await callCreateCode({ data: { token } });
+      const { code, createdAt, expiresAt } = await callCreateCode({ data: { token, ttlHours } });
       localStorage.setItem(CODE_CREATED_KEY, createdAt);
       setSyncCodeCreatedAt(createdAt);
-      return code;
+      return { code, expiresAt };
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Couldn't create a sync code";
       setSyncError(msg);
