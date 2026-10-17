@@ -313,6 +313,7 @@ export async function pullState(token: string) {
     lastCheckin: data.last_checkin,
     checkins: readHistory(data.checkins),
     hasRecoveryCode: !!data.recovery_code_hash,
+    recoveryCodeExpiresAt: data.recovery_code_expires_at,
   };
 }
 
@@ -352,18 +353,23 @@ function randomCode(length = 16): string {
 }
 
 /** Create (or replace) the account's sync code. Returns the code once. */
-export async function createRecoveryCode(token: string) {
+export async function createRecoveryCode(token: string, ttlHours?: number | null) {
   const accountId = verifyToken(token);
+  const expiresAt = ttlHours ? new Date(Date.now() + ttlHours * 3600_000).toISOString() : null;
   for (let attempt = 0; attempt < 5; attempt++) {
     const raw = randomCode();
     const normalized = normalizeRecoveryCode(raw);
     const hash = hashRecoveryCode(normalized);
     const { error } = await supabaseAdmin
       .from("pulse_accounts")
-      .update({ recovery_code_hash: hash, recovery_code_created_at: new Date().toISOString() })
+      .update({
+        recovery_code_hash: hash,
+        recovery_code_created_at: new Date().toISOString(),
+        recovery_code_expires_at: expiresAt,
+      })
       .eq("id", accountId);
     if (!error) {
-      return { code: formatRecoveryCode(normalized), createdAt: new Date().toISOString() };
+      return { code: formatRecoveryCode(normalized), createdAt: new Date().toISOString(), expiresAt };
     }
     // Unique-index collision: try again with a fresh code.
     if (!/duplicate key/i.test(error.message)) throw new Error(error.message);
@@ -375,7 +381,7 @@ export async function revokeRecoveryCode(token: string) {
   const accountId = verifyToken(token);
   const { error } = await supabaseAdmin
     .from("pulse_accounts")
-    .update({ recovery_code_hash: null, recovery_code_created_at: null })
+    .update({ recovery_code_hash: null, recovery_code_created_at: null, recovery_code_expires_at: null })
     .eq("id", accountId);
   if (error) throw new Error(error.message);
   return { ok: true };
@@ -394,6 +400,13 @@ export async function redeemRecoveryCode(code: string) {
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!data) throw new Error("No account found for that sync code");
+  if (data.recovery_code_expires_at && new Date(data.recovery_code_expires_at).getTime() < Date.now()) {
+    await supabaseAdmin
+      .from("pulse_accounts")
+      .update({ recovery_code_hash: null, recovery_code_created_at: null, recovery_code_expires_at: null })
+      .eq("id", data.id);
+    throw new Error("This sync code has expired. Create a new one on your other device.");
+  }
 
   return {
     token: issueToken(data.id),

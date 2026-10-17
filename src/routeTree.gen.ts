@@ -9,23 +9,28 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
-import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiSendAlertRouteImport } from './routes/api/send-alert'
-import { Route as AppSettingsRouteImport } from './routes/_app.settings'
-import { Route as AppHistoryRouteImport } from './routes/_app.history'
-import { Route as AppEmergencyNumbersRouteImport } from './routes/_app.emergency-numbers'
-import { Route as AppEmergencyContactRouteImport } from './routes/_app.emergency-contact'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AppAppRouteImport } from './routes/_app.app'
-import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
-import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as AppEmergencyContactRouteImport } from './routes/_app.emergency-contact'
+import { Route as AppEmergencyNumbersRouteImport } from './routes/_app.emergency-numbers'
+import { Route as AppHistoryRouteImport } from './routes/_app.history'
+import { Route as AppSafetyPlanRouteImport } from './routes/_app.safety-plan'
+import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as ApiSendAlertRouteImport } from './routes/api/send-alert'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
@@ -33,33 +38,14 @@ const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
   path: '/privacy-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppRoute = AppRouteImport.update({
-  id: '/_app',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiSendAlertRoute = ApiSendAlertRouteImport.update({
-  id: '/api/send-alert',
-  path: '/api/send-alert',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppSettingsRoute = AppSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppHistoryRoute = AppHistoryRouteImport.update({
-  id: '/history',
-  path: '/history',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppEmergencyNumbersRoute = AppEmergencyNumbersRouteImport.update({
-  id: '/emergency-numbers',
-  path: '/emergency-numbers',
+const AppAppRoute = AppAppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => AppRoute,
 } as any)
 const AppEmergencyContactRoute = AppEmergencyContactRouteImport.update({
@@ -67,20 +53,29 @@ const AppEmergencyContactRoute = AppEmergencyContactRouteImport.update({
   path: '/emergency-contact',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAppRoute = AppAppRouteImport.update({
-  id: '/app',
-  path: '/app',
+const AppEmergencyNumbersRoute = AppEmergencyNumbersRouteImport.update({
+  id: '/emergency-numbers',
+  path: '/emergency-numbers',
   getParentRoute: () => AppRoute,
 } as any)
-const LovableEmailQueueProcessRoute =
-  LovableEmailQueueProcessRouteImport.update({
-    id: '/lovable/email/queue/process',
-    path: '/lovable/email/queue/process',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
-  id: '/lovable/email/auth/webhook',
-  path: '/lovable/email/auth/webhook',
+const AppHistoryRoute = AppHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSafetyPlanRoute = AppSafetyPlanRouteImport.update({
+  id: '/safety-plan',
+  path: '/safety-plan',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const ApiSendAlertRoute = ApiSendAlertRouteImport.update({
+  id: '/api/send-alert',
+  path: '/api/send-alert',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
@@ -88,6 +83,17 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -97,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/emergency-contact': typeof AppEmergencyContactRoute
   '/emergency-numbers': typeof AppEmergencyNumbersRoute
   '/history': typeof AppHistoryRoute
+  '/safety-plan': typeof AppSafetyPlanRoute
   '/settings': typeof AppSettingsRoute
   '/api/send-alert': typeof ApiSendAlertRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/emergency-contact': typeof AppEmergencyContactRoute
   '/emergency-numbers': typeof AppEmergencyNumbersRoute
   '/history': typeof AppHistoryRoute
+  '/safety-plan': typeof AppSafetyPlanRoute
   '/settings': typeof AppSettingsRoute
   '/api/send-alert': typeof ApiSendAlertRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/_app/emergency-contact': typeof AppEmergencyContactRoute
   '/_app/emergency-numbers': typeof AppEmergencyNumbersRoute
   '/_app/history': typeof AppHistoryRoute
+  '/_app/safety-plan': typeof AppSafetyPlanRoute
   '/_app/settings': typeof AppSettingsRoute
   '/api/send-alert': typeof ApiSendAlertRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -143,6 +152,7 @@ export interface FileRouteTypes {
     | '/emergency-contact'
     | '/emergency-numbers'
     | '/history'
+    | '/safety-plan'
     | '/settings'
     | '/api/send-alert'
     | '/lovable/email/auth/preview'
@@ -157,6 +167,7 @@ export interface FileRouteTypes {
     | '/emergency-contact'
     | '/emergency-numbers'
     | '/history'
+    | '/safety-plan'
     | '/settings'
     | '/api/send-alert'
     | '/lovable/email/auth/preview'
@@ -172,6 +183,7 @@ export interface FileRouteTypes {
     | '/_app/emergency-contact'
     | '/_app/emergency-numbers'
     | '/_app/history'
+    | '/_app/safety-plan'
     | '/_app/settings'
     | '/api/send-alert'
     | '/lovable/email/auth/preview'
@@ -192,18 +204,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy-policy': {
-      id: '/privacy-policy'
-      path: '/privacy-policy'
-      fullPath: '/privacy-policy'
-      preLoaderRoute: typeof PrivacyPolicyRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app': {
@@ -213,39 +218,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/send-alert': {
-      id: '/api/send-alert'
-      path: '/api/send-alert'
-      fullPath: '/api/send-alert'
-      preLoaderRoute: typeof ApiSendAlertRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/settings': {
-      id: '/_app/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AppSettingsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/history': {
-      id: '/_app/history'
-      path: '/history'
-      fullPath: '/history'
-      preLoaderRoute: typeof AppHistoryRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/emergency-numbers': {
-      id: '/_app/emergency-numbers'
-      path: '/emergency-numbers'
-      fullPath: '/emergency-numbers'
-      preLoaderRoute: typeof AppEmergencyNumbersRouteImport
+    '/_app/app': {
+      id: '/_app/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppAppRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/emergency-contact': {
@@ -255,18 +246,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEmergencyContactRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/app': {
-      id: '/_app/app'
-      path: '/app'
-      fullPath: '/app'
-      preLoaderRoute: typeof AppAppRouteImport
+    '/_app/emergency-numbers': {
+      id: '/_app/emergency-numbers'
+      path: '/emergency-numbers'
+      fullPath: '/emergency-numbers'
+      preLoaderRoute: typeof AppEmergencyNumbersRouteImport
       parentRoute: typeof AppRoute
     }
-    '/lovable/email/queue/process': {
-      id: '/lovable/email/queue/process'
-      path: '/lovable/email/queue/process'
-      fullPath: '/lovable/email/queue/process'
-      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+    '/_app/history': {
+      id: '/_app/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AppHistoryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/safety-plan': {
+      id: '/_app/safety-plan'
+      path: '/safety-plan'
+      fullPath: '/safety-plan'
+      preLoaderRoute: typeof AppSafetyPlanRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/api/send-alert': {
+      id: '/api/send-alert'
+      path: '/api/send-alert'
+      fullPath: '/api/send-alert'
+      preLoaderRoute: typeof ApiSendAlertRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/preview': {
+      id: '/lovable/email/auth/preview'
+      path: '/lovable/email/auth/preview'
+      fullPath: '/lovable/email/auth/preview'
+      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/auth/webhook': {
@@ -276,11 +295,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/auth/preview': {
-      id: '/lovable/email/auth/preview'
-      path: '/lovable/email/auth/preview'
-      fullPath: '/lovable/email/auth/preview'
-      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -291,6 +310,7 @@ interface AppRouteChildren {
   AppEmergencyContactRoute: typeof AppEmergencyContactRoute
   AppEmergencyNumbersRoute: typeof AppEmergencyNumbersRoute
   AppHistoryRoute: typeof AppHistoryRoute
+  AppSafetyPlanRoute: typeof AppSafetyPlanRoute
   AppSettingsRoute: typeof AppSettingsRoute
 }
 
@@ -299,6 +319,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppEmergencyContactRoute: AppEmergencyContactRoute,
   AppEmergencyNumbersRoute: AppEmergencyNumbersRoute,
   AppHistoryRoute: AppHistoryRoute,
+  AppSafetyPlanRoute: AppSafetyPlanRoute,
   AppSettingsRoute: AppSettingsRoute,
 }
 

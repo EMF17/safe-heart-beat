@@ -366,6 +366,18 @@ function SettingsPage() {
           </div>
         </section>
 
+        <section className="mb-8">
+          <Link
+            to="/safety-plan"
+            className="block bg-card border border-border/60 rounded-2xl p-4 hover:border-primary/60"
+          >
+            <p className="text-sm font-medium">Personal safety checklist</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Describe how you live and where — get an AI-powered preparedness checklist.
+            </p>
+          </Link>
+        </section>
+
         {/* Sync code */}
         <SyncCodeCard />
 

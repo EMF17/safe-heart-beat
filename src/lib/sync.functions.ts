@@ -116,9 +116,14 @@ export const ensureSyncAccount = createServerFn({ method: "POST" })
 
 export const createSyncCode = createServerFn({ method: "POST" })
   .inputValidator((input) =>
-    z.object({ token: z.string().min(10).max(2048) }).parse(input),
+    z
+      .object({
+        token: z.string().min(10).max(2048),
+        ttlHours: z.number().int().min(1).max(24 * 90).nullable().optional(),
+      })
+      .parse(input),
   )
-  .handler(async ({ data }) => sync.createRecoveryCode(data.token));
+  .handler(async ({ data }) => sync.createRecoveryCode(data.token, data.ttlHours ?? null));
 
 export const revokeSyncCode = createServerFn({ method: "POST" })
   .inputValidator((input) =>

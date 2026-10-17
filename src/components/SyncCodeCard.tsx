@@ -18,14 +18,18 @@ export function SyncCodeCard() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [ttl, setTtl] = useState<string>("24");
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
 
   const generate = async () => {
     setBusy(true);
     setError(null);
     setNotice(null);
     try {
-      const c = await p.generateSyncCode();
+      const res = await p.generateSyncCode(ttl === "never" ? null : Number(ttl));
+      const c = res.code;
       setCode(c);
+      setExpiresAt(res.expiresAt);
       setMode("code");
       try {
         setQrDataUrl(
@@ -97,6 +101,9 @@ export function SyncCodeCard() {
               {code}
             </p>
             <p className="text-xs text-muted-foreground mt-2">
+              {expiresAt
+                ? `Expires ${new Date(expiresAt).toLocaleString()} — after that this code and QR stop working. `
+                : "This code never expires unless you turn it off. "}
               This is shown once. Store it somewhere safe — anyone with this code can restore your
               data.
             </p>
@@ -195,6 +202,23 @@ export function SyncCodeCard() {
               </button>
             </div>
           </div>
+        )}
+
+        {mode === "idle" && (
+          <label className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
+            New code expires after
+            <select
+              value={ttl}
+              onChange={(e) => setTtl(e.target.value)}
+              className="rounded-lg border border-border bg-background px-2 py-1.5 text-xs text-foreground"
+            >
+              <option value="1">1 hour</option>
+              <option value="24">24 hours</option>
+              <option value="168">7 days</option>
+              <option value="720">30 days</option>
+              <option value="never">Never</option>
+            </select>
+          </label>
         )}
 
         {mode === "idle" && (
