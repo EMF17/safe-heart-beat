@@ -185,6 +185,7 @@ function PrivacyPolicyPage() {
           <p className="text-sm text-white/80 leading-relaxed">
             All connections are encrypted. Server data is locked so only Pulse&apos;s own server code can read it, and your device proves its identity with a signed secret token. Sync codes are stored only as one-way fingerprints.
           </p>
+        </section>
 
         <section className="mb-8">
           <h2 className="text-lg font-bold mb-3">Children&apos;s Privacy</h2>
