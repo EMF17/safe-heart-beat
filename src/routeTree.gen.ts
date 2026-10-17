@@ -17,6 +17,7 @@ import { Route as AppAppRouteImport } from './routes/_app.app'
 import { Route as AppEmergencyContactRouteImport } from './routes/_app.emergency-contact'
 import { Route as AppEmergencyNumbersRouteImport } from './routes/_app.emergency-numbers'
 import { Route as AppHistoryRouteImport } from './routes/_app.history'
+import { Route as AppSafetyPlanRouteImport } from './routes/_app.safety-plan'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as ApiSendAlertRouteImport } from './routes/api/send-alert'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -62,6 +63,11 @@ const AppHistoryRoute = AppHistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => AppRoute,
 } as any)
+const AppSafetyPlanRoute = AppSafetyPlanRouteImport.update({
+  id: '/safety-plan',
+  path: '/safety-plan',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -97,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/emergency-contact': typeof AppEmergencyContactRoute
   '/emergency-numbers': typeof AppEmergencyNumbersRoute
   '/history': typeof AppHistoryRoute
+  '/safety-plan': typeof AppSafetyPlanRoute
   '/settings': typeof AppSettingsRoute
   '/api/send-alert': typeof ApiSendAlertRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/emergency-contact': typeof AppEmergencyContactRoute
   '/emergency-numbers': typeof AppEmergencyNumbersRoute
   '/history': typeof AppHistoryRoute
+  '/safety-plan': typeof AppSafetyPlanRoute
   '/settings': typeof AppSettingsRoute
   '/api/send-alert': typeof ApiSendAlertRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/_app/emergency-contact': typeof AppEmergencyContactRoute
   '/_app/emergency-numbers': typeof AppEmergencyNumbersRoute
   '/_app/history': typeof AppHistoryRoute
+  '/_app/safety-plan': typeof AppSafetyPlanRoute
   '/_app/settings': typeof AppSettingsRoute
   '/api/send-alert': typeof ApiSendAlertRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -143,6 +152,7 @@ export interface FileRouteTypes {
     | '/emergency-contact'
     | '/emergency-numbers'
     | '/history'
+    | '/safety-plan'
     | '/settings'
     | '/api/send-alert'
     | '/lovable/email/auth/preview'
@@ -157,6 +167,7 @@ export interface FileRouteTypes {
     | '/emergency-contact'
     | '/emergency-numbers'
     | '/history'
+    | '/safety-plan'
     | '/settings'
     | '/api/send-alert'
     | '/lovable/email/auth/preview'
@@ -172,6 +183,7 @@ export interface FileRouteTypes {
     | '/_app/emergency-contact'
     | '/_app/emergency-numbers'
     | '/_app/history'
+    | '/_app/safety-plan'
     | '/_app/settings'
     | '/api/send-alert'
     | '/lovable/email/auth/preview'
@@ -248,6 +260,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHistoryRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/safety-plan': {
+      id: '/_app/safety-plan'
+      path: '/safety-plan'
+      fullPath: '/safety-plan'
+      preLoaderRoute: typeof AppSafetyPlanRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/settings': {
       id: '/_app/settings'
       path: '/settings'
@@ -291,6 +310,7 @@ interface AppRouteChildren {
   AppEmergencyContactRoute: typeof AppEmergencyContactRoute
   AppEmergencyNumbersRoute: typeof AppEmergencyNumbersRoute
   AppHistoryRoute: typeof AppHistoryRoute
+  AppSafetyPlanRoute: typeof AppSafetyPlanRoute
   AppSettingsRoute: typeof AppSettingsRoute
 }
 
@@ -299,6 +319,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppEmergencyContactRoute: AppEmergencyContactRoute,
   AppEmergencyNumbersRoute: AppEmergencyNumbersRoute,
   AppHistoryRoute: AppHistoryRoute,
+  AppSafetyPlanRoute: AppSafetyPlanRoute,
   AppSettingsRoute: AppSettingsRoute,
 }
 
