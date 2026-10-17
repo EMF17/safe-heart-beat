@@ -83,7 +83,7 @@ function PrivacyPolicyPage() {
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span>Check-in history is used to show your streaks and decide when an alert is due.</span>
+              <span>Check-in history is used to show your past check-ins and decide when an alert is due.</span>
             </li>
           </ul>
         </section>

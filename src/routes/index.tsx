@@ -11,6 +11,7 @@ import {
   Globe2,
   Lock,
   HeartPulse,
+  Smartphone,
 } from "lucide-react";
 import { HomeTourDemo } from "@/components/HomeTourDemo";
 
@@ -69,7 +70,9 @@ function LandingPage() {
         <Hero returning={returning} />
         <HowItWorks />
         <Features />
+        <Comparison />
         <PrivacySection />
+        <Faq />
         <ClosingCta returning={returning} />
       </main>
       <SiteFooter />
@@ -237,17 +240,27 @@ function Features() {
     {
       icon: <Globe2 className="w-5 h-5" />,
       title: "Worldwide emergency numbers",
-      body: "Searchable numbers for 165+ countries, stored offline and included in every alert email.",
+      body: "Searchable numbers for 167 countries, stored offline and included in every alert email.",
     },
     {
       icon: <Lock className="w-5 h-5" />,
       title: "Private by default",
-      body: "No sign-up, no ads, no analytics profile. Your check-in history stays on your device.",
+      body: "No sign-up, no ads, no analytics profile. Only what's needed to send an alert leaves your device.",
     },
     {
       icon: <HeartPulse className="w-5 h-5" />,
       title: "Check-in history",
       body: "See every check-in you've made, so you can spot your own patterns at a glance.",
+    },
+    {
+      icon: <ShieldCheck className="w-5 h-5" />,
+      title: "AI safety checklist",
+      body: "Describe how you live and get a personal preparedness checklist, saved only on your device.",
+    },
+    {
+      icon: <Smartphone className="w-5 h-5" />,
+      title: "Move to a new phone",
+      body: "A sync code or QR scan brings your contact and history across — no account, and codes can expire.",
     },
   ];
 
@@ -282,6 +295,104 @@ function Features() {
   );
 }
 
+function Comparison() {
+  const rows: [string, string, string, string][] = [
+    ["Price", "Free", "Paid", "Free basic plan, paid extras"],
+    ["Account needed", "No", "No", "Yes (phone number)"],
+    ["Uses your location", "Never", "No", "Yes"],
+    ["Works in a browser", "Yes, any device", "App only", "App only"],
+    ["Choose 24/48/72h rhythm", "Yes", "Limited", "Daily"],
+    ["Local emergency numbers in alert", "Yes, 167 countries", "No", "No"],
+  ];
+  return (
+    <section className="max-w-4xl mx-auto px-5 py-20 md:py-24">
+      <div className="text-center max-w-xl mx-auto">
+        <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight">
+          How Pulse compares
+        </h2>
+        <p className="mt-4 text-muted-foreground">
+          A free alternative to Demumu ("Are You Dead?") and Snug — without an account or location tracking.
+        </p>
+      </div>
+      <div className="mt-10 overflow-x-auto rounded-3xl border border-border/60 bg-card">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border/60 text-left">
+              <th className="p-4 font-medium"></th>
+              <th className="p-4 font-semibold text-primary">Pulse</th>
+              <th className="p-4 font-medium">Demumu</th>
+              <th className="p-4 font-medium">Snug</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r[0]} className="border-b border-border/40 last:border-0">
+                <td className="p-4 text-muted-foreground">{r[0]}</td>
+                <td className="p-4 font-medium">{r[1]}</td>
+                <td className="p-4 text-muted-foreground">{r[2]}</td>
+                <td className="p-4 text-muted-foreground">{r[3]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-3 text-xs text-muted-foreground text-center">
+        Based on public information as of October 2026. Other apps may change.
+      </p>
+    </section>
+  );
+}
+
+const FAQS = [
+  {
+    q: "When is my emergency contact emailed?",
+    a: "Only after you miss two check-in windows in a row. With a 48-hour rhythm that's 96 hours; with 24 hours it's 48 hours; with 72 hours it's 144 hours. Pausing stops alerts completely.",
+  },
+  {
+    q: "Do I need an account?",
+    a: "No. There's no sign-up, email or password. Pulse creates an anonymous record so alerts can still go out if your phone is off.",
+  },
+  {
+    q: "What if I get a new phone?",
+    a: "Create a sync code in Settings, then type it or scan its QR code on the new device to bring your contact and history across. You can make the code expire automatically.",
+  },
+  {
+    q: "Does Pulse track my location?",
+    a: "Never. Your region is guessed from your device's language and time zone so alerts include the right emergency numbers.",
+  },
+  {
+    q: "Is it really free?",
+    a: "Yes. No ads, no subscription.",
+  },
+  {
+    q: "Does it call emergency services?",
+    a: "No. Pulse emails the person you choose, with local emergency numbers so they know who to call.",
+  },
+];
+
+function Faq() {
+  return (
+    <section className="border-t border-border/50 bg-card/40">
+      <div className="max-w-3xl mx-auto px-5 py-20 md:py-24">
+        <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-center">
+          Questions people ask
+        </h2>
+        <div className="mt-10 space-y-3">
+          {FAQS.map((f) => (
+            <details key={f.q} className="group rounded-2xl border border-border/60 bg-card p-5">
+              <summary className="cursor-pointer list-none font-medium flex items-center justify-between gap-3">
+                {f.q}
+                <ChevronRight className="w-4 h-4 shrink-0 transition group-open:rotate-90" />
+              </summary>
+              <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{f.a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function PrivacySection() {
   return (
     <section className="border-y border-border/50 bg-card/40">
@@ -293,10 +404,11 @@ function PrivacySection() {
           A safety app shouldn’t watch you
         </h2>
         <p className="mt-4 text-muted-foreground leading-relaxed">
-          Pulse never asks for your location, contacts or camera. There is no
-          account to create and nothing to sell. The only time information
-          leaves your device is the single email we send your emergency contact
-          if you go quiet.
+          Pulse never asks for your location or contacts, and there is no
+          account to create and nothing to sell. We keep only what's needed to
+          send an alert — your contact's email and your latest check-in time —
+          under a random ID. The camera is used only if you choose to scan a
+          sync QR code, and nothing is recorded.
         </p>
         <Link
           to="/privacy-policy"

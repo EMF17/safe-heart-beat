@@ -76,7 +76,7 @@ function OnboardingScreen({ onDismiss }: { onDismiss: () => void }) {
     {
       icon: <Hand className="w-6 h-6" />,
       title: "Tap the green button",
-      body: "Once every 48 hours. It takes two seconds and keeps your safety net armed.",
+      body: "Once every 48 hours by default (or 24 or 72). It takes two seconds and keeps your safety net armed.",
     },
     {
       icon: <Mail className="w-6 h-6" />,
@@ -86,7 +86,7 @@ function OnboardingScreen({ onDismiss }: { onDismiss: () => void }) {
     {
       icon: <ShieldCheck className="w-6 h-6" />,
       title: "We only email if needed",
-      body: "If you miss two check-ins in a row (96 hours), we send one alert. That's it.",
+      body: "If you miss two check-ins in a row (96 hours on the default rhythm), we send one alert. That's it.",
     },
   ];
 
