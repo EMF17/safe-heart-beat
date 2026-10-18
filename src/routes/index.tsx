@@ -19,14 +19,14 @@ export const Route = createFileRoute("/")({
   component: LandingPage,
   head: () => ({
     meta: [
-      { title: "Pulse — A quiet safety net for people who live alone" },
+      { title: "Pulse Safety Check-in — Free safety app for people who live alone" },
       {
         name: "description",
         content:
           "Tap one button every 48 hours. If you ever miss two check-ins, Pulse emails your emergency contact. No accounts, no tracking, free to use.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "Pulse — A quiet safety net for people who live alone" },
+      { property: "og:title", content: "Pulse Safety Check-in — Free safety app for people who live alone" },
       {
         property: "og:description",
         content:
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "SoftwareApplication",
-          name: "Pulse",
+          name: "Pulse Safety Check-in",
           applicationCategory: "HealthApplication",
           operatingSystem: "Web",
           url: "https://pulse-checkin.app/",
@@ -450,6 +450,9 @@ function SiteFooter() {
         <nav className="flex items-center gap-5">
           <Link to="/app" className="hover:text-foreground transition">
             Open app
+          </Link>
+          <Link to="/demumu-alternative" className="hover:text-foreground transition">
+            Demumu alternative
           </Link>
           <Link to="/emergency-numbers" className="hover:text-foreground transition">
             Emergency numbers
