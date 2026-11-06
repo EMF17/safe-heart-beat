@@ -1,0 +1,1 @@
+- Native iOS/Android apps use Capacitor (capacitor.config.ts) as a shell loading the live site URL; why: SSR + server functions can't run from a static bundle.
