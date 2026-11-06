@@ -454,6 +454,9 @@ function SiteFooter() {
           <Link to="/demumu-alternative" className="hover:text-foreground transition">
             Demumu alternative
           </Link>
+          <Link to="/zh-hk" className="hover:text-foreground transition">
+            中文
+          </Link>
           <Link to="/emergency-numbers" className="hover:text-foreground transition">
             Emergency numbers
           </Link>

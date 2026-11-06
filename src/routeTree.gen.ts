@@ -14,6 +14,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as DemumuAlternativeRouteImport } from './routes/demumu-alternative'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ZhHkRouteImport } from './routes/zh-hk'
 import { Route as AppAppRouteImport } from './routes/_app.app'
 import { Route as AppEmergencyContactRouteImport } from './routes/_app.emergency-contact'
 import { Route as AppEmergencyNumbersRouteImport } from './routes/_app.emergency-numbers'
@@ -47,6 +48,11 @@ const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ZhHkRoute = ZhHkRouteImport.update({
+  id: '/zh-hk',
+  path: '/zh-hk',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppAppRoute = AppAppRouteImport.update({
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/demumu-alternative': typeof DemumuAlternativeRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/zh-hk': typeof ZhHkRoute
   '/app': typeof AppAppRoute
   '/emergency-contact': typeof AppEmergencyContactRoute
   '/emergency-numbers': typeof AppEmergencyNumbersRoute
@@ -122,6 +129,7 @@ export interface FileRoutesByTo {
   '/demumu-alternative': typeof DemumuAlternativeRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/zh-hk': typeof ZhHkRoute
   '/app': typeof AppAppRoute
   '/emergency-contact': typeof AppEmergencyContactRoute
   '/emergency-numbers': typeof AppEmergencyNumbersRoute
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/demumu-alternative': typeof DemumuAlternativeRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/zh-hk': typeof ZhHkRoute
   '/_app/app': typeof AppAppRoute
   '/_app/emergency-contact': typeof AppEmergencyContactRoute
   '/_app/emergency-numbers': typeof AppEmergencyNumbersRoute
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/demumu-alternative'
     | '/privacy-policy'
     | '/sitemap.xml'
+    | '/zh-hk'
     | '/app'
     | '/emergency-contact'
     | '/emergency-numbers'
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
     | '/demumu-alternative'
     | '/privacy-policy'
     | '/sitemap.xml'
+    | '/zh-hk'
     | '/app'
     | '/emergency-contact'
     | '/emergency-numbers'
@@ -191,6 +202,7 @@ export interface FileRouteTypes {
     | '/demumu-alternative'
     | '/privacy-policy'
     | '/sitemap.xml'
+    | '/zh-hk'
     | '/_app/app'
     | '/_app/emergency-contact'
     | '/_app/emergency-numbers'
@@ -209,6 +221,7 @@ export interface RootRouteChildren {
   DemumuAlternativeRoute: typeof DemumuAlternativeRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ZhHkRoute: typeof ZhHkRoute
   ApiSendAlertRoute: typeof ApiSendAlertRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -250,6 +263,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/zh-hk': {
+      id: '/zh-hk'
+      path: '/zh-hk'
+      fullPath: '/zh-hk'
+      preLoaderRoute: typeof ZhHkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/app': {
@@ -351,6 +371,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemumuAlternativeRoute: DemumuAlternativeRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ZhHkRoute: ZhHkRoute,
   ApiSendAlertRoute: ApiSendAlertRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
