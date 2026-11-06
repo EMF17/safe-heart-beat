@@ -191,7 +191,7 @@ function HowItWorks() {
             Three steps. Then you forget about it.
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Pulse is designed to be boring on purpose. No feeds, no streaks, no
+            Pulse is designed to be boring on purpose. No feeds, no pressure, no
             guilt — just a quiet promise running in the background.
           </p>
         </div>

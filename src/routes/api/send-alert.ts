@@ -85,8 +85,8 @@ export const Route = createFileRoute("/api/send-alert")({
 
         const introText =
           type === "test"
-            ? `This is a test alert from Pulse. If ${name} ever misses two 48-hour check-ins, you'll receive a real alert at this email address.`
-            : `${name} has not checked into Pulse for 96 hours. Please call or text them to make sure they're okay.`;
+            ? `This is a test alert from Pulse. If ${name} ever misses two check-ins in a row, you'll receive a real alert at this email address.`
+            : `${name} has missed two check-ins in a row on Pulse. Please call or text them to make sure they're okay.`;
 
         // Emergency section — calm, factual, no location data
         let emergencyText = "";

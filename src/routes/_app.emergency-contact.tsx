@@ -97,7 +97,7 @@ function EmergencyContactPage() {
           Who should we notify?
         </h1>
         <p className="text-muted-foreground text-sm md:text-base mb-8">
-          We'll only email this person if you miss two check-ins in a row (96 hours).
+          We'll only email this person if you miss two check-ins in a row (96 hours with the default 48-hour rhythm).
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
