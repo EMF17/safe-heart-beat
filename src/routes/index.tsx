@@ -315,22 +315,22 @@ function Comparison() {
         </p>
       </div>
       <div className="mt-10 overflow-x-auto rounded-3xl border border-border/60 bg-card">
-        <table className="w-full text-sm">
+        <table className="w-full text-xs sm:text-sm">
           <thead>
             <tr className="border-b border-border/60 text-left">
-              <th className="p-4 font-medium"></th>
-              <th className="p-4 font-semibold text-primary">Pulse</th>
-              <th className="p-4 font-medium">Demumu</th>
-              <th className="p-4 font-medium">Snug</th>
+              <th className="px-2.5 py-3 sm:p-4 font-medium"></th>
+              <th className="px-2.5 py-3 sm:p-4 font-semibold text-primary">Pulse</th>
+              <th className="px-2.5 py-3 sm:p-4 font-medium">Demumu</th>
+              <th className="px-2.5 py-3 sm:p-4 font-medium">Snug</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r) => (
               <tr key={r[0]} className="border-b border-border/40 last:border-0">
-                <td className="p-4 text-muted-foreground">{r[0]}</td>
-                <td className="p-4 font-medium">{r[1]}</td>
-                <td className="p-4 text-muted-foreground">{r[2]}</td>
-                <td className="p-4 text-muted-foreground">{r[3]}</td>
+                <td className="px-2.5 py-3 sm:p-4 text-muted-foreground">{r[0]}</td>
+                <td className="px-2.5 py-3 sm:p-4 font-medium">{r[1]}</td>
+                <td className="px-2.5 py-3 sm:p-4 text-muted-foreground">{r[2]}</td>
+                <td className="px-2.5 py-3 sm:p-4 text-muted-foreground">{r[3]}</td>
               </tr>
             ))}
           </tbody>
