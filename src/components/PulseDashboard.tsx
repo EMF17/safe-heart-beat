@@ -600,7 +600,7 @@ function Onboarding({
                 className="w-full bg-transparent border-b border-input px-0 py-2 text-base focus:outline-none focus:border-primary transition-colors"
               />
             </Field>
-            <Field label="Emergency contact email" hint="We'll only email them if you miss 96 hours">
+            <Field label="Emergency contact email" hint="We'll only email them if you miss two check-ins in a row">
               <input
                 type="email" required value={email} onChange={e => setEmail(e.target.value)}
                 placeholder="contact@example.com"
@@ -621,7 +621,7 @@ function Onboarding({
           </form>
 
           <p className="text-xs text-muted-foreground mt-6 text-center leading-relaxed">
-            Privacy-first · No account · No location · Passkey sync optional
+            Privacy-first · No account · No location · Sync code optional
           </p>
         </div>
       </main>
