@@ -73,7 +73,7 @@ function AppLayout() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col safe-area-pt">
       <div className="flex-1 overflow-y-auto">
         <Outlet />
       </div>

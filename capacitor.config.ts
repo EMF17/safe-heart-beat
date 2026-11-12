@@ -9,6 +9,7 @@ const config: CapacitorConfig = {
   server: {
     url: "https://pulse-checkin.app/app",
     cleartext: false,
+    errorPath: "index.html",
   },
 };
 

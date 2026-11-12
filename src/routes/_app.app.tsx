@@ -11,6 +11,8 @@ export const Route = createFileRoute("/_app/app")({
   component: HomePage,
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Your check-in — Pulse" },
       {
         name: "description",

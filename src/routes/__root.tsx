@@ -71,7 +71,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       {
         name: "google-site-verification",
         content: "P6-qgGfM0sCTwiLLPeA3sFOvsSPW91MOkUL2TWX_x6s",
@@ -87,8 +87,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Pulse" },
       { name: "twitter:description", content: "A quiet safety net for people who live alone." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9c8b5b1c-c04c-450d-a0d6-391f308b1e59/id-preview-6018fbd3--57fde084-46b3-4099-b6cf-c8f440c6ec33.lovable.app-1779636615844.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9c8b5b1c-c04c-450d-a0d6-391f308b1e59/id-preview-6018fbd3--57fde084-46b3-4099-b6cf-c8f440c6ec33.lovable.app-1779636615844.png" },
     ],
     links: [
       {

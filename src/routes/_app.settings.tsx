@@ -34,6 +34,8 @@ export const Route = createFileRoute("/_app/settings")({
   component: SettingsPage,
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Settings — Pulse" },
       { name: "description", content: "Pulse app settings and preferences." },
       { property: "og:title", content: "Settings — Pulse" },

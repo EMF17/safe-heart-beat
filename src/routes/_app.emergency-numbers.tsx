@@ -68,6 +68,8 @@ export const Route = createFileRoute("/_app/emergency-numbers")({
   component: EmergencyNumbersPage,
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Worldwide Emergency Numbers — Pulse" },
       {
         name: "description",

@@ -7,6 +7,10 @@ export const Route = createFileRoute("/privacy-policy")({
     meta: [
       { title: "Privacy Policy — Pulse" },
       { name: "description", content: "Pulse privacy policy." },
+      { property: "og:title", content: "Privacy Policy — Pulse" },
+      { property: "og:description", content: "How Pulse handles check-in data, recovery codes, and safety plans." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
 });

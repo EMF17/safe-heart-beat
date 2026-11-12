@@ -13,6 +13,8 @@ export const Route = createFileRoute("/_app/history")({
   component: HistoryPage,
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Safety Check-in History — Pulse" },
       { name: "description", content: "View your Pulse check-in history and streaks." },
       { property: "og:title", content: "Safety Check-in History — Pulse" },

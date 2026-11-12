@@ -13,6 +13,8 @@ export const Route = createFileRoute("/_app/emergency-contact")({
   component: EmergencyContactPage,
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Emergency Contact — Pulse" },
       {
         name: "description",
