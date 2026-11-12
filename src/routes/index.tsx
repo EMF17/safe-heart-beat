@@ -154,8 +154,8 @@ function Hero({ returning }: { returning: boolean }) {
         </div>
 
         <p className="mt-5 text-xs text-muted-foreground">
-          Takes about 60 seconds to set up. Nothing leaves your device unless an
-          alert is needed.
+          Takes about 60 seconds to set up. No usage analytics. Online recovery
+          stores a backup; alert emails share only the details needed.
         </p>
 
         <HomeTourDemo />
@@ -245,7 +245,7 @@ function Features() {
     {
       icon: <Lock className="w-5 h-5" />,
       title: "Private by default",
-      body: "No sign-up, no ads, no analytics profile. Only what's needed to send an alert leaves your device.",
+      body: "No sign-up, no ads, no usage analytics. Check-ins stay on your device unless you enable online recovery.",
     },
     {
       icon: <HeartPulse className="w-5 h-5" />,
@@ -255,12 +255,12 @@ function Features() {
     {
       icon: <ShieldCheck className="w-5 h-5" />,
       title: "AI safety checklist",
-      body: "Describe how you live and get a personal preparedness checklist, saved only on your device.",
+      body: "Send your living situation and region to Lovable AI for a personal preparedness checklist. The finished list is saved on your device.",
     },
     {
       icon: <Smartphone className="w-5 h-5" />,
       title: "Move to a new phone",
-      body: "A sync code or QR scan brings your contact and history across — no account, and codes can expire.",
+      body: "An online backup lets a sync code or QR scan restore your contact and history — no account, and codes can expire.",
     },
   ];
 
@@ -350,7 +350,7 @@ const FAQS = [
   },
   {
     q: "Do I need an account?",
-    a: "No. There's no sign-up, email or password. Pulse creates an anonymous record so alerts can still go out if your phone is off.",
+    a: "No sign-up or password is required. Saving a contact stores it on your device. Enabling a Sync Code or passkey creates an online backup used for recovery and alerts. The current app must be open and connected to request an alert; it cannot guarantee alerts while your phone is off.",
   },
   {
     q: "What if I get a new phone?",
@@ -404,11 +404,13 @@ function PrivacySection() {
           A safety app shouldn’t watch you
         </h2>
         <p className="mt-4 text-muted-foreground leading-relaxed">
-          Pulse never asks for your location or contacts, and there is no
-          account to create and nothing to sell. We keep only what's needed to
-          send an alert — your contact's email and your latest check-in time —
-          under a random ID. The camera is used only if you choose to scan a
-          sync QR code, and nothing is recorded.
+          Pulse does not collect usage analytics, use GPS, or read your address
+          book. Contact details and check-ins are stored on your device. If you
+          enable a Sync Code or passkey, your contact details, optional name and
+          up to 500 check-ins are also stored online under a random record ID,
+          before any alert. Alert emails pass the recipient and message to
+          Resend. The optional checklist sends your description and region to
+          Lovable AI. QR scanning stays on your device; no camera images are saved.
         </p>
         <Link
           to="/privacy-policy"

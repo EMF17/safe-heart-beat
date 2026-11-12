@@ -32,19 +32,23 @@ function PrivacyPolicyPage() {
           Privacy Policy for Pulse
         </h1>
         <p className="text-sm text-white/60 mb-10">
-          Last updated: October 17, 2026
+          Last updated: November 12, 2026
         </p>
 
         <section className="mb-8">
           <h2 className="text-lg font-bold mb-3">Overview</h2>
           <p className="text-sm text-white/80 leading-relaxed">
-            Pulse is a safety check-in app that alerts an emergency contact if you miss your check-ins. There is no account, email sign-up or password. We keep as little data as possible, and most of it stays on your device.
+            Pulse is a safety check-in app designed to email an emergency contact if you miss your check-ins. There is no account sign-up or password, and no usage analytics. Contact details and check-ins are stored on your device; enabling online recovery creates a server backup before any alert. The optional AI checklist also sends your description and region for processing. We do not promise that nothing leaves your device until an alert.
           </p>
         </section>
 
         <section className="mb-8">
           <h2 className="text-lg font-bold mb-3">Data Stored on Your Device</h2>
           <ul className="space-y-3 text-sm text-white/80 leading-relaxed">
+            <li className="flex gap-2">
+              <span className="shrink-0">·</span>
+              <span><strong>Contact details:</strong> Your emergency contact&apos;s name and email, and the optional name you enter.</span>
+            </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
               <span><strong>Check-in history:</strong> Times you tapped &quot;I&apos;m Safe&quot;.</span>
@@ -65,11 +69,11 @@ function PrivacyPolicyPage() {
           <ul className="space-y-3 text-sm text-white/80 leading-relaxed">
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span><strong>Anonymous safety record:</strong> When you save an emergency contact, we create a record with a random ID (not linked to your name, phone or device). It holds your contact&apos;s name and email, the optional name you entered, and your latest check-in time, so alerts can be sent even if your phone is off or lost.</span>
+              <span><strong>Online recovery and alert record:</strong> Saving a contact alone stores it on your device. If you enable a Sync Code or passkey, we create an online record under a random ID. It contains your contact&apos;s name and email, your optional name, latest check-in time and up to 500 check-ins, and updates while recovery is enabled. This is personal data, not anonymous data, and is stored before an alert. Alerts use this record; the current app must be open and connected to request them. Alerts while your phone is off are not guaranteed.</span>
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span><strong>Sync code backup (optional):</strong> If you create a sync code, your check-in history (up to 500 entries) is also stored so you can restore it on a new device. The code itself is never stored — only a one-way scrambled fingerprint, so we cannot read or recover it. You can choose for the code to expire automatically (1 hour to 30 days); expired codes stop working and are cleared.</span>
+              <span><strong>Recovery credentials (optional):</strong> A Sync Code lets another device retrieve your online backup. Only a one-way fingerprint of the code is stored on our servers. You can choose an expiry of 1 hour, 24 hours, 7 days or 30 days, or no expiry. Expired codes cannot restore data; expiry does not delete the backup. Passkey recovery stores public credential information, not your private passkey.</span>
             </li>
           </ul>
         </section>
@@ -107,7 +111,7 @@ function PrivacyPolicyPage() {
           <ul className="space-y-3 text-sm text-white/80 leading-relaxed">
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span>If you use the personal safety checklist, the living-situation description and region you type are sent to our AI provider (via Lovable AI) to create your checklist. This text is not linked to your safety record, and we don&apos;t store it on our servers. The finished checklist is saved only on your device.</span>
+              <span>If you use the personal safety checklist, the living-situation description and region you type pass through Pulse&apos;s server to Lovable AI and its model provider to create your checklist, before any alert. Pulse does not save that text in your safety record or checklist database. Provider processing and operational logs are separate from usage analytics; we do not promise that providers retain nothing. The finished checklist is saved on your device.</span>
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
@@ -131,11 +135,11 @@ function PrivacyPolicyPage() {
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span><strong>Lovable Cloud:</strong> Hosts the app and the secure database that holds your anonymous safety record.</span>
+              <span><strong>Lovable Cloud:</strong> Hosts the app and stores your online recovery and alert record when enabled. Hosting and service operation may involve technical logs; disabling usage analytics does not remove data needed to operate these services.</span>
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span><strong>Lovable AI:</strong> Generates the optional safety checklist from the text you provide.</span>
+              <span><strong>Lovable AI:</strong> Processes your description and region with its model provider for the optional checklist. See <a href="https://lovable.dev/privacy" target="_blank" rel="noopener noreferrer" className="underline text-white/90 hover:text-white">Lovable&apos;s privacy policy</a> for how Lovable handles data.</span>
             </li>
           </ul>
         </section>
@@ -149,7 +153,7 @@ function PrivacyPolicyPage() {
             </li>
             <li className="flex items-center gap-2">
               <span className="shrink-0 text-red-400">❌</span>
-              <span>No device identifiers or advertising IDs</span>
+              <span>No advertising IDs; online recovery uses a random record ID and recovery credentials</span>
             </li>
             <li className="flex items-center gap-2">
               <span className="shrink-0 text-red-400">❌</span>
@@ -175,7 +179,7 @@ function PrivacyPolicyPage() {
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span><strong>Turn off sync code:</strong> Settings → Sync Code → Turn off makes your code stop working immediately.</span>
+              <span><strong>Turn off sync code:</strong> Settings → Sync Code → Turn off makes your code stop working immediately. This does not delete the online backup or stop an already connected device from updating it. Use Delete All Data to request removal of the online record.</span>
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
@@ -208,7 +212,7 @@ function PrivacyPolicyPage() {
         <section className="mb-12">
           <h2 className="text-lg font-bold mb-3">Contact Us</h2>
           <p className="text-sm text-white/80 leading-relaxed">
-            For privacy questions or to request data deletion (though we store nothing server-side), contact:{" "}
+            For privacy questions or to request deletion of your online data, contact:{" "}
             <a
               href="mailto:pulse.safety.fin@gmail.com"
               className="underline text-white/90 hover:text-white"
