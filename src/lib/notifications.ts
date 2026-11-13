@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { isNativeApp, requestNativePermission, scheduleNativeReminders, cancelNativeReminders } from "./native-reminders";
 
 const FIRED_KEY = "pulse:firedNotifications";
 
@@ -68,11 +69,24 @@ export function useCheckInNotifications(
   const { intervalMs, alertThresholdMs, reminderEnabled, isPaused } = opts;
 
   useEffect(() => {
-    requestNotificationPermission();
+    if (isNativeApp()) requestNativePermission().catch(() => {});
+    else requestNotificationPermission();
   }, []);
+
+  // In the phone app, schedule reminders on the device so they fire while closed.
+  useEffect(() => {
+    if (!isNativeApp()) return;
+    const run = async () => {
+      if (lastCheckIn === null || isPaused || !reminderEnabled) return cancelNativeReminders();
+      await requestNativePermission();
+      return scheduleNativeReminders(lastCheckIn, intervalMs, alertThresholdMs);
+    };
+    run().catch(() => {});
+  }, [lastCheckIn, intervalMs, alertThresholdMs, reminderEnabled, isPaused]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (isNativeApp()) return;
     if (lastCheckIn === null) return;
     if (isPaused) return;
 

@@ -21,6 +21,7 @@
     "@capacitor/android": "^8.6.0",
     "@capacitor/core": "^8.6.0",
     "@capacitor/ios": "^8.6.0",
+    "@capacitor/local-notifications": "^8",
     "@cloudflare/vite-plugin": "^1.43.0",
     "@fontsource/manrope": "^5.2.8",
     "@fontsource/sora": "^5.2.8",
