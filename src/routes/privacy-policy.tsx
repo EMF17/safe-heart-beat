@@ -38,7 +38,7 @@ function PrivacyPolicyPage() {
         <section className="mb-8">
           <h2 className="text-lg font-bold mb-3">Overview</h2>
           <p className="text-sm text-white/80 leading-relaxed">
-            Pulse is a safety check-in app designed to email an emergency contact if you miss your check-ins. There is no account sign-up or password, and no usage analytics. Contact details and check-ins are stored on your device; enabling online recovery creates a server backup before any alert. The optional AI checklist also sends your description and region for processing. We do not promise that nothing leaves your device until an alert.
+            Pulse is a safety check-in app designed to email an emergency contact if you miss your check-ins. There is no account sign-up or password. Visits are counted anonymously without cookies. Contact details and check-ins are stored on your device; enabling online recovery creates a server backup before any alert. The optional AI checklist also sends your description and region for processing. We do not promise that nothing leaves your device until an alert.
           </p>
         </section>
 
@@ -111,7 +111,7 @@ function PrivacyPolicyPage() {
           <ul className="space-y-3 text-sm text-white/80 leading-relaxed">
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span>If you use the personal safety checklist, the living-situation description and region you type pass through Pulse&apos;s server to Lovable AI and its model provider to create your checklist, before any alert. Pulse does not save that text in your safety record or checklist database. Provider processing and operational logs are separate from usage analytics; we do not promise that providers retain nothing. The finished checklist is saved on your device.</span>
+              <span>If you use the personal safety checklist, the living-situation description and region you type pass through Pulse&apos;s server to Lovable AI and its model provider to create your checklist, before any alert. Pulse does not save that text in your safety record or checklist database. Provider processing and operational logs are separate from visit counting; we do not promise that providers retain nothing. The finished checklist is saved on your device.</span>
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
@@ -135,7 +135,11 @@ function PrivacyPolicyPage() {
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span><strong>Lovable Cloud:</strong> Hosts the app and stores your online recovery and alert record when enabled. Hosting and service operation may involve technical logs; disabling usage analytics does not remove data needed to operate these services.</span>
+              <span><strong>Lovable Cloud:</strong> Hosts the app and stores your online recovery and alert record when enabled. Hosting and service operation may involve technical logs; these are separate from visit counting.</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="shrink-0">·</span>
+              <span><strong>Visit counting (Lovable):</strong> Pulse counts visits using Lovable&apos;s analytics. It uses no cookies, stores nothing on your device, doesn&apos;t keep IP addresses and doesn&apos;t identify you. It records the pages visited, where visitors came from, country, browser, operating system and device type, how long visits last, page speed, errors, and which buttons and links are clicked. This is recorded for every visitor. Detailed data is kept for 90 days and daily summaries for a year. Lovable collects this data for us. <a href="https://lovable.dev/privacy" target="_blank" rel="noopener noreferrer" className="underline text-white/90 hover:text-white">Lovable&apos;s privacy policy</a> explains how it handles it.</span>
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
@@ -157,7 +161,7 @@ function PrivacyPolicyPage() {
             </li>
             <li className="flex items-center gap-2">
               <span className="shrink-0 text-red-400">❌</span>
-              <span>No usage analytics or tracking</span>
+              <span>No cookies, cross-site tracking or advertising profiles</span>
             </li>
             <li className="flex items-center gap-2">
               <span className="shrink-0 text-red-400">❌</span>

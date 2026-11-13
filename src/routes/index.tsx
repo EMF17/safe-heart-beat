@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Tap one button every 48 hours. If you ever miss two check-ins, Pulse emails your emergency contact. No accounts, no tracking, free to use.",
+          "Tap one button every 48 hours. If you ever miss two check-ins, Pulse emails your emergency contact. No accounts, no cookies, free to use.",
       },
       { property: "og:type", content: "website" },
       { property: "og:title", content: "Pulse Safety Check-in — Free safety app for people who live alone" },
@@ -154,7 +154,7 @@ function Hero({ returning }: { returning: boolean }) {
         </div>
 
         <p className="mt-5 text-xs text-muted-foreground">
-          Takes about 60 seconds to set up. No usage analytics. Online recovery
+          Takes about 60 seconds to set up. Visits counted without cookies. Online recovery
           stores a backup; alert emails share only the details needed.
         </p>
 
@@ -245,7 +245,7 @@ function Features() {
     {
       icon: <Lock className="w-5 h-5" />,
       title: "Private by default",
-      body: "No sign-up, no ads, no usage analytics. Check-ins stay on your device unless you enable online recovery.",
+      body: "No sign-up, no ads, no cookies. Check-ins stay on your device unless you enable online recovery.",
     },
     {
       icon: <HeartPulse className="w-5 h-5" />,
@@ -404,7 +404,7 @@ function PrivacySection() {
           A safety app shouldn’t watch you
         </h2>
         <p className="mt-4 text-muted-foreground leading-relaxed">
-          Pulse does not collect usage analytics, use GPS, or read your address
+          Pulse counts visits without cookies or identifying you, and does not use GPS or read your address
           book. Contact details and check-ins are stored on your device. If you
           enable a Sync Code or passkey, your contact details, optional name and
           up to 500 check-ins are also stored online under a random record ID,
