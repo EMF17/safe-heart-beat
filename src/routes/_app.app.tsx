@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_app/app")({
       {
         property: "og:description",
         content:
-          "A simple 'I'm Safe' button. No accounts, no tracking. If you miss two check-ins, we email your emergency contact.",
+          "A simple 'I'm Safe' button. No accounts, no cookies. If you miss two check-ins, we email your emergency contact.",
       },
       { property: "og:url", content: "https://pulse-checkin.app/app" },
     ],
@@ -140,7 +140,7 @@ function OnboardingScreen({ onDismiss }: { onDismiss: () => void }) {
         </button>
 
         <p className="text-[11px] text-muted-foreground text-center mt-4 leading-relaxed">
-          No account · No tracking · Your data stays on this device
+          No account · Visits counted without cookies · Data stays on this device unless you turn on sync
         </p>
       </div>
     </div>

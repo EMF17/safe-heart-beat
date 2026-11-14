@@ -572,7 +572,7 @@ function Onboarding({
             Your quiet safety net.
           </h1>
           <p className="text-muted-foreground mb-6 leading-relaxed">
-            Tell us who to reach if you miss two check-ins. No accounts, no tracking — your data stays on this device unless you turn on sync.
+            Tell us who to reach if you miss two check-ins. No accounts, no cookies — your data stays on this device unless you turn on sync.
           </p>
 
           {!onCancel && webAuthnSupported && (

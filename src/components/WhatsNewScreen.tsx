@@ -63,7 +63,7 @@ export function WhatsNewScreen({ onDismiss }: WhatsNewScreenProps) {
 
         {/* Privacy note */}
         <p className="text-xs text-muted-foreground text-center mb-6 leading-relaxed">
-          Everything stays private. No accounts. No tracking. Just you and your safety net.
+          Everything stays private. No accounts. No cookies. Just you and your safety net.
         </p>
 
         {/* CTA */}
