@@ -106,6 +106,7 @@ export type Database = {
           checkins: Json
           contact_email: string
           contact_name: string
+          contact_phone: string | null
           created_at: string
           id: string
           last_checkin: string | null
@@ -119,6 +120,7 @@ export type Database = {
           checkins?: Json
           contact_email: string
           contact_name?: string
+          contact_phone?: string | null
           created_at?: string
           id?: string
           last_checkin?: string | null
@@ -132,6 +134,7 @@ export type Database = {
           checkins?: Json
           contact_email?: string
           contact_name?: string
+          contact_phone?: string | null
           created_at?: string
           id?: string
           last_checkin?: string | null
@@ -142,6 +145,38 @@ export type Database = {
           user_name?: string
         }
         Relationships: []
+      }
+      pulse_alert_deliveries: {
+        Row: {
+          account_id: string
+          channel: string
+          checkin_key: string
+          created_at: string
+          status: string
+        }
+        Insert: {
+          account_id: string
+          channel: string
+          checkin_key: string
+          created_at?: string
+          status?: string
+        }
+        Update: {
+          account_id?: string
+          channel?: string
+          checkin_key?: string
+          created_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pulse_alert_deliveries_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "pulse_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pulse_challenges: {
         Row: {

@@ -3,6 +3,7 @@ import { getRequestHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
 
 import * as sync from "./sync.server";
+import { normalizeContactPhone } from "./contact-phone";
 
 function getOrigin(passedOrigin?: string): string {
   // Prefer the request Origin header (server-trusted). Fall back to client-passed
@@ -79,6 +80,7 @@ const stateSchema = z.object({
   userName: z.string().max(80).default(""),
   contactName: z.string().max(80).default(""),
   contactEmail: z.string().email().max(255),
+  contactPhone: z.string().max(40).nullable().optional().transform((value) => value == null ? value : normalizeContactPhone(value)),
   lastCheckin: z.string().datetime().nullable(),
   checkins: z.array(z.string()).max(1000).optional(),
 });
@@ -99,6 +101,16 @@ export const pullSyncState = createServerFn({ method: "POST" })
     z.object({ token: z.string().min(10).max(2048) }).parse(input),
   )
   .handler(async ({ data }) => sync.pullState(data.token));
+
+export const saveContactPhone = createServerFn({ method: "POST" })
+  .inputValidator((input) => z.object({ token: z.string().min(10).max(2048), phone: z.string().max(40) }).parse(input))
+  .handler(async ({ data }) => sync.updateContactPhone(data.token, normalizeContactPhone(data.phone)));
+
+export const getSmsStatus = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { smsConfigured } = await import("./sms.server");
+    return { connected: smsConfigured() };
+  });
 
 export const deleteSyncAccount = createServerFn({ method: "POST" })
   .inputValidator((input) =>

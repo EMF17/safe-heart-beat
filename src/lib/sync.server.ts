@@ -246,6 +246,7 @@ export async function finishAuthentication(args: {
       userName: account.user_name,
       contactName: account.contact_name,
       contactEmail: account.contact_email,
+      contactPhone: account.contact_phone,
       lastCheckin: account.last_checkin,
     },
   };
@@ -257,6 +258,7 @@ export interface SyncedState {
   userName: string;
   contactName: string;
   contactEmail: string;
+  contactPhone?: string | null;
   lastCheckin: string | null;
   /** Full check-in history as ISO timestamps (most recent last). */
   checkins?: string[];
@@ -289,6 +291,7 @@ export async function pushState(token: string, state: SyncedState) {
       user_name: state.userName,
       contact_name: state.contactName,
       contact_email: state.contactEmail,
+      ...(state.contactPhone !== undefined ? { contact_phone: state.contactPhone } : {}),
       last_checkin: state.lastCheckin,
       ...(history ? { checkins: history } : {}),
     })
@@ -310,6 +313,7 @@ export async function pullState(token: string) {
     userName: data.user_name,
     contactName: data.contact_name,
     contactEmail: data.contact_email,
+    contactPhone: data.contact_phone,
     lastCheckin: data.last_checkin,
     checkins: readHistory(data.checkins),
     hasRecoveryCode: !!data.recovery_code_hash,
@@ -415,6 +419,7 @@ export async function redeemRecoveryCode(code: string) {
       userName: data.user_name,
       contactName: data.contact_name,
       contactEmail: data.contact_email,
+      contactPhone: data.contact_phone,
       lastCheckin: data.last_checkin,
       checkins: readHistory(data.checkins),
     },
@@ -425,6 +430,13 @@ export async function redeemRecoveryCode(code: string) {
 export async function deleteAccount(token: string) {
   const accountId = verifyToken(token);
   const { error } = await supabaseAdmin.from("pulse_accounts").delete().eq("id", accountId);
+  if (error) throw new Error(error.message);
+  return { ok: true };
+}
+
+export async function updateContactPhone(token: string, phone: string | null) {
+  const accountId = verifyToken(token);
+  const { error } = await supabaseAdmin.from("pulse_accounts").update({ contact_phone: phone }).eq("id", accountId);
   if (error) throw new Error(error.message);
   return { ok: true };
 }

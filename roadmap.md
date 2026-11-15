@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Add Settings phone number and prepare SMS delivery alongside email
+- [ ] Connect Twilio and verify real SMS delivery (connection declined; needs SMS-capable number and supported destinations)
 - [x] Phone-app reminders scheduled on the device (due, missed, 1 hour before alert)
 - [ ] WhatsApp alerts to contacts (waiting: user skipped connecting a WhatsApp Business account)
 - [x] Align homepage and privacy policy with actual storage and disable usage analytics

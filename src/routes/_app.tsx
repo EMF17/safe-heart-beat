@@ -58,11 +58,15 @@ function AppLayout() {
           type: "missed",
           countryCode,
         }),
-      }).catch(() => {
-        localStorage.removeItem(LAST_ALERT_KEY);
-      });
+      }).then(async (response) => {
+        const result = await response.json();
+        // Keep retries possible for a failed or not-yet-connected channel.
+        if (!response.ok || !result.success || (contact.phone && result.sms?.status !== "sent" && result.sms?.status !== "already_sent")) {
+          localStorage.removeItem(LAST_ALERT_KEY);
+        }
+      }).catch(() => localStorage.removeItem(LAST_ALERT_KEY));
     });
-  }, [hydrated, lastCheckIn, contact?.email, contact?.name, alertThresholdMs, isPaused, syncToken]);
+  }, [hydrated, lastCheckIn, contact?.email, contact?.name, contact?.phone, alertThresholdMs, isPaused, syncToken]);
 
 
   const tabs = [

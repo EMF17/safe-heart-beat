@@ -1,2 +1,3 @@
 - Native iOS/Android apps use Capacitor (capacitor.config.ts) as a shell loading the live site URL; why: SSR + server functions can't run from a static bundle.
 - Keep native platform source in ios/ and android/ and sync with Capacitor; why: device builds need persistent camera permissions, icons, and offline fallback settings.
+- SMS delivery uses the server-only Twilio gateway and the signed recovery token; persist separate email/SMS receipts so retrying one channel does not repeat the other.

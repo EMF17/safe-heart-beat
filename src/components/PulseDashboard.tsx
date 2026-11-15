@@ -535,7 +535,7 @@ function Onboarding({
       setError("Enter a valid email for your emergency contact.");
       return;
     }
-    onSave({ name: name.trim(), email: trimmedEmail }, userName.trim());
+    onSave({ ...initial, name: name.trim(), email: trimmedEmail }, userName.trim());
   };
 
   const handleRestore = async () => {

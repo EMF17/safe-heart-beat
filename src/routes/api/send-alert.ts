@@ -12,12 +12,6 @@ export const Route = createFileRoute("/api/send-alert")({
     handlers: {
       POST: async ({ request }) => {
         const apiKey = process.env.RESEND_API_KEY;
-        if (!apiKey) {
-          return Response.json(
-            { error: "RESEND_API_KEY is not configured" },
-            { status: 500 }
-          );
-        }
 
         let body: AlertPayload;
         try {
@@ -54,7 +48,7 @@ export const Route = createFileRoute("/api/send-alert")({
 
         const { data: account, error: accErr } = await supabaseAdmin
           .from("pulse_accounts")
-          .select("contact_email, contact_name")
+          .select("contact_email, contact_name, contact_phone, last_checkin")
           .eq("id", accountId)
           .single();
         if (accErr || !account) {
@@ -140,6 +134,33 @@ export const Route = createFileRoute("/api/send-alert")({
   <p style="margin:24px 0 0;font-size:12px;color:#888">Pulse Safety · pulse-checkin.app</p>
 </div>`;
 
+        const { sendSms, smsConfigured } = await import("@/lib/sms.server");
+        type Delivery = { status: "sent" | "already_sent" | "not_connected" | "no_number" | "failed" | "sending"; error?: string };
+        // Receipts are independent: an email success never suppresses a pending SMS.
+        const key = account.last_checkin ?? "no-checkin";
+        const deliver = async (channel: "email" | "sms", send: () => Promise<Delivery>): Promise<Delivery> => {
+          if (type === "test") return send();
+          const { error: claimError } = await supabaseAdmin.from("pulse_alert_deliveries").insert({ account_id: accountId, checkin_key: key, channel });
+          if (claimError) {
+            const { data: receipt } = await supabaseAdmin.from("pulse_alert_deliveries").select("status").eq("account_id", accountId).eq("checkin_key", key).eq("channel", channel).maybeSingle();
+            return { status: receipt?.status === "sent" ? "already_sent" : "sending" };
+          }
+          let result: Delivery;
+          try { result = await send(); }
+          catch (error) {
+            console.error(`${channel} delivery failed`, error instanceof Error ? error.message : "Unknown error");
+            result = { status: "failed", error: `Could not send ${channel}. Please try again.` };
+          }
+          if (result.status === "sent") {
+            await supabaseAdmin.from("pulse_alert_deliveries").update({ status: "sent" }).eq("account_id", accountId).eq("checkin_key", key).eq("channel", channel);
+          } else {
+            await supabaseAdmin.from("pulse_alert_deliveries").delete().eq("account_id", accountId).eq("checkin_key", key).eq("channel", channel);
+          }
+          return result;
+        };
+
+        const [email, sms] = await Promise.all([
+          apiKey ? deliver("email", async () => {
         const res = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
@@ -155,14 +176,18 @@ export const Route = createFileRoute("/api/send-alert")({
           }),
         });
 
-        const data = await res.json().catch(() => ({}));
         if (!res.ok) {
-          return Response.json(
-            { error: (data as any)?.message || "Failed to send email", details: data },
-            { status: res.status }
-          );
+          const errorBody = await res.text();
+          console.error(`Resend failed [${res.status}]: ${errorBody}`);
+          return { status: "failed", error: "Email provider did not accept the alert." };
         }
-        return Response.json({ success: true, id: (data as any)?.id });
+        return { status: "sent" };
+          }) : Promise.resolve<Delivery>({ status: "not_connected" }),
+          account.contact_phone && smsConfigured()
+            ? deliver("sms", () => sendSms(account.contact_phone ?? "", `Pulse Safety: ${type === "test" ? "TEST — " : ""}${type === "test" ? "This is a test safety alert for" : "Two missed check-ins for"} ${name}. ${type === "test" ? "No action needed." : "Please call or text them to check they are okay."}${emergencyText}`))
+            : Promise.resolve<Delivery>({ status: account.contact_phone ? "not_connected" : "no_number" }),
+        ]);
+        return Response.json({ success: email.status === "sent" || email.status === "already_sent" || sms.status === "sent" || sms.status === "already_sent", email, sms });
       },
     },
   },

@@ -4,6 +4,10 @@ import { Switch } from "@/components/ui/switch";
 import { requestNotificationPermission } from "@/lib/notifications";
 import { usePreferences, SUPPORTED_INTERVALS, formatPauseDate, type IntervalHours } from "@/lib/preferences";
 import { SyncCodeCard } from "@/components/SyncCodeCard";
+import { Button } from "@/components/ui/button";
+import { useServerFn } from "@tanstack/react-start";
+import { getSmsStatus, saveContactPhone } from "@/lib/sync.functions";
+import { normalizeContactPhone } from "@/lib/contact-phone";
 
 
 const ONBOARDING_KEY = "pulse:onboardingCompleted";
@@ -28,6 +32,7 @@ const CONTACT_KEY = "pulse:contact";
 interface Contact {
   name: string;
   email: string;
+  phone?: string | null;
 }
 
 export const Route = createFileRoute("/_app/settings")({
@@ -56,6 +61,12 @@ function SettingsPage() {
   const prefs = usePreferences();
   const [contact, setContact] = useState<Contact | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [savingPhone, setSavingPhone] = useState(false);
+  const [smsConnected, setSmsConnected] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const savePhone = useServerFn(saveContactPhone);
+  const smsStatus = useServerFn(getSmsStatus);
 
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -75,11 +86,32 @@ function SettingsPage() {
     const raw = window.localStorage.getItem(CONTACT_KEY);
     if (raw) {
       try {
-        setContact(JSON.parse(raw));
+        const stored = JSON.parse(raw) as Contact;
+        setContact(stored);
+        setPhone(stored.phone ?? "");
       } catch {}
     }
     setHydrated(true);
+    smsStatus().then((status) => setSmsConnected(status.connected)).catch(() => {});
   }, []);
+
+  const handleSavePhone = async () => {
+    if (!contact) return;
+    setSavingPhone(true);
+    try {
+      const normalized = normalizeContactPhone(phone);
+      const token = localStorage.getItem("pulse:syncToken");
+      if (token) await savePhone({ data: { token, phone: normalized ?? "" } });
+      const updated = { ...contact, phone: normalized };
+      localStorage.setItem(CONTACT_KEY, JSON.stringify(updated));
+      setContact(updated);
+      setPhone(normalized ?? "");
+      window.dispatchEvent(new Event("pulse:contactChanged"));
+      showToast(normalized ? "Phone number saved." : "SMS number removed; email stays enabled.");
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Could not save phone number.");
+    } finally { setSavingPhone(false); }
+  };
 
   const handleReminderToggle = async (next: boolean) => {
     prefs.setReminderEnabled(next);
@@ -169,6 +201,7 @@ function SettingsPage() {
       navigator.vibrate(15);
     }
     showToast("Sending test alert…");
+    setTesting(true);
     try {
       const { getActiveCountryCode } = await import("@/lib/region");
       const countryCode = getActiveCountryCode();
@@ -186,10 +219,12 @@ function SettingsPage() {
         showToast(`Failed to send test alert: ${data?.error || res.statusText}`);
         return;
       }
-      showToast("Test alert sent! Check their inbox.");
+      const emailSent = data.email?.status === "sent";
+      const smsSent = data.sms?.status === "sent";
+      showToast(smsSent && emailSent ? "Test email and SMS accepted for delivery." : smsSent ? "Test SMS accepted; email failed." : emailSent ? `Test email accepted. ${data.sms?.status === "failed" ? data.sms.error : "SMS is pending Twilio setup or a saved phone number."}` : "Neither alert was accepted. Please check your delivery settings.");
     } catch (e) {
       showToast(`Failed: ${e instanceof Error ? e.message : "Network error"}`);
-    }
+    } finally { setTesting(false); }
   };
 
   if (!hydrated) return <div className="min-h-full" />;
@@ -230,12 +265,21 @@ function SettingsPage() {
             ) : (
               <p className="text-sm text-muted-foreground">No contact saved</p>
             )}
-            <button
+            {contact && <div className="space-y-3 border-t border-border pt-4">
+              <label htmlFor="contact-phone" className="block text-sm font-medium">Emergency contact phone (optional)</label>
+              <input id="contact-phone" type="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="+852 9123 4567" className="w-full min-w-0 rounded-md border border-input bg-background px-3 py-2 text-base" />
+              <p className="text-xs text-muted-foreground">Include the country code. Only add a contact who agrees to receive safety and test texts. Leave blank for email only.</p>
+              <Button onClick={handleSavePhone} disabled={savingPhone} variant="outline" className="w-full">{savingPhone ? "Saving…" : "Save phone number"}</Button>
+              <p className="text-xs text-muted-foreground">{smsConnected ? "Twilio connected — SMS will accompany email when a number is saved." : "SMS pending — texts start once Twilio is connected with an SMS-capable number."} Online recovery must be enabled for alerts; the app must be open and connected.</p>
+            </div>}
+            <Button
               onClick={handleSendTestAlert}
+              disabled={testing}
+              variant="outline"
               className="w-full h-11 rounded-full border-2 border-primary text-primary font-medium text-sm hover:bg-primary/10 active:scale-[0.98] transition"
             >
               Send Test Alert
-            </button>
+            </Button>
           </div>
         </section>
 

@@ -47,6 +47,7 @@ export const ALERT_THRESHOLD_MS = 96 * 60 * 60 * 1000;
 export interface Contact {
   name: string;
   email: string;
+  phone?: string | null;
 }
 
 export type SyncStatus = "off" | "ready" | "syncing" | "error";
@@ -103,6 +104,17 @@ export function usePulse() {
     return () => clearInterval(id);
   }, []);
 
+  useEffect(() => {
+    const refresh = () => {
+      try {
+        const raw = localStorage.getItem(CONTACT_KEY);
+        if (raw) setContact(JSON.parse(raw));
+      } catch {}
+    };
+    window.addEventListener("pulse:contactChanged", refresh);
+    return () => window.removeEventListener("pulse:contactChanged", refresh);
+  }, []);
+
   // Debounced push when synced & state changes
   const pushTimer = useRef<number | null>(null);
   useEffect(() => {
@@ -118,6 +130,7 @@ export function usePulse() {
               userName,
               contactName: contact.name,
               contactEmail: contact.email,
+              contactPhone: contact.phone ?? null,
               lastCheckin: lastCheckIn ? new Date(lastCheckIn).toISOString() : null,
               checkins: readLocalHistory().map((n) => new Date(n).toISOString()),
             },
@@ -154,6 +167,7 @@ export function usePulse() {
   const saveContact = useCallback((c: Contact) => {
     localStorage.setItem(CONTACT_KEY, JSON.stringify(c));
     setContact(c);
+    window.dispatchEvent(new Event("pulse:contactChanged"));
   }, []);
 
   const saveName = useCallback((n: string) => {
@@ -214,7 +228,7 @@ export function usePulse() {
       localStorage.setItem(NAME_KEY, account.userName ?? "");
       setUserName(account.userName ?? "");
 
-      const restoredContact = { name: account.contactName ?? "", email: account.contactEmail };
+      const restoredContact = { name: account.contactName ?? "", email: account.contactEmail, phone: account.contactPhone };
       localStorage.setItem(CONTACT_KEY, JSON.stringify(restoredContact));
       setContact(restoredContact);
 
@@ -292,6 +306,7 @@ export function usePulse() {
         const restoredContact = {
           name: account.contactName ?? "",
           email: account.contactEmail,
+          phone: account.contactPhone,
         };
         localStorage.setItem(CONTACT_KEY, JSON.stringify(restoredContact));
         setContact(restoredContact);
@@ -352,9 +367,9 @@ export function usePulse() {
   if (prefs.isPaused) {
     status = "paused";
   } else if (lastCheckIn) {
-    if (elapsed! >= alertThresholdMs) status = "alert";
-    else if (elapsed! >= intervalMs) status = "overdue";
-    else if (elapsed! >= intervalMs * 0.75) status = "due";
+    if ((elapsed ?? 0) >= alertThresholdMs) status = "alert";
+    else if ((elapsed ?? 0) >= intervalMs) status = "overdue";
+    else if ((elapsed ?? 0) >= intervalMs * 0.75) status = "due";
     else status = "fresh";
   }
 

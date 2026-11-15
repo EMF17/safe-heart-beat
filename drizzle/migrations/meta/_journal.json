@@ -8,6 +8,13 @@
       "when": 1792220790465,
       "tag": "0000_sync_code_expiry",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794722131634,
+      "tag": "0001_emergency_contact_sms",
+      "breakpoints": true
     }
   ]
 }
