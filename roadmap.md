@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Add Pulse browser/home-screen icons and prepare matching app-store icons (store submission still required)
 - [x] Add Settings phone number and prepare SMS delivery alongside email
 - [ ] Connect Twilio and verify real SMS delivery (connection declined; needs SMS-capable number and supported destinations)
 - [x] Phone-app reminders scheduled on the device (due, missed, 1 hour before alert)

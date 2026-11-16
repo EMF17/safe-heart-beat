@@ -28,7 +28,11 @@ Requires Android Studio, the Android SDK selected by the project's Gradle config
 
 To generate an Android test APK locally, run `bun run mobile:apk`. It is written to `android/app/build/outputs/apk/debug/app-debug.apk`. This is a debug build, not a Play Store release. Store distribution requires a signed release, a Play Console account, and review. Never commit signing keys.
 
-## Current limitations
+## App and website icons
+
+The browser favicon and Apple home-screen icon use the same Pulse artwork as the configured iPhone and Android app icons. The iPhone App Store icon is `ios/App/App/Assets.xcassets/AppIcon.appiconset/pulse-icon.png` (1024 × 1024, opaque RGB), already selected in the Xcode asset catalog. The Google Play listing icon is `android/store/pulse-icon.png` (512 × 512, opaque RGB); upload it to the store listing when submitting the Android release. Store listings do not update from website publishing: signed app submission and store review are still required.
+
+## Device testing limitations
 
 - Internet is required to load the app; failed loading shows a local connection message. Reopen the app after reconnecting.
 - QR scanning has camera permission declarations but must be tested on real devices.
