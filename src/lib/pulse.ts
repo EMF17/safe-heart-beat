@@ -185,9 +185,9 @@ export function usePulse() {
     setSyncError(null);
     try {
       const origin = window.location.origin;
-      const accountId = localStorage.getItem(ACCOUNT_KEY);
+      const existingToken = localStorage.getItem(TOKEN_KEY);
       const { options, accountId: nextAccount, challengeId } = await callStartReg({
-        data: { accountId, contactEmail, origin },
+        data: { token: existingToken, contactEmail, origin },
       });
       const credential = await browserStartRegistration({ optionsJSON: options });
       const { token } = await callFinishReg({

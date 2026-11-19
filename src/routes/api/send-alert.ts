@@ -38,7 +38,7 @@ export const Route = createFileRoute("/api/send-alert")({
 
         let accountId: string;
         try {
-          accountId = verifyToken(token);
+          accountId = await verifyToken(token);
         } catch {
           return Response.json(
             { error: "Invalid or expired token" },
@@ -65,8 +65,17 @@ export const Route = createFileRoute("/api/send-alert")({
         }
 
         const type = body.type === "test" ? "test" : "missed";
+        // Missed alerts only go out when the account is genuinely overdue
+        // (shortest setting: two missed 24-hour windows).
+        const MIN_OVERDUE_MS = 47 * 3600_000;
+        const lastMs = account.last_checkin ? new Date(account.last_checkin).getTime() : NaN;
+        if (type === "missed" && (!Number.isFinite(lastMs) || Date.now() - lastMs < MIN_OVERDUE_MS)) {
+          return Response.json({ error: "No missed check-in to report" }, { status: 409 });
+        }
+        const escapeHtml = (v: string) =>
+          v.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
         const countryCode = (body.countryCode ?? "").trim().toUpperCase();
-        const name = contactName || "Your contact";
+        const name = (contactName || "Your contact").replace(/[\r\n<>]/g, " ").slice(0, 80);
 
         const country = countryCode
           ? emergencyNumbers.find((c) => c.code === countryCode) ?? null
@@ -127,8 +136,8 @@ export const Route = createFileRoute("/api/send-alert")({
         const bodyText = `${introText}${emergencyText}${footerText}`;
 
         const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px;line-height:1.55;color:#1a1a1a;max-width:560px">
-  <h2 style="font-size:18px;margin:0 0 16px">${subject}</h2>
-  <p style="margin:0 0 8px">${introText}</p>
+  <h2 style="font-size:18px;margin:0 0 16px">${escapeHtml(subject)}</h2>
+  <p style="margin:0 0 8px">${escapeHtml(introText)}</p>
   ${emergencyHtml}
   <p style="margin:16px 0 0;font-size:13px;color:#666">No location tracking. No automatic 911. This is an automated safety alert from Pulse.</p>
   <p style="margin:24px 0 0;font-size:12px;color:#888">Pulse Safety · pulse-checkin.app</p>
@@ -137,9 +146,9 @@ export const Route = createFileRoute("/api/send-alert")({
         const { sendSms, smsConfigured } = await import("@/lib/sms.server");
         type Delivery = { status: "sent" | "already_sent" | "not_connected" | "no_number" | "failed" | "sending"; error?: string };
         // Receipts are independent: an email success never suppresses a pending SMS.
-        const key = account.last_checkin ?? "no-checkin";
+        // Test alerts are limited to one per account per day.
+        const key = type === "test" ? `test-${new Date().toISOString().slice(0, 10)}` : (account.last_checkin ?? "no-checkin");
         const deliver = async (channel: "email" | "sms", send: () => Promise<Delivery>): Promise<Delivery> => {
-          if (type === "test") return send();
           const { error: claimError } = await supabaseAdmin.from("pulse_alert_deliveries").insert({ account_id: accountId, checkin_key: key, channel });
           if (claimError) {
             const { data: receipt } = await supabaseAdmin.from("pulse_alert_deliveries").select("status").eq("account_id", accountId).eq("checkin_key", key).eq("channel", channel).maybeSingle();

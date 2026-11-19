@@ -18,7 +18,7 @@ export const startPasskeyRegistration = createServerFn({ method: "POST" })
   .inputValidator((input) =>
     z
       .object({
-        accountId: z.string().uuid().nullable().optional(),
+        token: z.string().min(10).max(2048).nullable().optional(),
         contactEmail: z.string().email().optional(),
         origin: z.string().url().optional(),
       })
@@ -27,7 +27,7 @@ export const startPasskeyRegistration = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     return sync.startRegistration({
       origin: getOrigin(data.origin),
-      accountId: data.accountId ?? null,
+      token: data.token ?? null,
       contactEmail: data.contactEmail,
     });
   });

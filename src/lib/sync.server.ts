@@ -29,28 +29,57 @@ export function originToRpId(origin: string): string {
 
 // --- HMAC bearer token: `${accountId}.${expiresAt}.${hmac}` ---
 
-export function issueToken(accountId: string): string {
+// Tokens minted by redeeming a sync code carry a fingerprint of that code
+// (`${accountId}~${fp}`), so revoking or replacing the code cuts them off.
+function codeFingerprint(hash: string): string {
+  return createHmac("sha256", getSecret()).update(`fp:${hash}`).digest("base64url").slice(0, 22);
+}
+
+export function issueToken(accountId: string, codeHash?: string): string {
   const exp = Math.floor(Date.now() / 1000) + TOKEN_TTL_SECONDS;
-  const payload = `${accountId}.${exp}`;
+  const subject = codeHash ? `${accountId}~${codeFingerprint(codeHash)}` : accountId;
+  const payload = `${subject}.${exp}`;
   const sig = createHmac("sha256", getSecret()).update(payload).digest("base64url");
   return `${payload}.${sig}`;
 }
 
-export function verifyToken(token: string): string {
+function verifySignedToken(token: string): { accountId: string; fp: string | null } {
   const parts = token.split(".");
   if (parts.length !== 3) throw new Error("Invalid token");
-  const [accountId, expStr, sig] = parts;
+  const [subject, expStr, sig] = parts;
   const exp = Number(expStr);
   if (!Number.isFinite(exp) || exp * 1000 < Date.now()) {
     throw new Error("Token expired");
   }
   const expected = createHmac("sha256", getSecret())
-    .update(`${accountId}.${expStr}`)
+    .update(`${subject}.${expStr}`)
     .digest("base64url");
   const a = Buffer.from(sig);
   const b = Buffer.from(expected);
   if (a.length !== b.length || !timingSafeEqual(a, b)) {
     throw new Error("Invalid token signature");
+  }
+  const [accountId, fp] = subject.split("~");
+  return { accountId, fp: fp ?? null };
+}
+
+/**
+ * Verify a bearer token and confirm it is still active. Tokens obtained from a
+ * sync code stop working once that code is revoked or replaced.
+ * Set ownerOnly to reject sync-code tokens (for managing codes / passkeys).
+ */
+export async function verifyToken(token: string, opts: { ownerOnly?: boolean } = {}): Promise<string> {
+  const { accountId, fp } = verifySignedToken(token);
+  if (fp) {
+    if (opts.ownerOnly) throw new Error("This device can't manage sync settings. Use your original device.");
+    const { data } = await supabaseAdmin
+      .from("pulse_accounts")
+      .select("recovery_code_hash")
+      .eq("id", accountId)
+      .maybeSingle();
+    if (!data?.recovery_code_hash || codeFingerprint(data.recovery_code_hash) !== fp) {
+      throw new Error("This sync code was revoked. Ask your other device for a new one.");
+    }
   }
   return accountId;
 }
@@ -59,11 +88,12 @@ export function verifyToken(token: string): string {
 
 export async function startRegistration(args: {
   origin: string;
-  accountId?: string | null;
+  token?: string | null;
   contactEmail?: string;
 }) {
   const rpID = originToRpId(args.origin);
-  let accountId = args.accountId ?? null;
+  // Adding a passkey to an existing account requires proof of ownership.
+  let accountId: string | null = args.token ? await verifyToken(args.token, { ownerOnly: true }) : null;
 
   if (!accountId) {
     if (!args.contactEmail) throw new Error("Contact email required to create account");
@@ -283,7 +313,7 @@ function readHistory(raw: unknown): string[] {
 }
 
 export async function pushState(token: string, state: SyncedState) {
-  const accountId = verifyToken(token);
+  const accountId = await verifyToken(token);
   const history = sanitizeHistory(state.checkins);
   const { error } = await supabaseAdmin
     .from("pulse_accounts")
@@ -301,7 +331,7 @@ export async function pushState(token: string, state: SyncedState) {
 }
 
 export async function pullState(token: string) {
-  const accountId = verifyToken(token);
+  const accountId = await verifyToken(token);
   const { data, error } = await supabaseAdmin
     .from("pulse_accounts")
     .select("*")
@@ -358,7 +388,7 @@ function randomCode(length = 16): string {
 
 /** Create (or replace) the account's sync code. Returns the code once. */
 export async function createRecoveryCode(token: string, ttlHours?: number | null) {
-  const accountId = verifyToken(token);
+  const accountId = await verifyToken(token, { ownerOnly: true });
   const expiresAt = ttlHours ? new Date(Date.now() + ttlHours * 3600_000).toISOString() : null;
   for (let attempt = 0; attempt < 5; attempt++) {
     const raw = randomCode();
@@ -382,7 +412,7 @@ export async function createRecoveryCode(token: string, ttlHours?: number | null
 }
 
 export async function revokeRecoveryCode(token: string) {
-  const accountId = verifyToken(token);
+  const accountId = await verifyToken(token, { ownerOnly: true });
   const { error } = await supabaseAdmin
     .from("pulse_accounts")
     .update({ recovery_code_hash: null, recovery_code_created_at: null, recovery_code_expires_at: null })
@@ -413,7 +443,7 @@ export async function redeemRecoveryCode(code: string) {
   }
 
   return {
-    token: issueToken(data.id),
+    token: issueToken(data.id, hash),
     account: {
       id: data.id,
       userName: data.user_name,
@@ -428,14 +458,14 @@ export async function redeemRecoveryCode(code: string) {
 
 
 export async function deleteAccount(token: string) {
-  const accountId = verifyToken(token);
+  const accountId = await verifyToken(token);
   const { error } = await supabaseAdmin.from("pulse_accounts").delete().eq("id", accountId);
   if (error) throw new Error(error.message);
   return { ok: true };
 }
 
 export async function updateContactPhone(token: string, phone: string | null) {
-  const accountId = verifyToken(token);
+  const accountId = await verifyToken(token);
   const { error } = await supabaseAdmin.from("pulse_accounts").update({ contact_phone: phone }).eq("id", accountId);
   if (error) throw new Error(error.message);
   return { ok: true };
