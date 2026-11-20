@@ -17,13 +17,13 @@ export const Route = createFileRoute("/_app/app")({
       {
         name: "description",
         content:
-          "Tap I'm Safe to record your check-in and see how long until your next one is due.",
+          "Tap I’m OK to record your Pulse check-in, see confirmation and know when your next check-in is due.",
       },
       { property: "og:title", content: "Your check-in — Pulse" },
       {
         property: "og:description",
         content:
-          "A simple 'I'm Safe' button. No accounts, no cookies. If you miss two check-ins, we email your emergency contact.",
+          "Your simple Pulse daily screen: one I’m OK button, check-in confirmation and your next check-in time.",
       },
       { property: "og:url", content: "https://pulse-checkin.app/app" },
     ],

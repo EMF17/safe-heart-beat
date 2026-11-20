@@ -2,3 +2,4 @@
 - Keep native platform source in ios/ and android/ and sync with Capacitor; why: device builds need persistent camera permissions, icons, and offline fallback settings.
 - Derive browser, home-screen, and store icons from the configured iOS app icon; keep native/store icons local because platform packaging and submission require image files.
 - SMS delivery uses the server-only Twilio gateway and the signed recovery token; persist separate email/SMS receipts so retrying one channel does not repeat the other.
+- Keep the daily dashboard focused on check-in confirmation and the next due time, using usePulse for timing and persistence; optional recovery and safety-plan tools belong on their existing separate screens.

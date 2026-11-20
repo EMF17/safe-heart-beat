@@ -1,509 +1,104 @@
-import { useState, useEffect, useMemo } from "react";
-import { Link } from "@tanstack/react-router";
-import { Phone, Flame, Clock, ShieldCheck, AlertCircle, History } from "lucide-react";
-import { usePulse, formatDuration, formatSince, type Contact } from "@/lib/pulse";
-import { formatPauseDate } from "@/lib/preferences";
-import { ConfettiBurst } from "./Confetti";
+import { useState } from "react";
+import { Check, Clock } from "lucide-react";
+import { usePulse, type Contact } from "@/lib/pulse";
+import { Button } from "@/components/ui/button";
 
-function CountdownRing({ progress, status }: { progress: number; status: string }) {
-  const r = 140;
-  const c = 2 * Math.PI * r;
-  const dash = c * (1 - Math.min(1, Math.max(0, progress)));
-  const stroke =
-    status === "alert" ? "var(--color-destructive)" :
-    status === "overdue" ? "var(--color-warning)" :
-    "var(--color-primary)";
-  return (
-    <svg viewBox="0 0 320 320" className="absolute inset-0 w-full h-full -rotate-90">
-      <circle cx="160" cy="160" r={r} fill="none" stroke="var(--color-border)" strokeWidth="2" />
-      <circle
-        cx="160" cy="160" r={r}
-        fill="none" stroke={stroke} strokeWidth="3" strokeLinecap="round"
-        strokeDasharray={c} strokeDashoffset={dash}
-        style={{ transition: "stroke-dashoffset 1s linear, stroke 0.6s ease" }}
-      />
-    </svg>
-  );
-}
-
-function useCheckinStats(refreshKey = 0) {
-  const [history, setHistory] = useState<number[]>([]);
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const raw = window.localStorage.getItem("pulse:checkins");
-    if (!raw) {
-      setHistory([]);
-      return;
-    }
-    try {
-      const parsed: number[] = JSON.parse(raw);
-      setHistory(parsed.sort((a, b) => b - a));
-    } catch {}
-  }, [refreshKey]);
-
-  return useMemo(() => {
-    if (history.length === 0) return { total: 0, currentStreak: 0, bestStreak: 0 };
-    const uniqueDays = Array.from(
-      new Set(history.map((ts) => new Date(ts).toDateString()))
-    ).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
-
-    const today = new Date().toDateString();
-    const yesterday = new Date(Date.now() - 86400000).toDateString();
-
-    let currentStreak = 0;
-    if (uniqueDays[0] === today) {
-      currentStreak = 1;
-      for (let i = 1; i < uniqueDays.length; i++) {
-        const prev = new Date(uniqueDays[i - 1]);
-        const curr = new Date(uniqueDays[i]);
-        if ((prev.getTime() - curr.getTime()) / 86400000 === 1) currentStreak++;
-        else break;
-      }
-    } else if (uniqueDays[0] === yesterday) {
-      currentStreak = 1;
-      for (let i = 1; i < uniqueDays.length; i++) {
-        const prev = new Date(uniqueDays[i - 1]);
-        const curr = new Date(uniqueDays[i]);
-        if ((prev.getTime() - curr.getTime()) / 86400000 === 1) currentStreak++;
-        else break;
-      }
-    }
-
-    let bestStreak = 1;
-    let run = 1;
-    for (let i = 1; i < uniqueDays.length; i++) {
-      const prev = new Date(uniqueDays[i - 1]);
-      const curr = new Date(uniqueDays[i]);
-      if ((prev.getTime() - curr.getTime()) / 86400000 === 1) {
-        run++;
-        bestStreak = Math.max(bestStreak, run);
-      } else {
-        run = 1;
-      }
-    }
-
-    return { total: history.length, currentStreak, bestStreak };
-  }, [history]);
+function formatCheckInTime(timestamp: number) {
+  return new Date(timestamp).toLocaleString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 export function PulseDashboard() {
   const p = usePulse();
-  const [statsRefresh, setStatsRefresh] = useState(0);
-  const stats = useCheckinStats(statsRefresh);
-  const [editing, setEditing] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [tickKey, setTickKey] = useState(0);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [buttonPulse, setButtonPulse] = useState(false);
-  const [confetti, setConfetti] = useState(false);
-
-  useEffect(() => {
-    if (!showSuccess) return;
-    const id = setTimeout(() => setShowSuccess(false), 4000);
-    return () => clearTimeout(id);
-  }, [showSuccess]);
+  const [justCheckedIn, setJustCheckedIn] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (!p.hydrated) return <div className="min-h-full" />;
 
-  if (!p.contact || editing) {
+  if (!p.contact) {
     return (
       <Onboarding
         initial={p.contact}
         initialName={p.userName}
         webAuthnSupported={p.webAuthnSupported}
         onRestore={p.restoreFromPasskey}
-        onSave={(c, n) => {
-          p.saveContact(c);
-          p.saveName(n);
-          setEditing(false);
+        onSave={(contact, name) => {
+          p.saveContact(contact);
+          p.saveName(name);
         }}
-        onCancel={p.contact ? () => setEditing(false) : undefined}
       />
     );
   }
 
   const handleCheckIn = () => {
-    p.checkIn();
-    setTickKey(k => k + 1);
-    setStatsRefresh(k => k + 1);
-    setShowSuccess(true);
-    setButtonPulse(true);
-    setConfetti(true);
-    setTimeout(() => setButtonPulse(false), 600);
-  };
-
-
-  const totalWindow = p.status === "alert" ? p.alertThresholdMs : p.intervalMs;
-  const progress = p.lastCheckIn ? Math.min(1, (Date.now() - p.lastCheckIn) / totalWindow) : 0;
-  const dueLabel = p.status === "alert" ? "Alert sending soon" :
-                   p.status === "overdue" ? "Check in to reset alert" :
-                   "Next check-in";
-  const dueMs = p.status === "alert" || p.status === "overdue" ? p.msUntilAlert : p.msUntilDue;
-  const dur = formatDuration(dueMs);
-
-  const statusCopy =
-    p.status === "paused" ? "Check-ins paused" :
-    p.status === "alert" ? "Alert window reached" :
-    p.status === "overdue" ? "You're overdue" :
-    p.status === "due" ? "Time to check in" :
-    p.status === "new" ? "Tap to start your first check-in" :
-    "You're safe";
-
-  const statusConfig = {
-    fresh: { label: "All good", tone: "primary", icon: ShieldCheck },
-    due: { label: "Due soon", tone: "warning", icon: Clock },
-    overdue: { label: "Overdue", tone: "destructive", icon: AlertCircle },
-    alert: { label: "Alert soon", tone: "destructive", icon: AlertCircle },
-    new: { label: "Ready", tone: "primary", icon: ShieldCheck },
-    paused: { label: "Paused", tone: "muted", icon: Clock },
-  }[p.status];
-
-  const StatusIcon = statusConfig.icon;
-
-  return (
-    <div className="min-h-full flex flex-col">
-      <Header
-        onEdit={() => setEditing(true)}
-        onSettings={() => setShowSettings(true)}
-        syncEnabled={p.syncEnabled}
-        syncStatus={p.syncStatus}
-      />
-
-      {/* Hero Section */}
-      <section className="flex-1 flex flex-col items-center justify-center px-6 py-6">
-        {/* Status badge */}
-        <div className={`mb-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border ${
-          statusConfig.tone === "destructive"
-            ? "bg-destructive/10 border-destructive/20 text-destructive"
-            : statusConfig.tone === "warning"
-            ? "bg-warning/10 border-warning/20 text-warning-foreground"
-            : statusConfig.tone === "muted"
-            ? "bg-muted border-border text-muted-foreground"
-            : "bg-primary/10 border-primary/20 text-primary"
-        }`}>
-          <StatusIcon className="w-3.5 h-3.5" />
-          {statusConfig.label}
-        </div>
-
-        <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">
-          {p.userName ? `Hi, ${p.userName}` : "Pulse"}
-        </p>
-        <h1 className="font-display text-4xl md:text-5xl font-semibold text-center mb-3 leading-tight">
-          {statusCopy}
-        </h1>
-        <p className="text-muted-foreground text-sm md:text-base text-center max-w-sm mb-6">
-          {p.isPaused && p.pauseUntil
-            ? `Paused until ${formatPauseDate(p.pauseUntil)}. No alerts will be sent.`
-            : p.lastCheckIn
-            ? `Next check-in due in ${Math.max(0, Math.floor(p.msUntilDue / (1000 * 60 * 60)))}h ${Math.max(0, Math.floor((p.msUntilDue % (1000 * 60 * 60)) / (1000 * 60)))}m`
-            : "First check-in ready. Tap the button to start."}
-        </p>
-
-        {showSuccess && (
-          <div className="mb-5 px-5 py-3 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium animate-in fade-in slide-in-from-bottom-2">
-            ✓ Check-in recorded
-          </div>
-        )}
-
-        <div className="relative w-[320px] h-[320px] md:w-[360px] md:h-[360px] flex items-center justify-center">
-          {p.status !== "alert" && p.status !== "paused" && (
-            <div className="absolute inset-6 rounded-full pulse-ring animate-breathe pointer-events-none" />
-          )}
-          <CountdownRing progress={p.isPaused ? 0 : progress} status={p.status} />
-          <button
-            key={tickKey}
-            onClick={handleCheckIn}
-            disabled={p.isPaused}
-            className={`${buttonPulse ? "animate-pulse-once" : ""} animate-tick relative z-10 w-[240px] h-[240px] md:w-[270px] md:h-[270px] rounded-full
-                       bg-gradient-to-b from-[var(--color-primary-glow)] to-[var(--color-primary)]
-                       text-primary-foreground font-display font-semibold text-3xl md:text-4xl
-                       shadow-[var(--shadow-pulse)] transition-transform
-                       hover:scale-[1.03] active:scale-[0.96] focus:outline-none
-                       focus-visible:ring-4 focus-visible:ring-primary/30
-                       disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100`}
-            aria-label="I'm safe — check in now"
-          >
-            {p.isPaused ? "Paused" : "I'm Safe"}
-          </button>
-        </div>
-
-        {/* Quick stats row */}
-        <div className="mt-8 grid grid-cols-3 gap-3 max-w-md w-full">
-          {p.isPaused && p.pauseUntil ? (
-            <div className="col-span-3 text-center bg-card/60 border border-border/60 rounded-2xl p-4">
-              <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground mb-1">Paused until</p>
-              <p className="font-display text-2xl font-semibold text-foreground">{formatPauseDate(p.pauseUntil)}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Resume anytime in Settings</p>
-            </div>
-          ) : (
-            <>
-              <Stat
-                icon={<Clock className="w-3.5 h-3.5" />}
-                label={dueLabel}
-                value={dur.primary}
-                sub={dur.secondary}
-                highlight={p.status === "alert" || p.status === "overdue"}
-              />
-              <Stat
-                icon={<History className="w-3.5 h-3.5" />}
-                label="Total"
-                value={`${stats.total}`}
-                sub="check-ins"
-              />
-              <Stat
-                icon={<Flame className="w-3.5 h-3.5" />}
-                label="Streak"
-                value={`${stats.currentStreak}`}
-                sub={stats.currentStreak === 1 ? "day" : "days"}
-                highlight={stats.currentStreak >= 7}
-              />
-            </>
-          )}
-        </div>
-
-        {/* Last check-in & interval summary */}
-        {!p.isPaused && (
-          <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
-            {p.lastCheckIn ? (
-              <>
-                <span>Last: {formatSince(Date.now() - p.lastCheckIn)}</span>
-                <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
-              </>
-            ) : null}
-            <span>{p.intervalHours}h rhythm · Alert after {p.intervalHours * 2}h</span>
-          </div>
-        )}
-
-        <div className="mt-6 flex justify-center">
-          <Link
-            to="/emergency-numbers"
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Open emergency numbers"
-          >
-            <Phone className="w-3.5 h-3.5" />
-            Emergency Numbers
-          </Link>
-        </div>
-      </section>
-
-      <Footer contact={p.contact} userName={p.userName} />
-
-      {showSettings && (
-        <SettingsSheet
-          contact={p.contact}
-          syncEnabled={p.syncEnabled}
-          syncStatus={p.syncStatus}
-          syncError={p.syncError}
-          webAuthnSupported={p.webAuthnSupported}
-          onClose={() => setShowSettings(false)}
-          onEditContact={() => { setShowSettings(false); setEditing(true); }}
-          onEnableSync={() => p.enableSync(p.contact!.email)}
-          onDisableSync={(deleteRemote) => p.disableSync(deleteRemote)}
-        />
-      )}
-
-      <ConfettiBurst active={confetti} />
-    </div>
-  );
-}
-
-function Stat({ icon, label, value, sub, highlight }: { icon?: React.ReactNode; label: string; value: string; sub?: string; highlight?: boolean }) {
-  return (
-    <div className="text-center bg-card/60 border border-border/60 rounded-2xl p-4">
-      <div className="flex items-center justify-center gap-1 text-[10px] uppercase tracking-[0.18em] text-muted-foreground mb-1.5">
-        {icon}
-        {label}
-      </div>
-      <p className={`font-display text-2xl font-semibold tabular-nums ${highlight ? "text-destructive" : "text-foreground"}`}>
-        {value}
-      </p>
-      {sub && <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>}
-    </div>
-  );
-}
-
-function Header({
-  onEdit,
-  onSettings,
-  syncEnabled,
-  syncStatus,
-}: {
-  onEdit: () => void;
-  onSettings: () => void;
-  syncEnabled: boolean;
-  syncStatus: string;
-}) {
-  return (
-    <header className="flex items-center justify-between px-6 py-5">
-      <div className="flex items-center gap-2">
-        <span className="relative flex h-2.5 w-2.5">
-          <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-60 animate-ping" />
-          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary" />
-        </span>
-        <span className="font-display text-lg font-semibold tracking-tight">Pulse</span>
-        {syncEnabled && (
-          <span
-            className="ml-2 text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
-            title={syncStatus === "error" ? "Sync error" : "Synced via passkey"}
-          >
-            {syncStatus === "syncing" ? "syncing…" : syncStatus === "error" ? "sync error" : "synced"}
-          </span>
-        )}
-      </div>
-      <div className="flex items-center gap-4">
-        <button
-          onClick={onEdit}
-          className="text-xs uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Edit
-        </button>
-        <button
-          onClick={onSettings}
-          className="text-xs uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Settings
-        </button>
-      </div>
-    </header>
-  );
-}
-
-function Footer({ contact, userName }: { contact: Contact; userName: string }) {
-  return (
-    <footer className="px-6 py-6 border-t border-border/60 bg-card/40 backdrop-blur-sm">
-      <div className="max-w-md mx-auto text-center text-xs text-muted-foreground">
-        <p>
-          If you miss two check-ins, we'll alert{" "}
-          <span className="text-foreground font-medium">{contact.name || contact.email}</span>
-          {userName ? <> that <span className="text-foreground font-medium">{userName}</span> hasn't checked in.</> : "."}
-        </p>
-      </div>
-    </footer>
-  );
-}
-
-function SettingsSheet({
-  contact,
-  syncEnabled,
-  syncStatus,
-  syncError,
-  webAuthnSupported,
-  onClose,
-  onEditContact,
-  onEnableSync,
-  onDisableSync,
-}: {
-  contact: Contact;
-  syncEnabled: boolean;
-  syncStatus: string;
-  syncError: string | null;
-  webAuthnSupported: boolean;
-  onClose: () => void;
-  onEditContact: () => void;
-  onEnableSync: () => Promise<string>;
-  onDisableSync: (deleteRemote: boolean) => Promise<void>;
-}) {
-  const [busy, setBusy] = useState(false);
-  const [localError, setLocalError] = useState<string | null>(null);
-
-  const toggle = async () => {
-    setBusy(true);
-    setLocalError(null);
+    setError(null);
     try {
-      if (syncEnabled) {
-        await onDisableSync(false);
-      } else {
-        await onEnableSync();
-      }
-    } catch (e) {
-      setLocalError(e instanceof Error ? e.message : "Something went wrong");
-    } finally {
-      setBusy(false);
+      p.checkIn();
+      setJustCheckedIn(true);
+    } catch {
+      setError("Your check-in could not be saved. Please try again.");
     }
   };
+  const isOverdue = p.status === "overdue" || p.status === "alert";
+  const nextCheckIn = p.lastCheckIn ? p.lastCheckIn + p.intervalMs : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-foreground/20 backdrop-blur-sm" onClick={onClose}>
-      <div
-        className="w-full md:max-w-md bg-card border-t md:border border-border rounded-t-3xl md:rounded-3xl p-6 shadow-[var(--shadow-soft)] animate-in slide-in-from-bottom-4"
-        onClick={(e) => e.stopPropagation()}
+    <main className="mx-auto flex min-h-full w-full max-w-lg flex-col items-center px-6 py-5 text-center md:py-10">
+      <header className="mb-5">
+        <p className="font-display text-xl font-semibold tracking-normal text-primary">Pulse</p>
+        <h1 className="mt-2 font-display text-2xl font-semibold tracking-normal">
+          {p.userName ? `Hello, ${p.userName}` : "Your check-in"}
+        </h1>
+      </header>
+
+      <Button
+        onClick={handleCheckIn}
+        disabled={p.isPaused}
+        aria-label="I’m OK"
+        className="h-52 w-52 shrink-0 flex-col gap-2 rounded-full font-display text-4xl font-semibold shadow-[var(--shadow-soft)] focus-visible:ring-4 focus-visible:ring-ring/40 motion-safe:transition-transform motion-safe:active:scale-95 md:h-60 md:w-60 [&_svg]:size-9"
       >
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="font-display text-xl font-semibold">Settings</h2>
-          <button onClick={onClose} className="text-xs uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground">
-            Done
-          </button>
-        </div>
+        <Check aria-hidden="true" strokeWidth={2.5} />
+        I’m OK
+      </Button>
 
-        {/* Sync toggle */}
-        <div className="rounded-2xl border border-border bg-background/60 p-4">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="font-medium">Sync across devices</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Uses a passkey on this device. Restore on a new device with one tap — no codes, no passwords.
-              </p>
-            </div>
-            <button
-              onClick={toggle}
-              disabled={busy || !webAuthnSupported}
-              className={`shrink-0 w-12 h-7 rounded-full transition-colors relative ${
-                syncEnabled ? "bg-primary" : "bg-muted"
-              } ${(busy || !webAuthnSupported) ? "opacity-50" : ""}`}
-              aria-label="Toggle device sync"
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-background shadow transition-transform ${
-                  syncEnabled ? "translate-x-5" : "translate-x-0"
-                }`}
-              />
-            </button>
-          </div>
-
-          {!webAuthnSupported && (
-            <p className="text-xs text-muted-foreground mt-3">
-              This browser doesn't support passkeys, so cross-device sync isn't available here.
+      <div role="status" aria-live="polite" aria-atomic="true" className="mt-5 min-h-16 w-full">
+        {p.isPaused ? (
+          <p className="text-lg font-medium">Check-ins are paused</p>
+        ) : p.lastCheckIn ? (
+          <>
+            <p className={`flex items-center justify-center gap-2 text-lg font-semibold ${isOverdue ? "text-warning-foreground" : "text-foreground"}`}>
+              {!isOverdue && <Check className="h-5 w-5 text-primary" aria-hidden="true" />}
+              {justCheckedIn ? "Check-in recorded" : isOverdue ? "Your check-in is overdue" : "Last check-in recorded"}
             </p>
-          )}
-          {syncEnabled && syncStatus === "ready" && (
-            <p className="text-xs text-primary mt-3">Synced. Changes are saved automatically.</p>
-          )}
-          {syncStatus === "syncing" && (
-            <p className="text-xs text-muted-foreground mt-3">Working with your passkey…</p>
-          )}
-          {(localError || (syncError && syncStatus === "error")) && (
-            <p className="text-xs text-destructive mt-3">{localError ?? syncError}</p>
-          )}
-        </div>
-
-        {/* Contact */}
-        <button
-          onClick={onEditContact}
-          className="mt-3 w-full text-left rounded-2xl border border-border bg-background/60 p-4 hover:bg-background transition-colors"
-        >
-          <p className="font-medium">Emergency contact</p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {contact.name ? `${contact.name} · ` : ""}{contact.email}
-          </p>
-        </button>
-
-        {syncEnabled && (
-          <button
-            onClick={async () => {
-              setBusy(true);
-              setLocalError(null);
-              try { await onDisableSync(true); } catch (e) {
-                setLocalError(e instanceof Error ? e.message : "Failed");
-              } finally { setBusy(false); }
-            }}
-            disabled={busy}
-            className="mt-3 w-full text-xs text-destructive hover:underline disabled:opacity-50"
-          >
-            Disable sync and delete cloud copy
-          </button>
+            <p className="mt-1 text-base text-muted-foreground">
+              {formatCheckInTime(p.lastCheckIn)}
+            </p>
+          </>
+        ) : (
+          <p className="text-lg text-muted-foreground">Ready for your first check-in</p>
         )}
       </div>
-    </div>
+      {error && <p role="alert" className="mt-2 text-base text-destructive">{error}</p>}
+
+      <section aria-label="Next check-in" className="mt-4 w-full border-t border-border pt-4">
+        <p className="flex items-center justify-center gap-2 text-base text-muted-foreground">
+          <Clock className="h-4 w-4" aria-hidden="true" />
+          {p.isPaused ? "Check-ins resume" : "Next check-in"}
+        </p>
+        <p className="mt-1 text-lg font-semibold">
+          {p.isPaused && p.pauseUntil
+            ? formatCheckInTime(p.pauseUntil)
+            : nextCheckIn
+              ? formatCheckInTime(nextCheckIn)
+              : "Not started yet"}
+        </p>
+      </section>
+    </main>
   );
 }
 
