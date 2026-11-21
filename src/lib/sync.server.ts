@@ -74,11 +74,14 @@ export async function verifyToken(token: string, opts: { ownerOnly?: boolean } =
     if (opts.ownerOnly) throw new Error("This device can't manage sync settings. Use your original device.");
     const { data } = await supabaseAdmin
       .from("pulse_accounts")
-      .select("recovery_code_hash")
+      .select("recovery_code_hash, recovery_code_expires_at")
       .eq("id", accountId)
       .maybeSingle();
     if (!data?.recovery_code_hash || codeFingerprint(data.recovery_code_hash) !== fp) {
       throw new Error("This sync code was revoked. Ask your other device for a new one.");
+    }
+    if (data.recovery_code_expires_at && new Date(data.recovery_code_expires_at).getTime() <= Date.now()) {
+      throw new Error("This sync code has expired. Ask your other device for a new one.");
     }
   }
   return accountId;
