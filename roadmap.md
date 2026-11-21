@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Add a three-picture Traditional Chinese guide to opening Pulse, checking in and seeing confirmation
 - [x] Simplify daily check-in screen to one “I’m OK” button, saved confirmation and next check-in time; keep optional tools elsewhere
 - [x] Add Pulse browser/home-screen icons and prepare matching app-store icons (store submission still required)
 - [x] Add Settings phone number and prepare SMS delivery alongside email

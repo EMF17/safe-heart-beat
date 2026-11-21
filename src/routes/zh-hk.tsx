@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Hand, Mail, ShieldCheck, ChevronRight, Lock, Phone, Users } from "lucide-react";
+import { ChinesePictureGuide } from "@/components/ChinesePictureGuide";
 
 const TITLE = "Pulse 平安打卡 — 免費獨居人士平安報到工具";
 const DESC =
@@ -68,7 +69,10 @@ function ZhHkPage() {
             立即免費設定 <ChevronRight className="w-4 h-4" />
           </Link>
           <p className="mt-4 text-xs text-muted-foreground">設定約需一分鐘。應用程式介面目前為英文。</p>
+          <a href="#picture-guide" className="mt-5 inline-block text-base text-primary underline underline-offset-4">第一次用？看三張圖學報到</a>
         </section>
+
+        <ChinesePictureGuide />
 
         <section className="border-t border-border/50 bg-card/40">
           <div className="max-w-5xl mx-auto px-5 py-20">
