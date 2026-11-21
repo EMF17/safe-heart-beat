@@ -11,6 +11,7 @@ const pictures = [
     body: "用手機瀏覽器打開 pulse-checkin.app/zh-hk，按「立即免費設定」。已設定好？直接打開 pulse-checkin.app/app。",
     image: openPicture,
     alt: "Pulse 中文首頁：下方有綠色「立即免費設定」按鈕。",
+    crop: true,
     note: "第一次使用時，可請信任的家人或朋友陪你加入聯絡人的名字和電郵。",
   },
   {
@@ -46,7 +47,7 @@ export function ChinesePictureGuide() {
                   </h3>
                   <p className="mt-3 break-words text-lg leading-relaxed">{picture.body}</p>
                 </figcaption>
-                <img src={picture.image.url} alt={picture.alt} width={780} height={1440} loading="lazy" className="mt-5 block aspect-[13/24] w-full rounded-lg border border-border object-contain shadow-[var(--shadow-soft)]" />
+                <img src={picture.image.url} alt={picture.alt} width={780} height={1440} loading="lazy" className={`mt-5 block w-full rounded-lg border border-border ${"crop" in picture ? "aspect-[13/20] object-cover object-top" : "aspect-[13/24] object-contain"} shadow-[var(--shadow-soft)]`} />
                 <p className="mt-4 text-base leading-relaxed text-muted-foreground">{picture.note}</p>
               </figure>
             </li>
