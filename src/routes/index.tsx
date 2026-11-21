@@ -14,6 +14,7 @@ import {
   Smartphone,
 } from "lucide-react";
 import { HomeTourDemo } from "@/components/HomeTourDemo";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   component: LandingPage,
@@ -143,6 +144,11 @@ function Hero({ returning }: { returning: boolean }) {
           connection, alerts are not guaranteed. Do not rely on Pulse as your only
           safety arrangement; it is not an emergency service.
         </p>
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
+          <Button asChild variant="link"><Link to="/how-alerts-work">How alerts work</Link></Button>
+          <Button asChild variant="link"><Link to="/status">Alert status</Link></Button>
+          <Button asChild variant="outline"><Link to="/how-alerts-work" hash="test-alert"><Mail />Test an alert</Link></Button>
+        </div>
 
         <div className="mt-9 flex flex-col sm:flex-row gap-3 justify-center items-center">
           <Link
@@ -460,7 +466,9 @@ function SiteFooter() {
     <footer className="border-t border-border/50">
       <div className="max-w-5xl mx-auto px-5 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
         <p>© {new Date().getFullYear()} Pulse · Your quiet safety net</p>
-        <nav className="flex items-center gap-5">
+        <nav className="flex flex-wrap items-center justify-center gap-5">
+          <Link to="/how-alerts-work" className="hover:text-foreground">How alerts work</Link>
+          <Link to="/status" className="hover:text-foreground">Alert status</Link>
           <Link to="/app" className="hover:text-foreground transition">
             Open app
           </Link>

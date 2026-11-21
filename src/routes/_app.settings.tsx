@@ -4,6 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { requestNotificationPermission } from "@/lib/notifications";
 import { usePreferences, SUPPORTED_INTERVALS, formatPauseDate, type IntervalHours } from "@/lib/preferences";
 import { SyncCodeCard } from "@/components/SyncCodeCard";
+import { TestAlertPanel } from "@/components/TestAlertPanel";
 import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
 import { getSmsStatus, saveContactPhone } from "@/lib/sync.functions";
@@ -64,7 +65,6 @@ function SettingsPage() {
   const [phone, setPhone] = useState("");
   const [savingPhone, setSavingPhone] = useState(false);
   const [smsConnected, setSmsConnected] = useState(false);
-  const [testing, setTesting] = useState(false);
   const savePhone = useServerFn(saveContactPhone);
   const smsStatus = useServerFn(getSmsStatus);
 
@@ -184,49 +184,6 @@ function SettingsPage() {
     });
   };
 
-  const handleSendTestAlert = async () => {
-    if (!contact?.email) {
-      showToast("Please save an emergency contact first.");
-      return;
-    }
-    const syncToken =
-      typeof window !== "undefined"
-        ? window.localStorage.getItem("pulse:syncToken")
-        : null;
-    if (!syncToken) {
-      showToast("Enable sync (passkey) first so alerts can be authenticated.");
-      return;
-    }
-    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-      navigator.vibrate(15);
-    }
-    showToast("Sending test alert…");
-    setTesting(true);
-    try {
-      const { getActiveCountryCode } = await import("@/lib/region");
-      const countryCode = getActiveCountryCode();
-      const res = await fetch("/api/send-alert", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token: syncToken,
-          type: "test",
-          countryCode,
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        showToast(`Failed to send test alert: ${data?.error || res.statusText}`);
-        return;
-      }
-      const emailSent = data.email?.status === "sent";
-      const smsSent = data.sms?.status === "sent";
-      showToast(smsSent && emailSent ? "Test email and SMS accepted for delivery." : smsSent ? "Test SMS accepted; email failed." : emailSent ? `Test email accepted. ${data.sms?.status === "failed" ? data.sms.error : "SMS is pending Twilio setup or a saved phone number."}` : "Neither alert was accepted. Please check your delivery settings.");
-    } catch (e) {
-      showToast(`Failed: ${e instanceof Error ? e.message : "Network error"}`);
-    } finally { setTesting(false); }
-  };
-
   if (!hydrated) return <div className="min-h-full" />;
 
   return (
@@ -272,14 +229,7 @@ function SettingsPage() {
               <Button onClick={handleSavePhone} disabled={savingPhone} variant="outline" className="w-full">{savingPhone ? "Saving…" : "Save phone number"}</Button>
               <p className="text-xs text-muted-foreground">{smsConnected ? "Twilio connected — SMS will accompany email when a number is saved." : "SMS pending — texts start once Twilio is connected with an SMS-capable number."} Online recovery must be enabled for alerts; the app must be open and connected.</p>
             </div>}
-            <Button
-              onClick={handleSendTestAlert}
-              disabled={testing}
-              variant="outline"
-              className="w-full h-11 rounded-full border-2 border-primary text-primary font-medium text-sm hover:bg-primary/10 active:scale-[0.98] transition"
-            >
-              Send Test Alert
-            </Button>
+            <TestAlertPanel />
           </div>
         </section>
 
@@ -467,6 +417,8 @@ function SettingsPage() {
               <span className="text-sm">Privacy Policy</span>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </Link>
+            <Button asChild variant="ghost" className="w-full justify-between rounded-none min-h-11"><Link to="/how-alerts-work">How alerts work<ChevronRight /></Link></Button>
+            <Button asChild variant="ghost" className="w-full justify-between rounded-none min-h-11"><Link to="/status">Alert status<ChevronRight /></Link></Button>
             <Link
               to="/emergency-numbers"
               className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted/30 transition-colors border-b border-border/40"

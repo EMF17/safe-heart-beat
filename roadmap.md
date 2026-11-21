@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Add How alerts work and honest status pages, with a shared test-alert button and clear prerequisites (contact verification and simulated results checked; user will verify real delivery)
 - [x] Replace guaranteed-alert homepage promises with prominent open-app/internet limitations in English and Traditional Chinese; leave alert delivery unchanged
 - [x] Add a three-picture Traditional Chinese guide to opening Pulse, checking in and seeing confirmation
 - [x] Simplify daily check-in screen to one “I’m OK” button, saved confirmation and next check-in time; keep optional tools elsewhere

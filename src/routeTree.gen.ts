@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as DemumuAlternativeRouteImport } from './routes/demumu-alternative'
+import { Route as HowAlertsWorkRouteImport } from './routes/how-alerts-work'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as StatusRouteImport } from './routes/status'
 import { Route as ZhHkRouteImport } from './routes/zh-hk'
 import { Route as AppAppRouteImport } from './routes/_app.app'
 import { Route as AppEmergencyContactRouteImport } from './routes/_app.emergency-contact'
@@ -40,6 +42,11 @@ const DemumuAlternativeRoute = DemumuAlternativeRouteImport.update({
   path: '/demumu-alternative',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HowAlertsWorkRoute = HowAlertsWorkRouteImport.update({
+  id: '/how-alerts-work',
+  path: '/how-alerts-work',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
   id: '/privacy-policy',
   path: '/privacy-policy',
@@ -48,6 +55,11 @@ const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatusRoute = StatusRouteImport.update({
+  id: '/status',
+  path: '/status',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ZhHkRoute = ZhHkRouteImport.update({
@@ -110,8 +122,10 @@ const LovableEmailQueueProcessRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/demumu-alternative': typeof DemumuAlternativeRoute
+  '/how-alerts-work': typeof HowAlertsWorkRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/status': typeof StatusRoute
   '/zh-hk': typeof ZhHkRoute
   '/app': typeof AppAppRoute
   '/emergency-contact': typeof AppEmergencyContactRoute
@@ -127,8 +141,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/demumu-alternative': typeof DemumuAlternativeRoute
+  '/how-alerts-work': typeof HowAlertsWorkRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/status': typeof StatusRoute
   '/zh-hk': typeof ZhHkRoute
   '/app': typeof AppAppRoute
   '/emergency-contact': typeof AppEmergencyContactRoute
@@ -146,8 +162,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/demumu-alternative': typeof DemumuAlternativeRoute
+  '/how-alerts-work': typeof HowAlertsWorkRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/status': typeof StatusRoute
   '/zh-hk': typeof ZhHkRoute
   '/_app/app': typeof AppAppRoute
   '/_app/emergency-contact': typeof AppEmergencyContactRoute
@@ -165,8 +183,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/demumu-alternative'
+    | '/how-alerts-work'
     | '/privacy-policy'
     | '/sitemap.xml'
+    | '/status'
     | '/zh-hk'
     | '/app'
     | '/emergency-contact'
@@ -182,8 +202,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/demumu-alternative'
+    | '/how-alerts-work'
     | '/privacy-policy'
     | '/sitemap.xml'
+    | '/status'
     | '/zh-hk'
     | '/app'
     | '/emergency-contact'
@@ -200,8 +222,10 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/demumu-alternative'
+    | '/how-alerts-work'
     | '/privacy-policy'
     | '/sitemap.xml'
+    | '/status'
     | '/zh-hk'
     | '/_app/app'
     | '/_app/emergency-contact'
@@ -219,8 +243,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   DemumuAlternativeRoute: typeof DemumuAlternativeRoute
+  HowAlertsWorkRoute: typeof HowAlertsWorkRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  StatusRoute: typeof StatusRoute
   ZhHkRoute: typeof ZhHkRoute
   ApiSendAlertRoute: typeof ApiSendAlertRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -251,6 +277,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemumuAlternativeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/how-alerts-work': {
+      id: '/how-alerts-work'
+      path: '/how-alerts-work'
+      fullPath: '/how-alerts-work'
+      preLoaderRoute: typeof HowAlertsWorkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy-policy': {
       id: '/privacy-policy'
       path: '/privacy-policy'
@@ -263,6 +296,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/status': {
+      id: '/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof StatusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/zh-hk': {
@@ -369,8 +409,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   DemumuAlternativeRoute: DemumuAlternativeRoute,
+  HowAlertsWorkRoute: HowAlertsWorkRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  StatusRoute: StatusRoute,
   ZhHkRoute: ZhHkRoute,
   ApiSendAlertRoute: ApiSendAlertRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
