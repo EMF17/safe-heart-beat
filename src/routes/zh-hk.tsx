@@ -18,6 +18,8 @@ export const Route = createFileRoute("/zh-hk")({
       { property: "og:locale", content: "zh_HK" },
       { property: "og:url", content: "https://pulse-checkin.app/zh-hk" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:image", content: "https://pulse-checkin.app/og-image.png" },
+      { name: "twitter:image", content: "https://pulse-checkin.app/og-image.png" },
     ],
     links: [
       { rel: "canonical", href: "https://pulse-checkin.app/zh-hk" },
