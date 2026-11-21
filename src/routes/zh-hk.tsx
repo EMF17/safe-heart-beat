@@ -4,7 +4,7 @@ import { ChinesePictureGuide } from "@/components/ChinesePictureGuide";
 
 const TITLE = "Pulse 平安打卡 — 免費獨居人士平安報到工具";
 const DESC =
-  "每 48 小時按一下「我平安」。如連續兩次沒有報到，Pulse 會以電郵通知你信任的聯絡人。免費、無需註冊、不追蹤位置。";
+  "免費獨居人士平安報到工具。通知需應用程式開啟並連接網絡才能要求發出，不能保證送達。無需註冊、不追蹤位置。";
 
 export const Route = createFileRoute("/zh-hk")({
   component: ZhHkPage,
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/zh-hk")({
 const steps = [
   { icon: Mail, title: "加入一位信任的聯絡人", body: "子女、朋友、鄰居或親戚都可以。只需名字和電郵地址。" },
   { icon: Hand, title: "每 48 小時按一下", body: "按「我平安」就完成。亦可選擇每 24 或 72 小時報到一次。" },
-  { icon: ShieldCheck, title: "有需要時才通知", body: "如連續兩次沒有報到，聯絡人會收到一封電郵，附上本地緊急電話（香港：999）。" },
+  { icon: ShieldCheck, title: "未報到時要求發出通知", body: "如連續兩次沒有報到，Pulse 可要求發出電郵，附上本地緊急電話（香港：999）。應用程式必須開啟並連接網絡；不能保證送達。" },
 ];
 
 const faqs = [
@@ -56,11 +56,14 @@ function ZhHkPage() {
             免費 · 無需註冊 · 不追蹤位置
           </span>
           <h1 className="mt-6 font-display text-4xl md:text-6xl font-semibold leading-tight tracking-tight">
-            獨居也不孤單，
-            <span className="block text-primary">有事有人知。</span>
+            Pulse 平安打卡
+            <span className="block text-primary">獨居人士的報到工具</span>
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            Pulse 是為獨居人士和獨居長者而設的平安報到工具。每 48 小時按一下「我平安」，如連續兩次沒有報到，我們會以電郵通知你信任的人。
+            Pulse 是為獨居人士和獨居長者而設的平安報到工具。每 48 小時按一下「我平安」，如連續兩次沒有報到，Pulse 可要求以電郵通知你信任的人。
+          </p>
+          <p className="mt-5 text-base text-foreground max-w-xl mx-auto leading-relaxed">
+            <strong>重要限制：</strong>應用程式必須開啟並連接網絡，才能要求發出通知。手機關機、應用程式關閉或沒有網絡時，不能保證發出通知。請勿把 Pulse 當作唯一的安全安排；它並非緊急服務。
           </p>
           <Link
             to="/app"
@@ -76,7 +79,7 @@ function ZhHkPage() {
 
         <section className="border-t border-border/50 bg-card/40">
           <div className="max-w-5xl mx-auto px-5 py-20">
-            <h2 className="text-center font-display text-3xl font-semibold">三個步驟，之後就不用再擔心</h2>
+            <h2 className="text-center font-display text-3xl font-semibold">三個步驟，建立報到習慣</h2>
             <ol className="mt-12 grid gap-5 md:grid-cols-3">
               {steps.map((s) => (
                 <li key={s.title} className="rounded-3xl border border-border/60 bg-card p-6">

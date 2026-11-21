@@ -23,14 +23,14 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Tap one button every 48 hours. If you ever miss two check-ins, Pulse emails your emergency contact. No accounts, no cookies, free to use.",
+          "A free safety check-in for people living alone. Email alerts require Pulse to be open and connected; delivery is not guaranteed. No account or cookies.",
       },
       { property: "og:type", content: "website" },
       { property: "og:title", content: "Pulse Safety Check-in — Free safety app for people who live alone" },
       {
         property: "og:description",
         content:
-          "One tap says 'I'm safe.' Miss two check-ins and your trusted contact gets an email with local emergency numbers. Private by design.",
+          "One tap records your check-in. Missed-check-in email alerts require Pulse to be open and connected; delivery is not guaranteed.",
       },
       { property: "og:url", content: "https://pulse-checkin.app/" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -47,7 +47,7 @@ export const Route = createFileRoute("/")({
           operatingSystem: "Web",
           url: "https://pulse-checkin.app/",
           description:
-            "A privacy-first safety check-in for people who live alone. One tap every 48 hours; a missed window emails your emergency contact.",
+            "A privacy-first safety check-in for people who live alone. Email alerts after two missed windows require the app to be open and connected; delivery is not guaranteed.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
@@ -123,18 +123,25 @@ function Hero({ returning }: { returning: boolean }) {
       <div className="max-w-5xl mx-auto px-5 pt-16 pb-20 md:pt-24 md:pb-28 text-center">
         <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/70 px-4 py-1.5 text-xs font-medium text-muted-foreground">
           <HeartPulse className="w-3.5 h-3.5 text-primary" />
-          Free · No account · Works offline
+          Free · No account · Local check-ins work offline
         </span>
 
         <h1 className="mt-6 font-display text-4xl sm:text-5xl md:text-6xl font-semibold leading-[1.05] tracking-tight max-w-3xl mx-auto">
-          If something happened to you,
-          <span className="block text-primary">someone would know.</span>
+          Pulse Safety Check-in
+          <span className="block text-primary">for people living alone.</span>
         </h1>
 
         <p className="mt-6 text-base md:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
           Pulse is a two-second check-in for people who live alone. Tap “I’m
-          Safe” every 48 hours. Miss two windows in a row, and we quietly email
-          the person you trust.
+          OK” every 48 hours. After two missed windows, Pulse can request an email
+          to the person you trust.
+        </p>
+
+        <p className="mt-5 text-base text-foreground max-w-xl mx-auto leading-relaxed">
+          <strong>Important:</strong> Pulse must be open and connected to the internet
+          to request an alert. If your phone is off, Pulse is closed, or there is no
+          connection, alerts are not guaranteed. Do not rely on Pulse as your only
+          safety arrangement; it is not an emergency service.
         </p>
 
         <div className="mt-9 flex flex-col sm:flex-row gap-3 justify-center items-center">
@@ -178,8 +185,8 @@ function HowItWorks() {
     },
     {
       icon: <ShieldCheck className="w-5 h-5" />,
-      title: "We only reach out if needed",
-      body: "Miss two windows in a row and your contact gets a single calm email with your local emergency number.",
+      title: "An email after missed check-ins",
+      body: "After two missed windows, Pulse can request an email with your local emergency number. The app must be open and connected; delivery is not guaranteed.",
     },
   ];
 
@@ -188,11 +195,11 @@ function HowItWorks() {
       <div className="max-w-5xl mx-auto px-5 py-20 md:py-24">
         <div className="text-center max-w-xl mx-auto">
           <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight">
-            Three steps. Then you forget about it.
+            Three steps to your check-in routine.
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Pulse is designed to be boring on purpose. No feeds, no pressure, no
-            guilt — just a quiet promise running in the background.
+            No feeds, no pressure, no guilt — just a simple check-in routine.
+            Keep Pulse open and connected for missed-check-in alert requests.
           </p>
         </div>
 
@@ -346,7 +353,11 @@ function Comparison() {
 const FAQS = [
   {
     q: "When is my emergency contact emailed?",
-    a: "Only after you miss two check-in windows in a row. With a 48-hour rhythm that's 96 hours; with 24 hours it's 48 hours; with 72 hours it's 144 hours. Pausing stops alerts completely.",
+    a: "Pulse can request an email after you miss two check-in windows in a row, but only while the app is open and connected to the internet. With a 48-hour rhythm that's 96 hours; with 24 hours it's 48 hours; with 72 hours it's 144 hours. Pausing stops alerts completely. Email delivery is not guaranteed.",
+  },
+  {
+    q: "Will alerts work if my phone is off or Pulse is closed?",
+    a: "Alerts are not guaranteed in those situations. Pulse currently relies on the app being open and connected to request an alert; it does not independently monitor missed check-ins on a server. Do not use Pulse as your only safety arrangement. In an emergency, contact local emergency services directly.",
   },
   {
     q: "Do I need an account?",
@@ -366,7 +377,7 @@ const FAQS = [
   },
   {
     q: "Does it call emergency services?",
-    a: "No. Pulse emails the person you choose, with local emergency numbers so they know who to call.",
+    a: "No. Pulse can request an email to the person you choose, with local emergency numbers so they know who to call. The app must be open and connected; delivery is not guaranteed.",
   },
 ];
 
