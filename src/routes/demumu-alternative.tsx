@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
+import { CompetitorComparison } from "@/components/CompetitorComparison";
 
 const URL = "https://pulse-checkin.app/demumu-alternative";
 const TITLE = "Free Demumu Alternative — Pulse Safety Check-in";
@@ -22,15 +23,6 @@ export const Route = createFileRoute("/demumu-alternative")({
   }),
 });
 
-const rows: [string, string, string][] = [
-  ["Price", "Free", "Paid"],
-  ["Account needed", "No", "No"],
-  ["Works in a browser", "Yes, any device", "App only"],
-  ["Choose 24/48/72h rhythm", "Yes", "Limited"],
-  ["Local emergency numbers in alert", "Yes, 167 countries", "No"],
-  ["Vacation / pause mode", "Yes", "—"],
-];
-
 function Page() {
   return (
     <div className="min-h-screen">
@@ -50,9 +42,10 @@ function Page() {
             A free Demumu alternative for people who live alone
           </h1>
           <p className="mt-5 text-muted-foreground leading-relaxed">
-            Demumu (also known as "Are You Dead?") made daily check-in apps famous: tap a
-            button to say you're alive, and if you stop, someone is told. Pulse Safety Check-in
-            does the same job for free, in any browser, with no account and no location tracking.
+            Looking at check-in services for living alone? Pulse Safety Check-in is free,
+            works in a browser, and requires no sign-up or GPS tracking. The comparison below
+            separates verified published information from older reporting about Demumu;
+            the services should not be assumed to offer equivalent protection.
           </p>
         </section>
 
@@ -67,29 +60,7 @@ function Page() {
 
         <section>
           <h2 className="font-display text-2xl font-semibold">Pulse vs Demumu</h2>
-          <div className="mt-4 overflow-x-auto rounded-3xl border border-border/60 bg-card">
-            <table className="w-full text-xs sm:text-sm">
-              <thead>
-                <tr className="border-b border-border/60 text-left">
-                  <th className="p-4"></th>
-                  <th className="px-2.5 py-3 sm:p-4 font-semibold text-primary">Pulse</th>
-                  <th className="px-2.5 py-3 sm:p-4 font-medium">Demumu</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r) => (
-                  <tr key={r[0]} className="border-b border-border/40 last:border-0">
-                    <td className="px-2.5 py-3 sm:p-4 text-muted-foreground">{r[0]}</td>
-                    <td className="px-2.5 py-3 sm:p-4 font-medium">{r[1]}</td>
-                    <td className="px-2.5 py-3 sm:p-4 text-muted-foreground">{r[2]}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-3 text-xs text-muted-foreground">
-            Based on public information as of October 2026. Other apps may change.
-          </p>
+          <CompetitorComparison includeSnug={false} />
         </section>
 
         <section>

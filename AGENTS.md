@@ -11,3 +11,4 @@
 - Every alert email carries a signed unsubscribe link; opt-outs and Resend complaints go to pulse_email_suppressions, which sendAccountAlert checks before sending. Why: a stranger listed as a contact must be able to stop all Pulse email.
 - Alerts (test and missed) go only to a contact who confirmed via a signed consent link (contact_confirmed_email must match contact_email); the overdue SQL sweep filters the same way. Why: prevents spamming strangers and protects the sending domain.
 - Sync codes are 28-symbol base32 bearer secrets (140 bits), stored only as HMAC, always expire (max 30 days), and redemption is rate-limited per hashed IP and globally via pulse_rate_hit. Why: a leaked or guessed code grants full account access.
+- Use one shared CompetitorComparison for both comparison pages, with a literal source-check date updated only after verification; why: prevents conflicting claims and falsely automatic freshness.

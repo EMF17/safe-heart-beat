@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { HomeTourDemo } from "@/components/HomeTourDemo";
 import { Button } from "@/components/ui/button";
+import { CompetitorComparison } from "@/components/CompetitorComparison";
 
 export const Route = createFileRoute("/")({
   component: LandingPage,
@@ -312,14 +313,6 @@ function Features() {
 }
 
 function Comparison() {
-  const rows: [string, string, string, string][] = [
-    ["Price", "Free", "Paid", "Free basic plan, paid extras"],
-    ["Account needed", "No", "No", "Yes (phone number)"],
-    ["Uses your location", "Never", "No", "Yes"],
-    ["Works in a browser", "Yes, any device", "App only", "App only"],
-    ["Choose 24/48/72h rhythm", "Yes", "Limited", "Daily"],
-    ["Local emergency numbers in alert", "Yes, 167 countries", "No", "No"],
-  ];
   return (
     <section className="max-w-4xl mx-auto px-5 py-20 md:py-24">
       <div className="text-center max-w-xl mx-auto">
@@ -327,34 +320,10 @@ function Comparison() {
           How Pulse compares
         </h2>
         <p className="mt-4 text-muted-foreground">
-          A free alternative to Demumu ("Are You Dead?") and Snug — without an account or location tracking.
+          Considering Demumu or Snug? Here is what we could verify from published sources. Pulse is free, with no sign-up or GPS tracking.
         </p>
       </div>
-      <div className="mt-10 overflow-x-auto rounded-3xl border border-border/60 bg-card">
-        <table className="w-full text-xs sm:text-sm">
-          <thead>
-            <tr className="border-b border-border/60 text-left">
-              <th className="px-2.5 py-3 sm:p-4 font-medium"></th>
-              <th className="px-2.5 py-3 sm:p-4 font-semibold text-primary">Pulse</th>
-              <th className="px-2.5 py-3 sm:p-4 font-medium">Demumu</th>
-              <th className="px-2.5 py-3 sm:p-4 font-medium">Snug</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r[0]} className="border-b border-border/40 last:border-0">
-                <td className="px-2.5 py-3 sm:p-4 text-muted-foreground">{r[0]}</td>
-                <td className="px-2.5 py-3 sm:p-4 font-medium">{r[1]}</td>
-                <td className="px-2.5 py-3 sm:p-4 text-muted-foreground">{r[2]}</td>
-                <td className="px-2.5 py-3 sm:p-4 text-muted-foreground">{r[3]}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <p className="mt-3 text-xs text-muted-foreground text-center">
-        Based on public information as of October 2026. Other apps may change.
-      </p>
+      <CompetitorComparison />
     </section>
   );
 }
