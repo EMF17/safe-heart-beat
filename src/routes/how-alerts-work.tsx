@@ -41,7 +41,7 @@ function HowAlertsWorkPage() {
     <section className="space-y-4 border-t border-border pt-8">
       <h2 className="font-display text-2xl font-semibold">When an alert becomes eligible</h2>
       <div className="overflow-x-auto"><table className="w-full text-sm text-left"><thead><tr className="border-b border-border"><th className="py-3 pr-4">Check-in interval</th><th className="py-3">Two missed windows</th></tr></thead><tbody>{[[24,48],[48,96],[72,144]].map(([interval,threshold]) => <tr key={interval} className="border-b border-border"><td className="py-3 pr-4">Every {interval} hours</td><td className="py-3">{threshold} hours after your last check-in</td></tr>)}</tbody></table></div>
-      <p className="text-sm text-muted-foreground">Vacation / Pause stops missed-check-in alerts while active. Reminder notifications are for you; they are not alerts to your contact.</p>
+      <p className="text-sm text-muted-foreground">Your contact must first confirm by email that they agree to be your safety contact; until they do, and again after you change their address, Pulse sends them no alerts. Vacation / Pause stops missed-check-in alerts while active. Reminder notifications are for you; they are not alerts to your contact.</p>
     </section>
     <section className="space-y-4 border-t border-border pt-8">
       <h2 className="font-display text-2xl font-semibold">What this does not prove</h2>

@@ -106,6 +106,9 @@ export type Database = {
           alert_state: string
           alert_state_changed_at: string | null
           checkins: Json
+          contact_confirm_sent_at: string | null
+          contact_confirmed_at: string | null
+          contact_confirmed_email: string | null
           contact_email: string
           contact_name: string
           contact_phone: string | null
@@ -125,6 +128,9 @@ export type Database = {
           alert_state?: string
           alert_state_changed_at?: string | null
           checkins?: Json
+          contact_confirm_sent_at?: string | null
+          contact_confirmed_at?: string | null
+          contact_confirmed_email?: string | null
           contact_email: string
           contact_name?: string
           contact_phone?: string | null
@@ -144,6 +150,9 @@ export type Database = {
           alert_state?: string
           alert_state_changed_at?: string | null
           checkins?: Json
+          contact_confirm_sent_at?: string | null
+          contact_confirmed_at?: string | null
+          contact_confirmed_email?: string | null
           contact_email?: string
           contact_name?: string
           contact_phone?: string | null

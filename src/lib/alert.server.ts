@@ -16,7 +16,7 @@ export async function sendAccountAlert(
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const { data: account, error: accErr } = await supabaseAdmin
             .from("pulse_accounts")
-            .select("contact_email, contact_name, contact_phone, last_checkin, created_at, country_code")
+            .select("contact_email, contact_name, contact_phone, last_checkin, created_at, country_code, contact_confirmed_email")
             .eq("id", accountId)
             .single();
           if (accErr || !account) {
@@ -44,6 +44,10 @@ export async function sendAccountAlert(
           const createdMs = new Date(account.created_at).getTime();
           if (type === "missed" && Date.now() - createdMs < MIN_OVERDUE_MS) {
             return Response.json({ error: "No missed check-in to report" }, { status: 409 });
+          }
+          const { isContactConfirmed } = await import("@/lib/contact-consent.server");
+          if (!isContactConfirmed(account)) {
+            return Response.json({ error: "Your contact has not confirmed yet.", needsConfirmation: true }, { status: 403 });
           }
           const { isSuppressed, unsubscribeUrl } = await import("@/lib/email-suppression.server");
           if (await isSuppressed(contactEmail)) {
