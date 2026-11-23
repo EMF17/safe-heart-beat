@@ -26,7 +26,7 @@ export function SyncCodeCard() {
     setError(null);
     setNotice(null);
     try {
-      const res = await p.generateSyncCode(ttl === "never" ? null : Number(ttl));
+      const res = await p.generateSyncCode(Number(ttl));
       const c = res.code;
       setCode(c);
       setExpiresAt(res.expiresAt);
@@ -103,7 +103,7 @@ export function SyncCodeCard() {
             <p className="text-xs text-muted-foreground mt-2">
               {expiresAt
                 ? `Expires ${new Date(expiresAt).toLocaleString()} — after that this code and QR stop working. `
-                : "This code never expires unless you turn it off. "}
+                : "This code expires within 30 days. "}
               This is shown once. Store it somewhere safe — anyone with this code can restore your
               data.
             </p>
@@ -178,7 +178,7 @@ export function SyncCodeCard() {
               id="sync-code-input"
               value={input}
               onChange={(e) => setInput(e.target.value.toUpperCase())}
-              placeholder="PULSE-XXXX-XXXX-XXXX-XXXX"
+              placeholder="PULSE-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX"
               autoComplete="off"
               spellCheck={false}
               className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2.5 font-mono text-sm tracking-wider outline-none focus:border-primary"
@@ -216,7 +216,6 @@ export function SyncCodeCard() {
               <option value="24">24 hours</option>
               <option value="168">7 days</option>
               <option value="720">30 days</option>
-              <option value="never">Never</option>
             </select>
           </label>
         )}

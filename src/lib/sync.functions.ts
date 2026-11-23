@@ -140,7 +140,7 @@ export const createSyncCode = createServerFn({ method: "POST" })
     z
       .object({
         token: z.string().min(10).max(2048),
-        ttlHours: z.number().int().min(1).max(24 * 90).nullable().optional(),
+        ttlHours: z.number().int().min(1).max(24 * 30).nullable().optional(),
       })
       .parse(input),
   )
@@ -156,4 +156,7 @@ export const redeemSyncCode = createServerFn({ method: "POST" })
   .inputValidator((input) =>
     z.object({ code: z.string().min(8).max(64) }).parse(input),
   )
-  .handler(async ({ data }) => sync.redeemRecoveryCode(data.code));
+  .handler(async ({ data }) => {
+    const ip = (getRequestHeader("cf-connecting-ip") ?? getRequestHeader("x-forwarded-for")?.split(",")[0] ?? "unknown").trim().slice(0, 64);
+    return sync.redeemRecoveryCode(data.code, ip);
+  });

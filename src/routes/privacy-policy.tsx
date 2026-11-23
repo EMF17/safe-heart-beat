@@ -73,7 +73,7 @@ function PrivacyPolicyPage() {
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span><strong>Recovery credentials (optional):</strong> A Sync Code lets another device retrieve your online backup. Only a one-way fingerprint of the code is stored on our servers. You can choose an expiry of 1 hour, 24 hours, 7 days or 30 days, or no expiry. Expired codes cannot restore data; expiry does not delete the backup. Passkey recovery stores public credential information, not your private passkey.</span>
+              <span><strong>Recovery credentials (optional):</strong> A Sync Code lets another device retrieve your online backup. Only a one-way fingerprint of the code is stored on our servers. Every code expires: you choose 1 hour, 24 hours, 7 days or 30 days. Repeated wrong guesses are temporarily blocked. Expired codes cannot restore data; expiry does not delete the backup. Passkey recovery stores public credential information, not your private passkey.</span>
             </li>
           </ul>
         </section>

@@ -402,8 +402,13 @@ export function normalizeRecoveryCode(input: string): string {
     .replace(/U/g, "V");
 }
 
-function formatRecoveryCode(raw: string): string {
-  return `PULSE-${raw.slice(0, 4)}-${raw.slice(4, 8)}-${raw.slice(8, 12)}-${raw.slice(12, 16)}`;
+// 28 symbols from a 32-letter alphabet = 140 bits of entropy (no modulo bias).
+export const CODE_LENGTH = 28;
+const LEGACY_CODE_LENGTH = 16;
+export const MAX_CODE_TTL_HOURS = 24 * 30;
+
+export function formatRecoveryCode(raw: string): string {
+  return `PULSE-${raw.match(/.{1,4}/g)!.join("-")}`;
 }
 
 function hashRecoveryCode(normalized: string): string {
@@ -412,7 +417,7 @@ function hashRecoveryCode(normalized: string): string {
     .digest("base64url");
 }
 
-function randomCode(length = 16): string {
+function randomCode(length = CODE_LENGTH): string {
   const bytes = randomBytes(length);
   let out = "";
   for (let i = 0; i < length; i++) {
@@ -424,7 +429,9 @@ function randomCode(length = 16): string {
 /** Create (or replace) the account's sync code. Returns the code once. */
 export async function createRecoveryCode(token: string, ttlHours?: number | null) {
   const accountId = await verifyToken(token, { ownerOnly: true });
-  const expiresAt = ttlHours ? new Date(Date.now() + ttlHours * 3600_000).toISOString() : null;
+  // Codes are bearer secrets: every code expires, at most 30 days out.
+  const hours = Math.min(Math.max(1, Math.floor(ttlHours ?? 24)), MAX_CODE_TTL_HOURS);
+  const expiresAt = new Date(Date.now() + hours * 3600_000).toISOString();
   for (let attempt = 0; attempt < 5; attempt++) {
     const raw = randomCode();
     const normalized = normalizeRecoveryCode(raw);
@@ -457,9 +464,18 @@ export async function revokeRecoveryCode(token: string) {
 }
 
 /** Exchange a sync code for a token + the account's synced state. */
-export async function redeemRecoveryCode(code: string) {
+export async function redeemRecoveryCode(code: string, clientIp = "unknown") {
+  // Rate limit guesses per connection and in total before touching the code.
+  const hit = async (bucket: string, limit: number, windowSeconds: number) => {
+    const { data, error } = await supabaseAdmin.rpc("pulse_rate_hit", { _bucket: bucket, _limit: limit, _window_seconds: windowSeconds });
+    return !error && data === true;
+  };
+  const ipKey = createHmac("sha256", getSecret()).update(`ip:${clientIp}`).digest("base64url").slice(0, 22);
+  if (!(await hit(`redeem-ip:${ipKey}`, 10, 900)) || !(await hit("redeem-all", 500, 3600))) {
+    throw new Error("Too many sync code attempts. Please wait 15 minutes and try again.");
+  }
   const normalized = normalizeRecoveryCode(code);
-  if (normalized.length !== 16) throw new Error("That sync code doesn't look right");
+  if (normalized.length !== CODE_LENGTH && normalized.length !== LEGACY_CODE_LENGTH) throw new Error("That sync code doesn't look right");
   const hash = hashRecoveryCode(normalized);
 
   const { data, error } = await supabaseAdmin
@@ -469,7 +485,7 @@ export async function redeemRecoveryCode(code: string) {
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!data) throw new Error("No account found for that sync code");
-  if (data.recovery_code_expires_at && new Date(data.recovery_code_expires_at).getTime() < Date.now()) {
+  if (!data.recovery_code_expires_at || new Date(data.recovery_code_expires_at).getTime() < Date.now()) {
     await supabaseAdmin
       .from("pulse_accounts")
       .update({ recovery_code_hash: null, recovery_code_created_at: null, recovery_code_expires_at: null })

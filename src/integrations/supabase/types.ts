@@ -368,6 +368,24 @@ export type Database = {
           },
         ]
       }
+      pulse_rate_limits: {
+        Row: {
+          bucket: string
+          hits: number
+          window_start: string
+        }
+        Insert: {
+          bucket: string
+          hits?: number
+          window_start: string
+        }
+        Update: {
+          bucket?: string
+          hits?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -421,6 +439,10 @@ export type Database = {
         Returns: {
           id: string
         }[]
+      }
+      pulse_rate_hit: {
+        Args: { _bucket: string; _limit: number; _window_seconds: number }
+        Returns: boolean
       }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }

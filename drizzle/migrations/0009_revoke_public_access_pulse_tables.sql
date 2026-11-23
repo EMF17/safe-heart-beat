@@ -1,0 +1,2 @@
+REVOKE ALL ON public.pulse_accounts, public.pulse_alert_deliveries, public.pulse_challenges, public.pulse_cron_heartbeats, public.pulse_email_events, public.pulse_email_suppressions, public.pulse_passkeys, public.pulse_rate_limits FROM anon, authenticated;
+CREATE INDEX IF NOT EXISTS pulse_challenges_account_id_idx ON public.pulse_challenges(account_id);
