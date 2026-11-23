@@ -428,8 +428,8 @@ function PrivacySection() {
           book. Contact details and check-ins are stored on your device. If you
           enable a Sync Code or passkey, your contact details, optional name and
           up to 500 check-ins are also stored online under a random record ID,
-          before any alert. Alert emails pass the recipient and message to
-          Resend. The optional checklist sends your description and region to
+          before any alert. Alert emails are sent through Resend to the contact
+          saved in your record, using Pulse's fixed message. The optional checklist sends your description and region to
           Lovable AI. QR scanning stays on your device; no camera images are saved.
         </p>
         <Link
