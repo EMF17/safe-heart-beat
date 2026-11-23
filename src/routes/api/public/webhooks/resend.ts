@@ -23,7 +23,7 @@ export const Route = createFileRoute("/api/public/webhooks/resend")({
         if (!(await verifySvixSignature(secret, id, ts, body, sig, Date.now()))) {
           return new Response("Invalid signature", { status: 401 });
         }
-        let event: { type?: string; data?: { email_id?: string } };
+        let event: { type?: string; data?: { email_id?: string; to?: unknown } };
         try { event = JSON.parse(body); } catch { return new Response("Bad JSON", { status: 400 }); }
         const type = String(event.type ?? "").slice(0, 60);
         const messageId = typeof event.data?.email_id === "string" ? event.data.email_id.slice(0, 100) : null;
@@ -37,6 +37,10 @@ export const Route = createFileRoute("/api/public/webhooks/resend")({
           await supabaseAdmin.from("pulse_alert_deliveries")
             .update(status === "delivered" ? { status, delivered_at: now, updated_at: now } : { status: "bounced", bounced_at: now, last_error: type, updated_at: now })
             .eq("provider_message_id", messageId);
+        }
+        if (status === "complained" && Array.isArray(event.data?.to)) {
+          const { suppress } = await import("@/lib/email-suppression.server");
+          for (const to of event.data.to.slice(0, 5)) if (typeof to === "string") await suppress(to, "complaint");
         }
         console.log(JSON.stringify({ event: "resend_webhook", type, messageId }));
         return Response.json({ ok: true });

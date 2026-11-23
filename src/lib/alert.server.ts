@@ -1,4 +1,5 @@
 import { MAX_SEND_ATTEMPTS, missedCycleKey, nextRetryAt, sendKey } from "@/lib/alert-state";
+import { safeContactName } from "@/lib/contact-name";
 import { emergencyNumbers, GLOBAL_FALLBACKS } from "@/lib/emergency-numbers";
 
 /**
@@ -44,6 +45,10 @@ export async function sendAccountAlert(
           if (type === "missed" && Date.now() - createdMs < MIN_OVERDUE_MS) {
             return Response.json({ error: "No missed check-in to report" }, { status: 409 });
           }
+          const { isSuppressed, unsubscribeUrl } = await import("@/lib/email-suppression.server");
+          if (await isSuppressed(contactEmail)) {
+            return Response.json({ error: "This contact has asked not to receive Pulse emails." }, { status: 403 });
+          }
           const likeEmail = contactEmail.replace(/[\\%_]/g, (c) => `\\${c}`);
           const { data: sameRecipient } = await supabaseAdmin
             .from("pulse_accounts").select("id").ilike("contact_email", likeEmail).limit(200);
@@ -67,7 +72,7 @@ export async function sendAccountAlert(
           const escapeHtml = (v: string) =>
             v.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
           const countryCode = (countryCodeInput ?? account.country_code ?? "").trim().toUpperCase();
-          const name = (contactName || "Your contact").replace(/[\r\n<>]/g, " ").slice(0, 80);
+          const name = safeContactName(contactName);
 
           const country = countryCode
             ? emergencyNumbers.find((c) => c.code === countryCode) ?? null
@@ -124,7 +129,8 @@ export async function sendAccountAlert(
 
 
           const footerText =
-            "\n\nNo location tracking. No automatic 911. This is an automated safety alert from Pulse.";
+            "\n\nNo location tracking. No automatic 911. This is an automated safety alert from Pulse." +
+            `\nDon't want Pulse emails? ${unsubscribeUrl(contactEmail)}`;
           const bodyText = `${introText}${emergencyText}${footerText}`;
 
           const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px;line-height:1.55;color:#1a1a1a;max-width:560px">
@@ -132,7 +138,7 @@ export async function sendAccountAlert(
     <p style="margin:0 0 8px">${escapeHtml(introText)}</p>
     ${emergencyHtml}
     <p style="margin:16px 0 0;font-size:13px;color:#666">No location tracking. No automatic 911. This is an automated safety alert from Pulse.</p>
-    <p style="margin:24px 0 0;font-size:12px;color:#888">Pulse Safety · pulse-checkin.app</p>
+    <p style="margin:24px 0 0;font-size:12px;color:#888">Pulse Safety · pulse-checkin.app · <a href="${escapeHtml(unsubscribeUrl(contactEmail))}" style="color:#888">Stop Pulse emails to this address</a></p>
   </div>`;
 
           const { sendSms, smsConfigured } = await import("@/lib/sms.server");
@@ -206,6 +212,10 @@ export async function sendAccountAlert(
               subject,
               text: bodyText,
               html,
+              headers: {
+                "List-Unsubscribe": `<${unsubscribeUrl(contactEmail)}>`,
+                "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+              },
             }),
           });
 

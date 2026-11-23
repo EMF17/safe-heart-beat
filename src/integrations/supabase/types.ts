@@ -303,6 +303,24 @@ export type Database = {
         }
         Relationships: []
       }
+      pulse_email_suppressions: {
+        Row: {
+          created_at: string
+          email_lower: string
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          email_lower: string
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          email_lower?: string
+          reason?: string
+        }
+        Relationships: []
+      }
       pulse_passkeys: {
         Row: {
           account_id: string

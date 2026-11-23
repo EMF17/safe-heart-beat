@@ -25,6 +25,7 @@ import { Route as AppSafetyPlanRouteImport } from './routes/_app.safety-plan'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as ApiSendAlertRouteImport } from './routes/api/send-alert'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
+import { Route as ApiPublicUnsubscribeRouteImport } from './routes/api/public/unsubscribe'
 import { Route as ApiPublicCronOverdueAlertsRouteImport } from './routes/api/public/cron/overdue-alerts'
 import { Route as ApiPublicCronWatchdogRouteImport } from './routes/api/public/cron/watchdog'
 import { Route as ApiPublicWebhooksResendRouteImport } from './routes/api/public/webhooks/resend'
@@ -111,6 +112,11 @@ const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   path: '/api/public/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicUnsubscribeRoute = ApiPublicUnsubscribeRouteImport.update({
+  id: '/api/public/unsubscribe',
+  path: '/api/public/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCronOverdueAlertsRoute =
   ApiPublicCronOverdueAlertsRouteImport.update({
     id: '/api/public/cron/overdue-alerts',
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRoute
   '/api/send-alert': typeof ApiSendAlertRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/api/public/cron/overdue-alerts': typeof ApiPublicCronOverdueAlertsRoute
   '/api/public/cron/watchdog': typeof ApiPublicCronWatchdogRoute
   '/api/public/webhooks/resend': typeof ApiPublicWebhooksResendRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRoute
   '/api/send-alert': typeof ApiSendAlertRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/api/public/cron/overdue-alerts': typeof ApiPublicCronOverdueAlertsRoute
   '/api/public/cron/watchdog': typeof ApiPublicCronWatchdogRoute
   '/api/public/webhooks/resend': typeof ApiPublicWebhooksResendRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRoute
   '/api/send-alert': typeof ApiSendAlertRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/api/public/cron/overdue-alerts': typeof ApiPublicCronOverdueAlertsRoute
   '/api/public/cron/watchdog': typeof ApiPublicCronWatchdogRoute
   '/api/public/webhooks/resend': typeof ApiPublicWebhooksResendRoute
@@ -233,6 +242,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/api/send-alert'
     | '/api/public/health'
+    | '/api/public/unsubscribe'
     | '/api/public/cron/overdue-alerts'
     | '/api/public/cron/watchdog'
     | '/api/public/webhooks/resend'
@@ -256,6 +266,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/api/send-alert'
     | '/api/public/health'
+    | '/api/public/unsubscribe'
     | '/api/public/cron/overdue-alerts'
     | '/api/public/cron/watchdog'
     | '/api/public/webhooks/resend'
@@ -280,6 +291,7 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/api/send-alert'
     | '/api/public/health'
+    | '/api/public/unsubscribe'
     | '/api/public/cron/overdue-alerts'
     | '/api/public/cron/watchdog'
     | '/api/public/webhooks/resend'
@@ -299,6 +311,7 @@ export interface RootRouteChildren {
   ZhHkRoute: typeof ZhHkRoute
   ApiSendAlertRoute: typeof ApiSendAlertRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
+  ApiPublicUnsubscribeRoute: typeof ApiPublicUnsubscribeRoute
   ApiPublicCronOverdueAlertsRoute: typeof ApiPublicCronOverdueAlertsRoute
   ApiPublicCronWatchdogRoute: typeof ApiPublicCronWatchdogRoute
   ApiPublicWebhooksResendRoute: typeof ApiPublicWebhooksResendRoute
@@ -421,6 +434,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/unsubscribe': {
+      id: '/api/public/unsubscribe'
+      path: '/api/public/unsubscribe'
+      fullPath: '/api/public/unsubscribe'
+      preLoaderRoute: typeof ApiPublicUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cron/overdue-alerts': {
       id: '/api/public/cron/overdue-alerts'
       path: '/api/public/cron/overdue-alerts'
@@ -497,6 +517,7 @@ const rootRouteChildren: RootRouteChildren = {
   ZhHkRoute: ZhHkRoute,
   ApiSendAlertRoute: ApiSendAlertRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
+  ApiPublicUnsubscribeRoute: ApiPublicUnsubscribeRoute,
   ApiPublicCronOverdueAlertsRoute: ApiPublicCronOverdueAlertsRoute,
   ApiPublicCronWatchdogRoute: ApiPublicCronWatchdogRoute,
   ApiPublicWebhooksResendRoute: ApiPublicWebhooksResendRoute,
