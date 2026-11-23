@@ -48,7 +48,7 @@ export const Route = createFileRoute("/api/send-alert")({
 
         const { data: account, error: accErr } = await supabaseAdmin
           .from("pulse_accounts")
-          .select("contact_email, contact_name, contact_phone, last_checkin")
+          .select("contact_email, contact_name, contact_phone, last_checkin, created_at")
           .eq("id", accountId)
           .single();
         if (accErr || !account) {
@@ -71,6 +71,30 @@ export const Route = createFileRoute("/api/send-alert")({
         const lastMs = account.last_checkin ? new Date(account.last_checkin).getTime() : NaN;
         if (type === "missed" && (!Number.isFinite(lastMs) || Date.now() - lastMs < MIN_OVERDUE_MS)) {
           return Response.json({ error: "No missed check-in to report" }, { status: 409 });
+        }
+        // Limit mail to any single recipient across ALL accounts, so creating
+        // throwaway accounts with someone else's address cannot flood them.
+        const createdMs = new Date(account.created_at).getTime();
+        if (type === "missed" && Date.now() - createdMs < MIN_OVERDUE_MS) {
+          return Response.json({ error: "No missed check-in to report" }, { status: 409 });
+        }
+        const likeEmail = contactEmail.replace(/[\\%_]/g, (c) => `\\${c}`);
+        const { data: sameRecipient } = await supabaseAdmin
+          .from("pulse_accounts").select("id").ilike("contact_email", likeEmail).limit(200);
+        const recipientAccounts = (sameRecipient ?? []).map((r) => r.id);
+        if (!recipientAccounts.includes(accountId)) recipientAccounts.push(accountId);
+        const windowMs = type === "test" ? 7 * 86400_000 : 86400_000;
+        let recentQuery = supabaseAdmin.from("pulse_alert_deliveries")
+          .select("account_id", { count: "exact", head: true })
+          .in("account_id", recipientAccounts).eq("channel", "email")
+          .gte("created_at", new Date(Date.now() - windowMs).toISOString());
+        recentQuery = type === "test" ? recentQuery.like("checkin_key", "test-%") : recentQuery.not("checkin_key", "like", "test-%");
+        const { count: recentCount, error: recentErr } = await recentQuery;
+        if (recentErr || (recentCount ?? 0) > 0) {
+          return Response.json(
+            { error: type === "test" ? "A test alert was already sent to this address this week." : "An alert was already sent to this address today." },
+            { status: 429 }
+          );
         }
         const escapeHtml = (v: string) =>
           v.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
