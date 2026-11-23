@@ -107,9 +107,12 @@ export type Database = {
           contact_email: string
           contact_name: string
           contact_phone: string | null
+          country_code: string | null
           created_at: string
           id: string
+          interval_ms: number
           last_checkin: string | null
+          paused_until: string | null
           recovery_code_created_at: string | null
           recovery_code_expires_at: string | null
           recovery_code_hash: string | null
@@ -121,9 +124,12 @@ export type Database = {
           contact_email: string
           contact_name?: string
           contact_phone?: string | null
+          country_code?: string | null
           created_at?: string
           id?: string
+          interval_ms?: number
           last_checkin?: string | null
+          paused_until?: string | null
           recovery_code_created_at?: string | null
           recovery_code_expires_at?: string | null
           recovery_code_hash?: string | null
@@ -135,9 +141,12 @@ export type Database = {
           contact_email?: string
           contact_name?: string
           contact_phone?: string | null
+          country_code?: string | null
           created_at?: string
           id?: string
+          interval_ms?: number
           last_checkin?: string | null
+          paused_until?: string | null
           recovery_code_created_at?: string | null
           recovery_code_expires_at?: string | null
           recovery_code_hash?: string | null
@@ -303,6 +312,12 @@ export type Database = {
           source_queue: string
         }
         Returns: number
+      }
+      pulse_overdue_accounts: {
+        Args: { _limit?: number }
+        Returns: {
+          id: string
+        }[]
       }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }

@@ -69,7 +69,7 @@ function PrivacyPolicyPage() {
           <ul className="space-y-3 text-sm text-white/80 leading-relaxed">
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span><strong>Online recovery and alert record:</strong> Saving a contact alone stores it on your device. If you enable a Sync Code or passkey, we create an online record under a random ID. It contains your contact&apos;s name and email, your optional name, latest check-in time and up to 500 check-ins, and updates while recovery is enabled. This is personal data, not anonymous data, and is stored before an alert. Alerts use this record; the current app must be open and connected to request them. Alerts while your phone is off are not guaranteed.</span>
+              <span><strong>Online recovery and alert record:</strong> When you save a contact, we create an online record under a random ID so our server can alert them if you miss check-ins. It contains your contact&apos;s name, email and optional phone, your optional name, latest check-in time, up to 500 check-ins, your check-in interval, any pause dates and your region code for emergency numbers. This is personal data, not anonymous data, and is stored before any alert. Our server checks it every hour and sends alerts even if your phone is off. You can delete it in Settings.</span>
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>

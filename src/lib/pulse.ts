@@ -12,6 +12,7 @@ import {
   startPasskeyAuthentication,
   finishPasskeyAuthentication,
   pushSyncState,
+  postCheckIn,
   pullSyncState,
   deleteSyncAccount,
   ensureSyncAccount,
@@ -28,6 +29,8 @@ const NAME_KEY = "pulse:name";
 const TOKEN_KEY = "pulse:syncToken";
 const ACCOUNT_KEY = "pulse:accountId";
 const CODE_CREATED_KEY = "pulse:syncCodeCreatedAt";
+const POSTED_CHECKIN_KEY = "pulse:postedCheckIn";
+const CREATING_KEY = "pulse:creatingAccount";
 
 function readLocalHistory(): number[] {
   try {
@@ -71,6 +74,7 @@ export function usePulse() {
   const callStartAuth = useServerFn(startPasskeyAuthentication);
   const callFinishAuth = useServerFn(finishPasskeyAuthentication);
   const callPush = useServerFn(pushSyncState);
+  const callPostCheckIn = useServerFn(postCheckIn);
   const callPull = useServerFn(pullSyncState);
   const callDelete = useServerFn(deleteSyncAccount);
   const callEnsureAccount = useServerFn(ensureSyncAccount);
@@ -115,6 +119,25 @@ export function usePulse() {
     return () => window.removeEventListener("pulse:contactChanged", refresh);
   }, []);
 
+  // Server-side alerts need an online record: once a contact is saved,
+  // create one automatically so the server can alert even if this phone is off.
+  useEffect(() => {
+    if (!hydrated || syncToken || !contact?.email) return;
+    const lock = Number(localStorage.getItem(CREATING_KEY) ?? 0);
+    if (Date.now() - lock < 30_000) return;
+    localStorage.setItem(CREATING_KEY, String(Date.now()));
+    callEnsureAccount({ data: { contactEmail: contact.email } })
+      .then((created) => {
+        if (localStorage.getItem(TOKEN_KEY)) return;
+        localStorage.setItem(TOKEN_KEY, created.token);
+        localStorage.setItem(ACCOUNT_KEY, created.accountId);
+        setSyncToken(created.token);
+        setSyncStatus("ready");
+      })
+      .catch(() => {})
+      .finally(() => localStorage.removeItem(CREATING_KEY));
+  }, [hydrated, syncToken, contact?.email, callEnsureAccount]);
+
   // Debounced push when synced & state changes
   const pushTimer = useRef<number | null>(null);
   useEffect(() => {
@@ -133,9 +156,19 @@ export function usePulse() {
               contactPhone: contact.phone ?? null,
               lastCheckin: lastCheckIn ? new Date(lastCheckIn).toISOString() : null,
               checkins: readLocalHistory().map((n) => new Date(n).toISOString()),
+              intervalMs: prefs.intervalMs as 86400000 | 172800000 | 259200000,
+              pausedUntil: prefs.pauseUntil ? new Date(prefs.pauseUntil).toISOString() : null,
+              countryCode: await import("@/lib/region").then((m) => { const c = m.getActiveCountryCode()?.toUpperCase() ?? null; return c && /^[A-Z]{2}$/.test(c) ? c : null; }).catch(() => null),
             },
           },
         });
+        // Post new check-ins so the server clock records them.
+        const posted = Number(localStorage.getItem(POSTED_CHECKIN_KEY) ?? 0);
+        if (lastCheckIn && lastCheckIn > posted) {
+          localStorage.setItem(POSTED_CHECKIN_KEY, String(lastCheckIn));
+          try { await callPostCheckIn({ data: { token: syncToken } }); }
+          catch (e) { localStorage.setItem(POSTED_CHECKIN_KEY, String(posted)); throw e; }
+        }
         setSyncStatus("ready");
         setSyncError(null);
       } catch (e) {
@@ -146,7 +179,7 @@ export function usePulse() {
     return () => {
       if (pushTimer.current) window.clearTimeout(pushTimer.current);
     };
-  }, [hydrated, syncToken, userName, contact, lastCheckIn, historyCount, callPush]);
+  }, [hydrated, syncToken, userName, contact, lastCheckIn, historyCount, callPush, callPostCheckIn, prefs.intervalMs, prefs.pauseUntil]);
 
   const checkIn = useCallback(() => {
     const t = Date.now();

@@ -295,6 +295,12 @@ export interface SyncedState {
   lastCheckin: string | null;
   /** Full check-in history as ISO timestamps (most recent last). */
   checkins?: string[];
+  /** Check-in interval in ms (24, 48 or 72 hours). */
+  intervalMs?: number;
+  /** Vacation/pause end, or null when not paused. */
+  pausedUntil?: string | null;
+  /** Active region for the alert's emergency numbers. */
+  countryCode?: string | null;
 }
 
 const MAX_HISTORY = 500;
@@ -325,12 +331,38 @@ export async function pushState(token: string, state: SyncedState) {
       contact_name: state.contactName,
       contact_email: state.contactEmail,
       ...(state.contactPhone !== undefined ? { contact_phone: state.contactPhone } : {}),
-      last_checkin: state.lastCheckin,
       ...(history ? { checkins: history } : {}),
+      ...(state.intervalMs !== undefined ? { interval_ms: state.intervalMs } : {}),
+      ...(state.pausedUntil !== undefined ? { paused_until: state.pausedUntil } : {}),
+      ...(state.countryCode !== undefined ? { country_code: state.countryCode } : {}),
     })
     .eq("id", accountId);
   if (error) throw new Error(error.message);
+  // The server owns last_checkin (set by postCheckIn with server time). A
+  // device may only seed it once, for accounts that have none yet.
+  if (state.lastCheckin) {
+    const seeded = Math.min(new Date(state.lastCheckin).getTime(), Date.now());
+    if (Number.isFinite(seeded)) {
+      await supabaseAdmin.from("pulse_accounts")
+        .update({ last_checkin: new Date(seeded).toISOString() })
+        .eq("id", accountId).is("last_checkin", null);
+    }
+  }
   return { ok: true };
+}
+
+/** Record a check-in using the server clock. */
+export async function postCheckIn(token: string) {
+  const accountId = await verifyToken(token);
+  const { data, error } = await supabaseAdmin
+    .from("pulse_accounts").select("checkins").eq("id", accountId).single();
+  if (error || !data) throw new Error("Account not found");
+  const at = new Date().toISOString();
+  const checkins = [...readHistory(data.checkins), at].slice(-MAX_HISTORY);
+  const { error: upErr } = await supabaseAdmin
+    .from("pulse_accounts").update({ last_checkin: at, checkins }).eq("id", accountId);
+  if (upErr) throw new Error(upErr.message);
+  return { lastCheckin: at };
 }
 
 export async function pullState(token: string) {

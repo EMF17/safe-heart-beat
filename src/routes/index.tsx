@@ -24,14 +24,14 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "A free safety check-in for people living alone. Email alerts require Pulse to be open and connected; delivery is not guaranteed. No account or cookies.",
+          "A free safety check-in for people living alone. Our server checks for missed check-ins every hour, even if your phone is off. No account or cookies.",
       },
       { property: "og:type", content: "website" },
       { property: "og:title", content: "Pulse Safety Check-in — Free safety app for people who live alone" },
       {
         property: "og:description",
         content:
-          "One tap records your check-in. Missed-check-in email alerts require Pulse to be open and connected; delivery is not guaranteed.",
+          "One tap records your check-in. If you miss two check-ins, our server emails your contact, even if your phone is off.",
       },
       { property: "og:url", content: "https://pulse-checkin.app/" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -50,7 +50,7 @@ export const Route = createFileRoute("/")({
           operatingSystem: "Web",
           url: "https://pulse-checkin.app/",
           description:
-            "A privacy-first safety check-in for people who live alone. Email alerts after two missed windows require the app to be open and connected; delivery is not guaranteed.",
+            "A privacy-first safety check-in for people who live alone. After two missed windows, our server emails your contact even if your phone is off or Pulse is closed.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
@@ -141,10 +141,11 @@ function Hero({ returning }: { returning: boolean }) {
         </p>
 
         <p className="mt-5 text-base text-foreground max-w-xl mx-auto leading-relaxed">
-          <strong>Important:</strong> Pulse must be open and connected to the internet
-          to request an alert. If your phone is off, Pulse is closed, or there is no
-          connection, alerts are not guaranteed. Do not rely on Pulse as your only
-          safety arrangement; it is not an emergency service.
+          <strong>How alerts work:</strong> your check-ins are saved on our server, which
+          checks every hour for missed check-ins and emails your contact, even if your
+          phone is off or Pulse is closed. A check-in made offline only counts once
+          your phone reconnects. Email delivery can't be guaranteed, and Pulse is not
+          an emergency service, so don't make it your only safety arrangement.
         </p>
         <div className="mt-4 flex flex-wrap justify-center gap-2">
           <Button asChild variant="link"><Link to="/how-alerts-work">How alerts work</Link></Button>
@@ -194,7 +195,7 @@ function HowItWorks() {
     {
       icon: <ShieldCheck className="w-5 h-5" />,
       title: "An email after missed check-ins",
-      body: "After two missed windows, Pulse can request an email with your local emergency number. The app must be open and connected; delivery is not guaranteed.",
+      body: "After two missed windows, our server emails your contact with your local emergency number, even if your phone is off.",
     },
   ];
 
@@ -207,7 +208,7 @@ function HowItWorks() {
           </h2>
           <p className="mt-4 text-muted-foreground">
             No feeds, no pressure, no guilt — just a simple check-in routine.
-            Keep Pulse open and connected for missed-check-in alert requests.
+            Missed check-ins are watched by our server, so your phone doesn't need to stay on.
           </p>
         </div>
 
@@ -361,15 +362,15 @@ function Comparison() {
 const FAQS = [
   {
     q: "When is my emergency contact emailed?",
-    a: "Pulse can request an email after you miss two check-in windows in a row, but only while the app is open and connected to the internet. With a 48-hour rhythm that's 96 hours; with 24 hours it's 48 hours; with 72 hours it's 144 hours. Pausing stops alerts completely. Email delivery is not guaranteed.",
+    a: "Our server emails your contact after you miss two check-in windows in a row, checking every hour, even if your phone is off or Pulse is closed. With a 48-hour rhythm that's 96 hours; with 24 hours it's 48 hours; with 72 hours it's 144 hours. Pausing stops alerts completely. Email delivery is not guaranteed.",
   },
   {
     q: "Will alerts work if my phone is off or Pulse is closed?",
-    a: "Alerts are not guaranteed in those situations. Pulse currently relies on the app being open and connected to request an alert; it does not independently monitor missed check-ins on a server. Do not use Pulse as your only safety arrangement. In an emergency, contact local emergency services directly.",
+    a: "Yes. Your last check-in, interval and pause dates are saved on our server, which checks every hour and sends the alert itself. A check-in tapped while offline only counts once your phone reconnects. Email delivery can't be guaranteed, so don't use Pulse as your only safety arrangement. In an emergency, contact local emergency services directly.",
   },
   {
     q: "Do I need an account?",
-    a: "No sign-up or password is required. Saving a contact stores it on your device. Enabling a Sync Code or passkey creates an online backup used for recovery and alerts. The current app must be open and connected to request an alert; it cannot guarantee alerts while your phone is off.",
+    a: "No sign-up or password is required. Saving a contact creates an online record under a random ID, so our server can alert your contact even if your phone is off. A Sync Code or passkey lets you restore it on a new phone.",
   },
   {
     q: "What if I get a new phone?",
@@ -385,7 +386,7 @@ const FAQS = [
   },
   {
     q: "Does it call emergency services?",
-    a: "No. Pulse can request an email to the person you choose, with local emergency numbers so they know who to call. The app must be open and connected; delivery is not guaranteed.",
+    a: "No. Pulse can request an email to the person you choose, with local emergency numbers so they know who to call. Our server sends it even if your phone is off; email delivery can't be guaranteed.",
   },
 ];
 

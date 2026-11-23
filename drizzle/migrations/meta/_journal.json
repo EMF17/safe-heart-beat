@@ -15,6 +15,20 @@
       "when": 1794722131634,
       "tag": "0001_emergency_contact_sms",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795432654267,
+      "tag": "0002_migration",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1795432672863,
+      "tag": "0003_migration",
+      "breakpoints": true
     }
   ]
 }

@@ -50,7 +50,7 @@ function StatusPage() {
     { title: "Pulse server", value: !query.data.reachable ? "Latest check failed" : "Responded to the last check", note: "This checks Pulse’s response, not inbox delivery or every service." },
     { title: "Email alerts", value: query.data.emailConfigured === null ? "Unable to check" : query.data.emailConfigured ? "Configured · delivery unverified" : "Not configured", note: query.data.emailConfigured === false ? "Email cannot be sent until the email service is configured." : "Use a test to check acceptance and ask your contact to confirm receipt." },
     { title: "SMS alerts", value: query.data.smsConfigured === null ? "Unable to check" : query.data.smsConfigured ? "Configured · delivery unverified" : "Not connected", note: "Texts need a connected SMS service, a saved online phone number and a supported destination." },
-    { title: "Phone-off monitoring", value: "Not available", note: "Pulse does not independently monitor missed check-ins on a server. Keep the app open and connected." },
+    { title: "Phone-off monitoring", value: "Hourly server check", note: "The server checks every hour for missed check-ins and sends alerts itself, even if your phone is off." },
     { title: "WhatsApp alerts", value: "Not available", note: "No WhatsApp messages are sent." },
   ];
   return <AlertInfoLayout>
@@ -58,7 +58,7 @@ function StatusPage() {
       <p className="text-sm font-medium text-primary flex items-center gap-2"><Activity className="size-4" />Pulse Safety Check-in</p>
       <h1 className="font-display text-3xl md:text-4xl font-semibold">Alert status</h1>
       <p className="text-lg text-muted-foreground leading-relaxed">Configuration and your current device — not a guarantee that an alert will arrive.</p>
-      <p className="text-sm leading-relaxed">This is not a continuously monitored uptime page. Email and SMS provider health, inbox delivery and incident history are not monitored here. Alerts still require Pulse open and connected.</p>
+      <p className="text-sm leading-relaxed">This is not a continuously monitored uptime page. Email and SMS provider health, inbox delivery and incident history are not monitored here. Missed check-ins are checked by the server every hour.</p>
       <div className="flex flex-wrap gap-3 items-center">
         <Button variant="outline" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw className={query.isFetching ? "animate-spin" : ""} />{query.isFetching ? "Checking…" : "Refresh status"}</Button>
         <span className="text-sm text-muted-foreground">Last server response: {checkedAt ?? (query.data.reachable ? "Loading time…" : "Unavailable")}</span>

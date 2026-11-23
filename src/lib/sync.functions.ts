@@ -83,6 +83,9 @@ const stateSchema = z.object({
   contactPhone: z.string().max(40).nullable().optional().transform((value) => value == null ? value : normalizeContactPhone(value)),
   lastCheckin: z.string().datetime().nullable(),
   checkins: z.array(z.string()).max(1000).optional(),
+  intervalMs: z.union([z.literal(86400000), z.literal(172800000), z.literal(259200000)]).optional(),
+  pausedUntil: z.string().datetime().nullable().optional(),
+  countryCode: z.string().regex(/^[A-Z]{2}$/).nullable().optional(),
 });
 
 export const pushSyncState = createServerFn({ method: "POST" })
@@ -95,6 +98,12 @@ export const pushSyncState = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => sync.pushState(data.token, data.state));
+
+export const postCheckIn = createServerFn({ method: "POST" })
+  .inputValidator((input) =>
+    z.object({ token: z.string().min(10).max(2048) }).parse(input),
+  )
+  .handler(async ({ data }) => sync.postCheckIn(data.token));
 
 export const pullSyncState = createServerFn({ method: "POST" })
   .inputValidator((input) =>

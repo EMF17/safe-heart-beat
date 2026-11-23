@@ -1,6 +1,5 @@
 import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { Home, Shield, History, Settings } from "lucide-react";
-import { useEffect } from "react";
 import { usePulse } from "@/lib/pulse";
 import { useCheckInNotifications } from "@/lib/notifications";
 
@@ -8,20 +7,15 @@ export const Route = createFileRoute("/_app")({
   component: AppLayout,
 });
 
-const LAST_ALERT_KEY = "pulse:lastAlertSent";
-
 function AppLayout() {
   const location = useLocation();
   const current = location.pathname;
   const {
     lastCheckIn,
-    contact,
-    hydrated,
     intervalMs,
     alertThresholdMs,
     reminderEnabled,
     isPaused,
-    syncToken,
   } = usePulse();
   useCheckInNotifications(lastCheckIn, {
     intervalMs,
@@ -30,44 +24,8 @@ function AppLayout() {
     isPaused,
   });
 
-  // Missed check-in alert: send ONE email if last check-in > alert threshold
-  // and no alert has been sent since that check-in. Skipped while paused.
-  // Requires an active sync token so the server can resolve the contact
-  // email from the authenticated account (prevents anonymous email abuse).
-  useEffect(() => {
-    if (!hydrated || !lastCheckIn || !contact?.email) return;
-    if (isPaused) return;
-    if (!syncToken) return;
-    const elapsed = Date.now() - lastCheckIn;
-    if (elapsed < alertThresholdMs) return;
-
-    const lastAlertRaw = localStorage.getItem(LAST_ALERT_KEY);
-    const lastAlert = lastAlertRaw ? Number(lastAlertRaw) : 0;
-    if (lastAlert >= lastCheckIn) return;
-
-    const sentAt = Date.now();
-    localStorage.setItem(LAST_ALERT_KEY, String(sentAt));
-
-    import("@/lib/region").then(({ getActiveCountryCode }) => {
-      const countryCode = getActiveCountryCode();
-      fetch("/api/send-alert", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token: syncToken,
-          type: "missed",
-          countryCode,
-        }),
-      }).then(async (response) => {
-        const result = await response.json();
-        // Keep retries possible for a failed or not-yet-connected channel.
-        if (!response.ok || !result.success || (contact.phone && result.sms?.status !== "sent" && result.sms?.status !== "already_sent")) {
-          localStorage.removeItem(LAST_ALERT_KEY);
-        }
-      }).catch(() => localStorage.removeItem(LAST_ALERT_KEY));
-    });
-  }, [hydrated, lastCheckIn, contact?.email, contact?.name, contact?.phone, alertThresholdMs, isPaused, syncToken]);
-
+  // Missed check-in alerts are sent by the server on a schedule, so they
+  // work even when this phone is off or Pulse is closed.
 
   const tabs = [
     { to: "/app" as const, label: "Home", icon: Home },

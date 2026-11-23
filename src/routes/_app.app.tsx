@@ -140,7 +140,7 @@ function OnboardingScreen({ onDismiss }: { onDismiss: () => void }) {
         </button>
 
         <p className="text-[11px] text-muted-foreground text-center mt-4 leading-relaxed">
-          No account · Visits counted without cookies · Data stays on this device unless you turn on sync
+          No account · Visits counted without cookies · Saved online so alerts work if your phone is off
         </p>
       </div>
     </div>

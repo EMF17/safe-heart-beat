@@ -24,6 +24,7 @@ import { Route as AppHistoryRouteImport } from './routes/_app.history'
 import { Route as AppSafetyPlanRouteImport } from './routes/_app.safety-plan'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as ApiSendAlertRouteImport } from './routes/api/send-alert'
+import { Route as ApiPublicCronOverdueAlertsRouteImport } from './routes/api/public/cron/overdue-alerts'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -102,6 +103,12 @@ const ApiSendAlertRoute = ApiSendAlertRouteImport.update({
   path: '/api/send-alert',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCronOverdueAlertsRoute =
+  ApiPublicCronOverdueAlertsRouteImport.update({
+    id: '/api/public/cron/overdue-alerts',
+    path: '/api/public/cron/overdue-alerts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   id: '/lovable/email/auth/preview',
   path: '/lovable/email/auth/preview',
@@ -134,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/safety-plan': typeof AppSafetyPlanRoute
   '/settings': typeof AppSettingsRoute
   '/api/send-alert': typeof ApiSendAlertRoute
+  '/api/public/cron/overdue-alerts': typeof ApiPublicCronOverdueAlertsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -153,6 +161,7 @@ export interface FileRoutesByTo {
   '/safety-plan': typeof AppSafetyPlanRoute
   '/settings': typeof AppSettingsRoute
   '/api/send-alert': typeof ApiSendAlertRoute
+  '/api/public/cron/overdue-alerts': typeof ApiPublicCronOverdueAlertsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -174,6 +183,7 @@ export interface FileRoutesById {
   '/_app/safety-plan': typeof AppSafetyPlanRoute
   '/_app/settings': typeof AppSettingsRoute
   '/api/send-alert': typeof ApiSendAlertRoute
+  '/api/public/cron/overdue-alerts': typeof ApiPublicCronOverdueAlertsRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/safety-plan'
     | '/settings'
     | '/api/send-alert'
+    | '/api/public/cron/overdue-alerts'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/safety-plan'
     | '/settings'
     | '/api/send-alert'
+    | '/api/public/cron/overdue-alerts'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -234,6 +246,7 @@ export interface FileRouteTypes {
     | '/_app/safety-plan'
     | '/_app/settings'
     | '/api/send-alert'
+    | '/api/public/cron/overdue-alerts'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -249,6 +262,7 @@ export interface RootRouteChildren {
   StatusRoute: typeof StatusRoute
   ZhHkRoute: typeof ZhHkRoute
   ApiSendAlertRoute: typeof ApiSendAlertRoute
+  ApiPublicCronOverdueAlertsRoute: typeof ApiPublicCronOverdueAlertsRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -361,6 +375,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSendAlertRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cron/overdue-alerts': {
+      id: '/api/public/cron/overdue-alerts'
+      path: '/api/public/cron/overdue-alerts'
+      fullPath: '/api/public/cron/overdue-alerts'
+      preLoaderRoute: typeof ApiPublicCronOverdueAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/auth/preview': {
       id: '/lovable/email/auth/preview'
       path: '/lovable/email/auth/preview'
@@ -415,6 +436,7 @@ const rootRouteChildren: RootRouteChildren = {
   StatusRoute: StatusRoute,
   ZhHkRoute: ZhHkRoute,
   ApiSendAlertRoute: ApiSendAlertRoute,
+  ApiPublicCronOverdueAlertsRoute: ApiPublicCronOverdueAlertsRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
