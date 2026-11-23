@@ -1,3 +1,4 @@
+import { MAX_SEND_ATTEMPTS, missedCycleKey, nextRetryAt, sendKey } from "@/lib/alert-state";
 import { emergencyNumbers, GLOBAL_FALLBACKS } from "@/lib/emergency-numbers";
 
 /**
@@ -49,9 +50,11 @@ export async function sendAccountAlert(
           const recipientAccounts = (sameRecipient ?? []).map((r) => r.id);
           if (!recipientAccounts.includes(accountId)) recipientAccounts.push(accountId);
           const windowMs = type === "test" ? 7 * 86400_000 : 86400_000;
+          const key = type === "test" ? `test-${new Date().toISOString().slice(0, 10)}` : missedCycleKey(lastMs);
           let recentQuery = supabaseAdmin.from("pulse_alert_deliveries")
             .select("account_id", { count: "exact", head: true })
             .in("account_id", recipientAccounts).eq("channel", "email")
+            .neq("checkin_key", key).not("status", "in", "(failed,dead)")
             .gte("created_at", new Date(Date.now() - windowMs).toISOString());
           recentQuery = type === "test" ? recentQuery.like("checkin_key", "test-%") : recentQuery.not("checkin_key", "like", "test-%");
           const { count: recentCount, error: recentErr } = await recentQuery;
@@ -135,35 +138,67 @@ export async function sendAccountAlert(
           const { sendSms, smsConfigured } = await import("@/lib/sms.server");
           type Delivery = { status: "sent" | "already_sent" | "not_connected" | "no_number" | "failed" | "sending"; error?: string };
           // Receipts are independent: an email success never suppresses a pending SMS.
-          // Test alerts are limited to one per account per day.
-          const key = type === "test" ? `test-${new Date().toISOString().slice(0, 10)}` : `missed-${Math.floor(lastMs)}`;
-          const deliver = async (channel: "email" | "sms", send: () => Promise<Delivery>): Promise<Delivery> => {
-            const { error: claimError } = await supabaseAdmin.from("pulse_alert_deliveries").insert({ account_id: accountId, checkin_key: key, channel });
+          // Each (account, cycle, channel) row is a unique send key. Claiming it is
+          // atomic, so overlapping sweeps or retries can never send twice; failures
+          // are kept with backoff so the next sweep retries the SAME key.
+          const deliver = async (channel: "email" | "sms", send: (idemKey: string) => Promise<Delivery & { providerId?: string }>): Promise<Delivery> => {
+            const sk = sendKey(accountId, key, channel);
+            const { error: claimError } = await supabaseAdmin.from("pulse_alert_deliveries")
+              .insert({ account_id: accountId, checkin_key: key, channel, send_key: sk, status: "sending", attempts: 1 });
+            let attempts = 1;
             if (claimError) {
-              const { data: receipt } = await supabaseAdmin.from("pulse_alert_deliveries").select("status").eq("account_id", accountId).eq("checkin_key", key).eq("channel", channel).maybeSingle();
-              return { status: receipt?.status === "sent" ? "already_sent" : "sending" };
+              const { data: receipt } = await supabaseAdmin.from("pulse_alert_deliveries")
+                .select("status, attempts, next_attempt_at, updated_at").eq("account_id", accountId).eq("checkin_key", key).eq("channel", channel).maybeSingle();
+              if (!receipt) return { status: "sending" };
+              const due = !receipt.next_attempt_at || new Date(receipt.next_attempt_at).getTime() <= Date.now();
+              // A "sending" row older than 15 minutes means the worker died mid-send;
+              // retrying is safe because the provider de-duplicates on the same key.
+              const stuck = receipt.status === "sending" && Date.now() - new Date(receipt.updated_at).getTime() > 15 * 60_000;
+              if (!(stuck || receipt.status === "failed") || !due || receipt.attempts >= MAX_SEND_ATTEMPTS) {
+                return { status: ["sent", "delivered", "bounced"].includes(receipt.status) ? "already_sent" : receipt.status === "failed" ? "failed" : "sending" };
+              }
+              // Compare-and-set on the attempt count: only one retry wins.
+              const { data: won } = await supabaseAdmin.from("pulse_alert_deliveries")
+                .update({ status: "sending", attempts: receipt.attempts + 1, send_key: sk, updated_at: new Date().toISOString() })
+                .eq("account_id", accountId).eq("checkin_key", key).eq("channel", channel)
+                .eq("status", receipt.status).eq("attempts", receipt.attempts).select("attempts");
+              if (!won?.length) return { status: "sending" };
+              attempts = receipt.attempts + 1;
             }
-            let result: Delivery;
-            try { result = await send(); }
+            let result: Delivery & { providerId?: string };
+            try { result = await send(sk); }
             catch (error) {
               console.error(`${channel} delivery failed`, error instanceof Error ? error.message : "Unknown error");
               result = { status: "failed", error: `Could not send ${channel}. Please try again.` };
             }
-            if (result.status === "sent") {
-              await supabaseAdmin.from("pulse_alert_deliveries").update({ status: "sent" }).eq("account_id", accountId).eq("checkin_key", key).eq("channel", channel);
-            } else {
+            const now = Date.now();
+            const retryAt = nextRetryAt(attempts, now);
+            const update = result.status === "sent"
+              ? { status: "sent", provider_message_id: result.providerId ?? null, last_error: null, next_attempt_at: null }
+              : { status: retryAt === null ? "dead" : "failed", last_error: (result.error ?? result.status).slice(0, 300), next_attempt_at: retryAt === null ? null : new Date(retryAt).toISOString() };
+            if (result.status !== "sent" && type === "test") {
+              // Failed tests are not retried automatically; free the key so the user can try again.
               await supabaseAdmin.from("pulse_alert_deliveries").delete().eq("account_id", accountId).eq("checkin_key", key).eq("channel", channel);
+              return { status: result.status, ...(result.error ? { error: result.error } : {}) };
             }
-            return result;
+            await supabaseAdmin.from("pulse_alert_deliveries").update({ ...update, updated_at: new Date(now).toISOString() })
+              .eq("account_id", accountId).eq("checkin_key", key).eq("channel", channel);
+            if (result.status === "sent" && channel === "email" && type === "missed") {
+              await supabaseAdmin.from("pulse_accounts").update({ alert_state: "alerted", alert_state_changed_at: new Date(now).toISOString() }).eq("id", accountId);
+            }
+            console.log(JSON.stringify({ event: "alert_delivery", type, channel, sendKey: sk, attempts, status: update.status }));
+            return { status: result.status, ...(result.error ? { error: result.error } : {}) };
           };
 
           const [email, sms] = await Promise.all([
-            apiKey ? deliver("email", async () => {
+            apiKey ? deliver("email", async (idemKey) => {
           const res = await fetch("https://api.resend.com/emails", {
             method: "POST",
             headers: {
               Authorization: `Bearer ${apiKey}`,
               "Content-Type": "application/json",
+              // Resend also de-duplicates on this key for 24h.
+              "Idempotency-Key": idemKey,
             },
             body: JSON.stringify({
               from: "Pulse Safety <alerts@pulse-checkin.app>",
@@ -177,9 +212,10 @@ export async function sendAccountAlert(
           if (!res.ok) {
             const errorBody = await res.text();
             console.error(`Resend failed [${res.status}]: ${errorBody}`);
-            return { status: "failed", error: "Email provider did not accept the alert." };
+            return { status: "failed", error: `Email provider did not accept the alert (${res.status}).` };
           }
-          return { status: "sent" };
+          const sentBody = (await res.json().catch(() => ({}))) as { id?: string };
+          return { status: "sent", ...(sentBody.id ? { providerId: sentBody.id } : {}) };
             }) : Promise.resolve<Delivery>({ status: "not_connected" }),
             account.contact_phone && smsConfigured()
               ? deliver("sms", () => sendSms(account.contact_phone ?? "", `Pulse Safety: ${type === "test" ? "TEST — " : ""}${type === "test" ? "This is a test safety alert for" : "Two missed check-ins for"} ${name}. ${type === "test" ? "No action needed." : "Please call or text them to check they are okay."}${emergencyText}`))

@@ -6,3 +6,5 @@
 - Keep the Chinese picture guide on the Chinese information page and use actual phone-screen assets with translated captions; why: readers can match the English check-in controls without adding distractions to the daily screen.
 
 - Missed-check-in alerts are sent only by the hourly server sweep (/api/public/cron/overdue-alerts → pulse_overdue_accounts → alert.server.ts); clients just post check-ins and settings. Why: alerts must work when the phone is off or the app is closed.
+- Alert sends are idempotent: each (account, cycle, channel) delivery row is the send key, claimed atomically, retried in place with backoff (max 5) and passed to Resend as Idempotency-Key; account alert_state moves ok→warned (SQL sweep) →alerted (only after the email is accepted). Why: retries and overlapping sweeps must never double-send.
+- The overdue sweep writes pulse_cron_heartbeats; /api/public/cron/watchdog (separate schedule) emails the owner when it is stale and /api/public/health returns 503 for outside monitors. Resend delivery/bounce events arrive at /api/public/webhooks/resend (Svix-verified, deduped by event id). Why: a stopped scheduler or bounced alert must be visible.

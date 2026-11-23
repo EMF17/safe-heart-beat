@@ -103,6 +103,8 @@ export type Database = {
       }
       pulse_accounts: {
         Row: {
+          alert_state: string
+          alert_state_changed_at: string | null
           checkins: Json
           contact_email: string
           contact_name: string
@@ -120,6 +122,8 @@ export type Database = {
           user_name: string
         }
         Insert: {
+          alert_state?: string
+          alert_state_changed_at?: string | null
           checkins?: Json
           contact_email: string
           contact_name?: string
@@ -137,6 +141,8 @@ export type Database = {
           user_name?: string
         }
         Update: {
+          alert_state?: string
+          alert_state_changed_at?: string | null
           checkins?: Json
           contact_email?: string
           contact_name?: string
@@ -158,24 +164,48 @@ export type Database = {
       pulse_alert_deliveries: {
         Row: {
           account_id: string
+          attempts: number
+          bounced_at: string | null
           channel: string
           checkin_key: string
           created_at: string
+          delivered_at: string | null
+          last_error: string | null
+          next_attempt_at: string | null
+          provider_message_id: string | null
+          send_key: string | null
           status: string
+          updated_at: string
         }
         Insert: {
           account_id: string
+          attempts?: number
+          bounced_at?: string | null
           channel: string
           checkin_key: string
           created_at?: string
+          delivered_at?: string | null
+          last_error?: string | null
+          next_attempt_at?: string | null
+          provider_message_id?: string | null
+          send_key?: string | null
           status?: string
+          updated_at?: string
         }
         Update: {
           account_id?: string
+          attempts?: number
+          bounced_at?: string | null
           channel?: string
           checkin_key?: string
           created_at?: string
+          delivered_at?: string | null
+          last_error?: string | null
+          next_attempt_at?: string | null
+          provider_message_id?: string | null
+          send_key?: string | null
           status?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -227,6 +257,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pulse_cron_heartbeats: {
+        Row: {
+          job: string
+          last_finished_at: string | null
+          last_result: Json | null
+          last_started_at: string | null
+          last_watchdog_alert_at: string | null
+        }
+        Insert: {
+          job: string
+          last_finished_at?: string | null
+          last_result?: Json | null
+          last_started_at?: string | null
+          last_watchdog_alert_at?: string | null
+        }
+        Update: {
+          job?: string
+          last_finished_at?: string | null
+          last_result?: Json | null
+          last_started_at?: string | null
+          last_watchdog_alert_at?: string | null
+        }
+        Relationships: []
+      }
+      pulse_email_events: {
+        Row: {
+          event_id: string
+          event_type: string
+          provider_message_id: string | null
+          received_at: string
+        }
+        Insert: {
+          event_id: string
+          event_type: string
+          provider_message_id?: string | null
+          received_at?: string
+        }
+        Update: {
+          event_id?: string
+          event_type?: string
+          provider_message_id?: string | null
+          received_at?: string
+        }
+        Relationships: []
       }
       pulse_passkeys: {
         Row: {
@@ -313,6 +388,7 @@ export type Database = {
         }
         Returns: number
       }
+      pulse_advance_alert_states: { Args: never; Returns: number }
       pulse_overdue_accounts: {
         Args: { _limit?: number }
         Returns: {

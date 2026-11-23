@@ -29,6 +29,20 @@
       "when": 1795432672863,
       "tag": "0003_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795442950040,
+      "tag": "0004_alert_state_machine_and_observability",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795443025156,
+      "tag": "0005_retry_stuck_alert_sends",
+      "breakpoints": true
     }
   ]
 }
