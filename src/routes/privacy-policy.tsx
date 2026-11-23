@@ -32,7 +32,7 @@ function PrivacyPolicyPage() {
           Privacy Policy for Pulse
         </h1>
         <p className="text-sm text-white/60 mb-10">
-          Last updated: November 15, 2026
+          Last updated: November 23, 2026
         </p>
 
         <section className="mb-8">
@@ -116,6 +116,10 @@ function PrivacyPolicyPage() {
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
               <span>Please don&apos;t include names, addresses or other identifying details. AI suggestions are general guidance, not professional advice.</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="shrink-0">·</span>
+              <span><strong>Your consent:</strong> Nothing is sent until you tick an unticked consent box next to the button, every time you create a checklist. Because your description may include health information, we rely on your explicit consent (GDPR Articles 6(1)(a) and 9(2)(a)). The checklist is optional and the rest of Pulse works without it. You can withdraw consent at any time by not using the checklist; withdrawal doesn&apos;t affect checklists already created. Your text may be processed outside your country by the AI model provider.</span>
             </li>
           </ul>
         </section>

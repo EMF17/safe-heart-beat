@@ -487,6 +487,9 @@ function SiteFooter() {
           <Link to="/privacy-policy" className="hover:text-foreground transition">
             Privacy
           </Link>
+          <Link to="/terms" className="hover:text-foreground transition">
+            Terms
+          </Link>
         </nav>
       </div>
     </footer>

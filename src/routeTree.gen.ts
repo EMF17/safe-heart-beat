@@ -16,6 +16,7 @@ import { Route as HowAlertsWorkRouteImport } from './routes/how-alerts-work'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StatusRouteImport } from './routes/status'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ZhHkRouteImport } from './routes/zh-hk'
 import { Route as AppAppRouteImport } from './routes/_app.app'
 import { Route as AppEmergencyContactRouteImport } from './routes/_app.emergency-contact'
@@ -67,6 +68,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const StatusRoute = StatusRouteImport.update({
   id: '/status',
   path: '/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ZhHkRoute = ZhHkRouteImport.update({
@@ -169,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
+  '/terms': typeof TermsRoute
   '/zh-hk': typeof ZhHkRoute
   '/app': typeof AppAppRoute
   '/emergency-contact': typeof AppEmergencyContactRoute
@@ -195,6 +202,7 @@ export interface FileRoutesByTo {
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
+  '/terms': typeof TermsRoute
   '/zh-hk': typeof ZhHkRoute
   '/app': typeof AppAppRoute
   '/emergency-contact': typeof AppEmergencyContactRoute
@@ -223,6 +231,7 @@ export interface FileRoutesById {
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
+  '/terms': typeof TermsRoute
   '/zh-hk': typeof ZhHkRoute
   '/_app/app': typeof AppAppRoute
   '/_app/emergency-contact': typeof AppEmergencyContactRoute
@@ -251,6 +260,7 @@ export interface FileRouteTypes {
     | '/privacy-policy'
     | '/sitemap.xml'
     | '/status'
+    | '/terms'
     | '/zh-hk'
     | '/app'
     | '/emergency-contact'
@@ -277,6 +287,7 @@ export interface FileRouteTypes {
     | '/privacy-policy'
     | '/sitemap.xml'
     | '/status'
+    | '/terms'
     | '/zh-hk'
     | '/app'
     | '/emergency-contact'
@@ -304,6 +315,7 @@ export interface FileRouteTypes {
     | '/privacy-policy'
     | '/sitemap.xml'
     | '/status'
+    | '/terms'
     | '/zh-hk'
     | '/_app/app'
     | '/_app/emergency-contact'
@@ -332,6 +344,7 @@ export interface RootRouteChildren {
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
+  TermsRoute: typeof TermsRoute
   ZhHkRoute: typeof ZhHkRoute
   ApiContactConfirmRoute: typeof ApiContactConfirmRoute
   ApiSendAlertRoute: typeof ApiSendAlertRoute
@@ -395,6 +408,13 @@ declare module '@tanstack/react-router' {
       path: '/status'
       fullPath: '/status'
       preLoaderRoute: typeof StatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/zh-hk': {
@@ -554,6 +574,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
+  TermsRoute: TermsRoute,
   ZhHkRoute: ZhHkRoute,
   ApiContactConfirmRoute: ApiContactConfirmRoute,
   ApiSendAlertRoute: ApiSendAlertRoute,

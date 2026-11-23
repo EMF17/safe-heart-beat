@@ -40,6 +40,7 @@ function SafetyPlanPage() {
   const [region, setRegion] = useState("");
   const [plan, setPlan] = useState<Saved | null>(null);
   const [busy, setBusy] = useState(false);
+  const [consent, setConsent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -63,10 +64,11 @@ function SafetyPlanPage() {
   };
 
   const submit = async () => {
+    if (!consent) return;
     setBusy(true);
     setError(null);
     try {
-      const res = await generate({ data: { situation, region } });
+      const res = await generate({ data: { situation, region, consent: true } });
       save({ ...res, done: {}, situation, region });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
@@ -119,9 +121,23 @@ function SafetyPlanPage() {
             className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
           />
         </label>
+        <label className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed">
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(e) => setConsent(e.target.checked)}
+            className="mt-0.5 h-4 w-4 shrink-0 accent-primary"
+          />
+          <span>
+            I agree that the description and region I typed above, which may include health details, will be sent
+            to Lovable AI and its AI model provider (a third party, possibly outside my country) only to create this
+            checklist. This is optional, and I can untick it or stop using the checklist at any time. See the{" "}
+            <Link to="/privacy-policy" className="underline">Privacy Policy</Link>.
+          </span>
+        </label>
         <button
           onClick={submit}
-          disabled={busy || situation.trim().length < 10 || region.trim().length < 2}
+          disabled={busy || !consent || situation.trim().length < 10 || region.trim().length < 2}
           className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium py-2.5 disabled:opacity-50"
         >
           <Sparkles className="w-4 h-4" />

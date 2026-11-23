@@ -41,6 +41,8 @@ export const generateSafetyChecklist = createServerFn({ method: "POST" })
       .object({
         situation: z.string().trim().min(10).max(1500),
         region: z.string().trim().min(2).max(120),
+        // Explicit GDPR Art. 9 consent: the user must tick an unticked box each time.
+        consent: z.literal(true, { message: "Please confirm you agree before creating a checklist." }),
       })
       .parse(input),
   )

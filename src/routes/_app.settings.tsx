@@ -417,6 +417,7 @@ function SettingsPage() {
               <span className="text-sm">Privacy Policy</span>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </Link>
+            <Button asChild variant="ghost" className="w-full justify-between rounded-none min-h-11"><Link to="/terms">Terms of Service<ChevronRight /></Link></Button>
             <Button asChild variant="ghost" className="w-full justify-between rounded-none min-h-11"><Link to="/how-alerts-work">How alerts work<ChevronRight /></Link></Button>
             <Button asChild variant="ghost" className="w-full justify-between rounded-none min-h-11"><Link to="/status">Alert status<ChevronRight /></Link></Button>
             <Link
