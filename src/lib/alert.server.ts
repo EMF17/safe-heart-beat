@@ -228,7 +228,7 @@ export async function sendAccountAlert(
           return { status: "sent", ...(sentBody.id ? { providerId: sentBody.id } : {}) };
             }) : Promise.resolve<Delivery>({ status: "not_connected" }),
             account.contact_phone && smsConfigured()
-              ? deliver("sms", () => sendSms(account.contact_phone ?? "", `Pulse Safety: ${type === "test" ? "TEST — " : ""}${type === "test" ? "This is a test safety alert for" : "Two missed check-ins for"} ${name}. ${type === "test" ? "No action needed." : "Please call or text them to check they are okay."}${emergencyText}`))
+              ? deliver("sms", () => sendSms(account.contact_phone ?? "", `Pulse Safety: ${type === "test" ? "TEST — " : ""}${type === "test" ? "This is a test safety alert for" : "Two missed check-ins for"} ${name}. ${type === "test" ? "No action needed." : "Please call or text them to check they are okay."}${emergencyText} Reply STOP to opt out.`))
               : Promise.resolve<Delivery>({ status: account.contact_phone ? "not_connected" : "no_number" }),
           ]);
           return Response.json({ success: email.status === "sent" || email.status === "already_sent" || sms.status === "sent" || sms.status === "already_sent", email, sms });
