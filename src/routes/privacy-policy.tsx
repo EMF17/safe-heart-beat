@@ -6,9 +6,9 @@ export const Route = createFileRoute("/privacy-policy")({
   head: () => ({
     meta: [
       { title: "Privacy Policy — Pulse" },
-      { name: "description", content: "Pulse privacy policy." },
+      { name: "description", content: "How Pulse stores contact details, check-ins and alert settings online for server-side alerts, with optional recovery and AI checklist consent." },
       { property: "og:title", content: "Privacy Policy — Pulse" },
-      { property: "og:description", content: "How Pulse handles check-in data, recovery codes, and safety plans." },
+      { property: "og:description", content: "Online safety records are required for Pulse alerts. Learn about stored data, optional recovery, AI consent and deletion." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -32,13 +32,13 @@ function PrivacyPolicyPage() {
           Privacy Policy for Pulse
         </h1>
         <p className="text-sm text-white/60 mb-10">
-          Last updated: November 23, 2026
+          Last updated: November 24, 2026
         </p>
 
         <section className="mb-8">
           <h2 className="text-lg font-bold mb-3">Overview</h2>
           <p className="text-sm text-white/80 leading-relaxed">
-            Pulse is a safety check-in app designed to email an emergency contact if you miss your check-ins. There is no account sign-up or password. Visits are counted anonymously without cookies. Contact details and check-ins are stored on your device; enabling online recovery creates a server backup before any alert. The optional AI checklist also sends your description and region for processing. We do not promise that nothing leaves your device until an alert.
+            Pulse is a safety check-in app designed to email an emergency contact if you miss your check-ins. There is no account sign-up or password. Visits are counted anonymously without cookies. Saving a contact creates an online safety record containing personal data, including contact details, check-ins and alert settings. This online storage is required for server-side alerts, happens before any alert and does not depend on enabling a Sync Code or passkey. A copy is also kept on your device. Recovery on another device is optional; online storage for alerts is not. The optional AI checklist sends your description and region for processing only with your explicit consent. Email delivery is not guaranteed.
           </p>
         </section>
 
@@ -69,11 +69,11 @@ function PrivacyPolicyPage() {
           <ul className="space-y-3 text-sm text-white/80 leading-relaxed">
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span><strong>Online recovery and alert record:</strong> When you save a contact, we create an online record under a random ID so our server can alert them if you miss check-ins. It contains your contact&apos;s name, email and optional phone, your optional name, latest check-in time, up to 500 check-ins, your check-in interval, any pause dates and your region code for emergency numbers. This is personal data, not anonymous data, and is stored before any alert. Our server checks it every hour and sends alerts even if your phone is off. You can delete it in Settings.</span>
+              <span><strong>Online safety record (required for alerts):</strong> When you save a contact, we create an online record under a random ID so our server can alert them if you miss check-ins. It contains your contact&apos;s name, email and optional phone, your optional name, latest check-in time, up to 500 check-ins, your check-in interval, any pause dates and your region code for emergency numbers. This is personal data, not anonymous data, and is stored before any alert, whether or not you enable recovery. Our server checks it every hour and can send alerts even if your phone is off, once your contact has confirmed. Email delivery is not guaranteed. You can delete the safety record in Settings; doing so also stops server-side monitoring for that record.</span>
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span><strong>Recovery credentials (optional):</strong> A Sync Code lets another device retrieve your online backup. Only a one-way fingerprint of the code is stored on our servers. Every code expires: you choose 1 hour, 24 hours, 7 days or 30 days. Repeated wrong guesses are temporarily blocked. Expired codes cannot restore data; expiry does not delete the backup. Passkey recovery stores public credential information, not your private passkey.</span>
+              <span><strong>Recovery credentials (optional):</strong> A Sync Code or passkey lets another device retrieve your existing online safety record; it does not enable online storage or monitoring. Only a one-way fingerprint of the code is stored on our servers. Every code expires: you choose 1 hour, 24 hours, 7 days or 30 days. Repeated wrong guesses are temporarily blocked. Expired codes cannot restore data; expiry does not delete the safety record or stop server-side monitoring. Passkey recovery stores public credential information, not your private passkey.</span>
             </li>
           </ul>
         </section>
@@ -83,7 +83,7 @@ function PrivacyPolicyPage() {
           <ul className="space-y-3 text-sm text-white/80 leading-relaxed">
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span>Your emergency contact&apos;s email and optional phone number are used only for missed-check-in alerts and test alerts you request. When online recovery is enabled, the phone number is included in the online record. Please obtain your contact&apos;s agreement before adding their number. SMS requires a connected Twilio account and supported destination; delivery is not guaranteed.</span>
+              <span>Your emergency contact&apos;s email is used to request their confirmation and to send missed-check-in alerts and test alerts after they confirm. If you save an optional phone number, it is included in the online safety record regardless of whether recovery is enabled, for SMS alerts when available. Please obtain your contact&apos;s agreement before adding their number. SMS requires a connected Twilio account and supported destination; delivery is not guaranteed.</span>
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
@@ -134,7 +134,7 @@ function PrivacyPolicyPage() {
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
               <span>
-                <strong>Resend (resend.com):</strong> Delivers alert emails. Your contact&apos;s email and the alert message are passed to Resend only when an alert is sent. See{" "}
+                <strong>Resend (resend.com):</strong> Delivers contact-confirmation emails, missed-check-in alerts and test alerts. When sending one of these emails, our server looks up the saved contact&apos;s email and passes it with Pulse&apos;s fixed message to Resend. See{" "}
                 <a href="https://resend.com/privacy" target="_blank" rel="noopener noreferrer" className="underline text-white/90 hover:text-white">
                   Resend&apos;s privacy policy
                 </a>
@@ -143,7 +143,7 @@ function PrivacyPolicyPage() {
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span><strong>Lovable Cloud:</strong> Hosts the app and stores your online recovery and alert record when enabled. Hosting and service operation may involve technical logs; these are separate from visit counting.</span>
+              <span><strong>Lovable Cloud:</strong> Hosts the app and stores your online safety record when you save a contact, regardless of whether recovery is enabled. This storage is required for server-side alerts. Hosting and service operation may involve technical logs; these are separate from visit counting.</span>
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
@@ -165,7 +165,7 @@ function PrivacyPolicyPage() {
             </li>
             <li className="flex items-center gap-2">
               <span className="shrink-0 text-red-400">❌</span>
-              <span>No advertising IDs; online recovery uses a random record ID and recovery credentials</span>
+              <span>No advertising IDs; your online safety record uses a random ID, but its contents are personal data</span>
             </li>
             <li className="flex items-center gap-2">
               <span className="shrink-0 text-red-400">❌</span>
@@ -191,7 +191,7 @@ function PrivacyPolicyPage() {
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span><strong>Turn off sync code:</strong> Settings → Sync Code → Turn off makes your code stop working immediately. This does not delete the online backup or stop an already connected device from updating it. Use Delete All Data to request removal of the online record.</span>
+              <span><strong>Turn off sync code:</strong> Settings → Sync Code → Turn off makes your code stop working immediately. This does not delete the online safety record, stop server-side monitoring or stop an already connected device from updating it. Use Delete All Data to remove the safety record and stop its monitoring.</span>
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>

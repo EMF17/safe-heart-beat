@@ -9,7 +9,7 @@ export const Route = createFileRoute("/how-alerts-work")({
   head: () => ({
     meta: [
       { title: "How alerts work — Pulse Safety Check-in" },
-      { name: "description", content: "Understand Pulse missed-check-in email alerts, online recovery requirements, timing and phone-off limitations. Try a test with your saved contact." },
+      { name: "description", content: "Understand Pulse missed-check-in email alerts, required online safety records, contact confirmation, timing and delivery limits. Recovery is optional." },
       { property: "og:title", content: "How alerts work — Pulse Safety Check-in" },
       { property: "og:description", content: "Pulse's server checks hourly for missed check-ins and emails your contact, even if your phone is off. See the timing and limits." },
       { property: "og:type", content: "website" },

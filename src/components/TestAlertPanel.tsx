@@ -40,7 +40,7 @@ export function TestAlertPanel() {
       setConfirmMsg(null);
       setReview({ token, email: account.contactEmail, phone: account.contactPhone ?? null, confirmed: !!status.confirmed, requestSentAt: status.requestSentAt ?? null });
     } catch {
-      setError("Could not verify your saved online contact. Check your connection and restore or enable online recovery in Settings.");
+      setError("Could not verify your saved online contact. Check your internet connection and saved contact in Settings. On a new device, restore your existing safety record first.");
     } finally { setBusy(false); }
   }
 
@@ -71,7 +71,7 @@ export function TestAlertPanel() {
       setResult({ email: describeTestChannel("email", data.email?.status), sms: describeTestChannel("sms", data.sms?.status) });
       setReview(null);
     } catch {
-      setError("The test result could not be confirmed. Check your connection and online recovery in Settings. Do not assume your contact received it.");
+      setError("The test result could not be confirmed. Check your internet connection and saved contact in Settings. Do not assume your contact received it.");
     } finally { setBusy(false); }
   }
 
@@ -80,7 +80,7 @@ export function TestAlertPanel() {
     <p className="text-sm text-muted-foreground leading-relaxed">Your contact must first confirm they agree to be your safety contact. Then you can send a clearly labelled test. A test does not change your check-in time or history. Ask them to check their inbox and spam folder.</p>
     <p className="text-sm text-muted-foreground">One accepted test per channel per day (resets at midnight UTC). SMS requires a connected service and a saved phone number.</p>
     {ready && !hasToken && <div className="space-y-3">
-      <p className="text-sm">Save a contact, then create a Sync Code or enable passkey recovery in Settings before testing. This stores your contact and check-ins online; it does not enable phone-off monitoring.</p>
+      <p className="text-sm">Save a contact in Settings while connected to the internet so Pulse can create the online safety record required for alerts. Your contact must confirm before testing. A Sync Code or passkey is optional and only needed to restore an existing record on another device.</p>
       <Button asChild variant="outline"><Link to="/settings">Set up in Settings</Link></Button>
     </div>}
     {!review && <Button onClick={reviewTest} disabled={!ready || !hasToken || busy} className="min-h-11 whitespace-normal"><Mail />{busy ? "Checking contact…" : "Send test alert"}</Button>}

@@ -171,8 +171,8 @@ function Hero({ returning }: { returning: boolean }) {
         </div>
 
         <p className="mt-5 text-xs text-muted-foreground">
-          Takes about 60 seconds to set up. Visits counted without cookies. Online recovery
-          stores a backup; alert emails share only the details needed.
+          Takes about 60 seconds to set up. Visits counted without cookies. Saving a contact
+          creates an online safety record required for alerts; recovery on another device is optional.
         </p>
 
         <HomeTourDemo />
@@ -261,8 +261,8 @@ function Features() {
     },
     {
       icon: <Lock className="w-5 h-5" />,
-      title: "Private by default",
-      body: "No sign-up, no ads, no cookies. Check-ins stay on your device unless you enable online recovery.",
+      title: "Clear about your data",
+      body: "No sign-up, no ads, no cookies. Saving a contact stores contact details, check-ins and alert settings online. This is required for alerts, not an optional backup.",
     },
     {
       icon: <HeartPulse className="w-5 h-5" />,
@@ -277,7 +277,7 @@ function Features() {
     {
       icon: <Smartphone className="w-5 h-5" />,
       title: "Move to a new phone",
-      body: "An online backup lets a sync code or QR scan restore your contact and history — no account, and codes can expire.",
+      body: "An optional Sync Code or passkey restores your existing online safety record on a new phone. Sync Codes can also be scanned as a QR code and always expire.",
     },
   ];
 
@@ -394,12 +394,18 @@ function PrivacySection() {
         </h2>
         <p className="mt-4 text-muted-foreground leading-relaxed">
           Pulse counts visits without cookies or identifying you, and does not use GPS or read your address
-          book. Contact details and check-ins are stored on your device. If you
-          enable a Sync Code or passkey, your contact details, optional name and
-          up to 500 check-ins are also stored online under a random record ID,
-          before any alert. Alert emails are sent through Resend to the contact
-          saved in your record, using Pulse's fixed message. The optional checklist sends your description and region to
-          Lovable AI. QR scanning stays on your device; no camera images are saved.
+          book. Saving a contact creates an online safety record containing their
+          name, email and optional phone number, your optional name, latest check-in
+          time, up to 500 check-ins, check-in interval, pause dates and region code.
+          These are personal data, not anonymous data, even under a random record ID.
+          Online storage is required for server-side alerts and happens before any
+          alert, whether or not you enable recovery. A copy is also kept on your device.
+          Sync Codes and passkeys are optional ways to restore this existing record,
+          not switches for online storage. You can delete the safety record in Settings.
+          Alert emails are sent through Resend to the confirmed contact saved in your
+          record, using Pulse's fixed message. The optional checklist sends your
+          description and region to Lovable AI only with your explicit consent.
+          QR scanning stays on your device; no camera images are saved.
         </p>
         <Link
           to="/privacy-policy"
