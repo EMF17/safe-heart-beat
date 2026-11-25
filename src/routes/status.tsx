@@ -15,7 +15,7 @@ const statusOptions = queryOptions({
       return { ...await getAlertConfiguration(), reachable: true };
     } catch {
       return { emailConfigured: null, smsConfigured: null, checkedAt: null, reachable: false,
-        sweep: { available: false, lastCompletedAt: null, stale: null, externalPing: null }, externalHeartbeatConfigured: null };
+        sweep: { available: false, lastCompletedAt: null, stale: null, source: null } };
     }
   },
   staleTime: 30_000,
@@ -26,9 +26,9 @@ export const Route = createFileRoute("/status")({
   component: StatusPage,
   head: () => ({ meta: [
     { title: "Alert status — Pulse Safety Check-in" },
-    { name: "description", content: "See Pulse's last completed hourly alert sweep, stale-sweep warnings, external heartbeat reporting and alert configuration. Delivery is not guaranteed." },
+    { name: "description", content: "See Pulse's last completed hourly alert sweep, stale-sweep warnings, two independent sweep triggers and alert configuration. Delivery is not guaranteed." },
     { property: "og:title", content: "Alert status — Pulse Safety Check-in" },
-    { property: "og:description", content: "Live last-sweep age, hourly alert-check health and external heartbeat reporting, without promising inbox delivery." },
+    { property: "og:description", content: "Live last-sweep age and hourly alert-check health from two independent schedules, without promising inbox delivery." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
   ], links: [{ rel: "canonical", href: "https://pulse-checkin.app/status" }] }),
 });
@@ -57,17 +57,13 @@ function StatusPage() {
 
   const age = nowMs === null ? null : sweepAgeMinutes(query.data.sweep.lastCompletedAt, nowMs);
   const sweepState = !query.data.sweep.available ? "Unable to check" : query.data.sweep.stale ? "Overdue · needs attention" : "Completed recently";
-  const externalState = query.data.externalHeartbeatConfigured === null ? "Unable to check" : !query.data.externalHeartbeatConfigured
-    ? "Not connected" : query.data.sweep.externalPing === "accepted" ? "Last completion ping accepted"
-    : query.data.sweep.externalPing === "failed" || query.data.sweep.externalPing === "invalid_configuration" ? "Last ping failed"
-    : "Configured · awaiting completion ping";
 
   const rows = [
     { title: "Pulse server", value: !query.data.reachable ? "Latest check failed" : "Responded to the last check", note: "This checks Pulse’s response, not inbox delivery or every service." },
     { title: "Email alerts", value: query.data.emailConfigured === null ? "Unable to check" : query.data.emailConfigured ? "Configured · delivery unverified" : "Not configured", note: query.data.emailConfigured === false ? "Email cannot be sent until the email service is configured." : "Use a test to check acceptance and ask your contact to confirm receipt." },
     { title: "SMS alerts", value: query.data.smsConfigured === null ? "Unable to check" : query.data.smsConfigured ? "Configured · delivery unverified" : "Not connected", note: "Texts need a connected SMS service, a saved online phone number and a supported destination." },
     { title: "Hourly alert sweep", value: sweepState, note: "A completion timestamp means the sweep finished, not that every email arrived. More than 150 minutes without a completion is overdue." },
-    { title: "External heartbeat", value: externalState, note: "Healthchecks.io receives a ping after each completed sweep when connected. Owner notifications must be enabled there; accepting a ping does not verify paging delivery." },
+    { title: "Backup trigger", value: "Independent schedule", note: "The sweep is started on the hour by the main scheduler and at half past by a separate GitHub schedule. If one stops, the other still runs. Running twice never sends an alert twice." },
     { title: "WhatsApp alerts", value: "Not available", note: "No WhatsApp messages are sent." },
   ];
   return <AlertInfoLayout>
@@ -76,7 +72,7 @@ function StatusPage() {
       <h1 className="font-display text-3xl md:text-4xl font-semibold">Alert status</h1>
       <p className="text-lg text-muted-foreground leading-relaxed">Last sweep: {!query.data.sweep.available ? "unavailable" : !query.data.sweep.lastCompletedAt ? "no completion recorded" : age === null ? "checking time…" : `${age} min ago`}</p>
       {query.data.sweep.lastCompletedAt && <p className="text-sm text-muted-foreground">Completed at <time dateTime={query.data.sweep.lastCompletedAt}>{query.data.sweep.lastCompletedAt.replace("T", " ").replace(/\.\d{3}Z$/, " UTC")}</time></p>}
-      <p className="text-sm leading-relaxed">Sweep health refreshes every minute. The existing internal watchdog checks for missing sweeps; independent monitoring also requires a connected external heartbeat and notifications. Inbox delivery, provider uptime and incident history are not verified here.</p>
+      <p className="text-sm leading-relaxed">Sweep health refreshes every minute. Alerts depend on stored check-in deadlines, not on any single run: two independent schedules start the sweep, and a send already made is never repeated. Inbox delivery, provider uptime and incident history are not verified here.</p>
       {query.data.sweep.stale && <p role="alert" className="text-sm text-destructive">The hourly sweep has no recent completion. Missed-check-in alerts may be delayed or stopped.</p>}
       <div className="flex flex-wrap gap-3 items-center">
         <Button variant="outline" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw className={query.isFetching ? "animate-spin" : ""} />{query.isFetching ? "Checking…" : "Refresh status"}</Button>

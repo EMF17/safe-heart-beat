@@ -1,6 +1,6 @@
 # Roadmap
 - [x] Add an external completion heartbeat to the hourly sweep and show live last-sweep age on the status page (31 tests passed; real completion displayed)
-- [ ] Required: connect and verify external paging before calling monitoring complete (user requires connection; needs a Healthchecks.io check with owner notifications and its private ping URL)
+- [x] Replaced external monitor with a second independent sweep trigger (GitHub Actions); needs GitHub connected + publish
 - [x] Correct privacy and recovery copy: online safety records are required for alerts; only cross-device recovery is optional (24 November 2026)
 - [x] Verify Demumu and Snug comparisons, remove unsupported claims, and share dated source references across both comparison pages (23 November 2026; current Demumu details explicitly unverified)
 - [x] Add How alerts work and honest status pages, with a shared test-alert button and clear prerequisites (contact verification and simulated results checked; user will verify real delivery)

@@ -1,0 +1,18 @@
+# Independent backup trigger for Pulse's missed-check-in sweep.
+# The main scheduler runs on the hour; this runs at half past, from GitHub.
+# Running twice is safe: every alert send has a unique key and is claimed once.
+name: Pulse backup alert sweep
+on:
+  schedule:
+    - cron: "30 * * * *"
+  workflow_dispatch: {}
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger sweep
+        run: |
+          code=$(curl -sS -o /tmp/out -w '%{http_code}' -X POST --max-time 60 https://pulse-checkin.app/api/public/cron/overdue-alerts)
+          cat /tmp/out; echo
+          case "$code" in 200|202) ;; *) echo "Sweep returned $code"; exit 1;; esac

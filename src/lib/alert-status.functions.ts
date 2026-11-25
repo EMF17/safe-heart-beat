@@ -4,22 +4,20 @@ import { createServerFn } from "@tanstack/react-start";
 export const getAlertConfiguration = createServerFn({ method: "GET" }).handler(async () => {
   const { smsConfigured } = await import("./sms.server");
   const { readSweepHealth } = await import("./heartbeat.server");
-  const { validHealthchecksUrl } = await import("./external-heartbeat.server");
-  let sweep: { available: boolean; lastCompletedAt: string | null; stale: boolean | null; externalPing: string | null } = {
-    available: false, lastCompletedAt: null, stale: null, externalPing: null,
+  let sweep: { available: boolean; lastCompletedAt: string | null; stale: boolean | null; source: string | null } = {
+    available: false, lastCompletedAt: null, stale: null, source: null,
   };
   try {
     const { lastMs, stale, data } = await readSweepHealth();
     const result = data?.last_result;
-    const ping = result && typeof result === "object" && !Array.isArray(result) ? result["externalHeartbeat"] : null;
+    const src = result && typeof result === "object" && !Array.isArray(result) ? result["source"] : null;
     sweep = { available: true, lastCompletedAt: lastMs ? new Date(lastMs).toISOString() : null, stale,
-      externalPing: typeof ping === "string" && ["accepted", "not_configured", "invalid_configuration", "failed"].includes(ping) ? ping : null };
+      source: src === "primary" || src === "backup" ? src : null };
   } catch { /* Keep configuration visible while marking sweep health unavailable. */ }
   return {
     emailConfigured: Boolean(process.env["RESEND_API_KEY"]),
     smsConfigured: smsConfigured(),
     checkedAt: new Date().toISOString(),
     sweep,
-    externalHeartbeatConfigured: validHealthchecksUrl(process.env["HEALTHCHECKS_PING_URL"]),
   };
 });
