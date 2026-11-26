@@ -9,8 +9,8 @@ export const Route = createFileRoute("/terms")({
       { name: "description", content: "Pulse terms of service: Pulse is not an emergency service and alert delivery is not guaranteed." },
       { property: "og:title", content: "Terms of Service — Pulse" },
       { property: "og:description", content: "The rules for using Pulse, including why alert delivery can't be guaranteed." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:type", content: "website" }, { property: "og:url", content: "https://pulse-checkin.app/terms" }, { property: "og:image", content: "https://pulse-checkin.app/og-image.png" }, { name: "twitter:image", content: "https://pulse-checkin.app/og-image.png" }, { name: "twitter:title", content: "Terms of Service — Pulse" }, { name: "twitter:description", content: "The rules for using Pulse, including why alert delivery can't be guaranteed." },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
 });

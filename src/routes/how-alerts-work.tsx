@@ -12,8 +12,8 @@ export const Route = createFileRoute("/how-alerts-work")({
       { name: "description", content: "Understand Pulse missed-check-in email alerts, required online safety records, contact confirmation, timing and delivery limits. Recovery is optional." },
       { property: "og:title", content: "How alerts work — Pulse Safety Check-in" },
       { property: "og:description", content: "Pulse's server checks hourly for missed check-ins and emails your contact, even if your phone is off. See the timing and limits." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:type", content: "website" }, { property: "og:url", content: "https://pulse-checkin.app/how-alerts-work" }, { property: "og:image", content: "https://pulse-checkin.app/og-image.png" }, { name: "twitter:image", content: "https://pulse-checkin.app/og-image.png" }, { name: "twitter:title", content: "How alerts work — Pulse Safety Check-in" }, { name: "twitter:description", content: "Pulse's server checks hourly for missed check-ins and emails your contact, even if your phone is off. See the timing and limits." },
+      { name: "twitter:card", content: "summary_large_image" },
     ], links: [{ rel: "canonical", href: "https://pulse-checkin.app/how-alerts-work" }],
   }),
 });

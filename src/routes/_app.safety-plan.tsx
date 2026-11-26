@@ -28,8 +28,8 @@ export const Route = createFileRoute("/_app/safety-plan")({
         property: "og:description",
         content: "Describe your home and region; Pulse builds a personalized preparedness checklist.",
       },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:type", content: "website" }, { property: "og:url", content: "https://pulse-checkin.app/safety-plan" }, { property: "og:image", content: "https://pulse-checkin.app/og-image.png" }, { name: "twitter:image", content: "https://pulse-checkin.app/og-image.png" }, { name: "twitter:title", content: "Personal Safety Checklist — Pulse" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
 });

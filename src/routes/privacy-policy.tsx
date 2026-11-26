@@ -9,8 +9,8 @@ export const Route = createFileRoute("/privacy-policy")({
       { name: "description", content: "How Pulse stores contact details, check-ins and alert settings online for server-side alerts, with optional recovery and AI checklist consent." },
       { property: "og:title", content: "Privacy Policy — Pulse" },
       { property: "og:description", content: "Online safety records are required for Pulse alerts. Learn about stored data, optional recovery, AI consent and deletion." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:type", content: "website" }, { property: "og:url", content: "https://pulse-checkin.app/privacy-policy" }, { property: "og:image", content: "https://pulse-checkin.app/og-image.png" }, { name: "twitter:image", content: "https://pulse-checkin.app/og-image.png" }, { name: "twitter:title", content: "Privacy Policy — Pulse" }, { name: "twitter:description", content: "Online safety records are required for Pulse alerts. Learn about stored data, optional recovery, AI consent and deletion." },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
 });

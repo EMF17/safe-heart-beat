@@ -13,8 +13,8 @@ export const Route = createFileRoute("/_app/emergency-contact")({
   component: EmergencyContactPage,
   head: () => ({
     meta: [
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:type", content: "website" }, { property: "og:image", content: "https://pulse-checkin.app/og-image.png" }, { name: "twitter:image", content: "https://pulse-checkin.app/og-image.png" }, { name: "twitter:title", content: "Emergency Contact — Pulse" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Emergency Contact — Pulse" },
       {
         name: "description",

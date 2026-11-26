@@ -29,7 +29,7 @@ export const Route = createFileRoute("/status")({
     { name: "description", content: "See Pulse's last completed hourly alert sweep, stale-sweep warnings, two independent sweep triggers and alert configuration. Delivery is not guaranteed." },
     { property: "og:title", content: "Alert status — Pulse Safety Check-in" },
     { property: "og:description", content: "Live last-sweep age and hourly alert-check health from two independent schedules, without promising inbox delivery." },
-    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+    { property: "og:type", content: "website" }, { property: "og:url", content: "https://pulse-checkin.app/status" }, { property: "og:image", content: "https://pulse-checkin.app/og-image.png" }, { name: "twitter:image", content: "https://pulse-checkin.app/og-image.png" }, { name: "twitter:title", content: "Alert status — Pulse Safety Check-in" }, { name: "twitter:description", content: "Live last-sweep age and hourly alert-check health from two independent schedules, without promising inbox delivery." }, { name: "twitter:card", content: "summary_large_image" },
   ], links: [{ rel: "canonical", href: "https://pulse-checkin.app/status" }] }),
 });
 

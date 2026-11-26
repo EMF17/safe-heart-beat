@@ -27,7 +27,7 @@ export const Route = createFileRoute("/")({
         content:
           "A free safety check-in for people living alone. Our server checks for missed check-ins every hour, even if your phone is off. No account or cookies.",
       },
-      { property: "og:type", content: "website" },
+      { property: "og:type", content: "website" }, { name: "twitter:title", content: "Pulse Safety Check-in — Free safety app for people who live alone" },
       { property: "og:title", content: "Pulse Safety Check-in — Free safety app for people who live alone" },
       {
         property: "og:description",

@@ -13,7 +13,7 @@ export const Route = createFileRoute("/demumu-alternative")({
     meta: [
       { title: TITLE },
       { name: "description", content: DESC },
-      { property: "og:type", content: "article" },
+      { property: "og:type", content: "article" }, { property: "og:image", content: "https://pulse-checkin.app/og-image.png" }, { name: "twitter:image", content: "https://pulse-checkin.app/og-image.png" },
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESC },
       { property: "og:url", content: URL },

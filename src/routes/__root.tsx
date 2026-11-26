@@ -83,10 +83,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Pulse" },
       { property: "og:description", content: "A quiet safety net for people who live alone." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
       
-      { name: "twitter:title", content: "Pulse" },
-      { name: "twitter:description", content: "A quiet safety net for people who live alone." },
     ],
     links: [
       { rel: "icon", type: "image/png", sizes: "64x64", href: "/favicon.png" },
