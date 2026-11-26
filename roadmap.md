@@ -20,3 +20,5 @@
 - [ ] Install and run on the user's iPhone (requires user's Mac, Xcode, and connected iPhone)
 - [x] Sync code auto-expiry (chosen duration; expired codes rejected)
 - [x] AI safety-preparedness checklist (living situation + region → personalized list)
+- [x] "Are you OK?" grace email to the user after the first missed window, with one-tap check-in link (awaits publication)
+- [ ] Second safety contact (user chose later)

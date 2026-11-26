@@ -117,6 +117,9 @@ export type Database = {
           id: string
           interval_ms: number
           last_checkin: string | null
+          owner_confirm_sent_at: string | null
+          owner_confirmed_email: string | null
+          owner_email: string | null
           paused_until: string | null
           recovery_code_created_at: string | null
           recovery_code_expires_at: string | null
@@ -139,6 +142,9 @@ export type Database = {
           id?: string
           interval_ms?: number
           last_checkin?: string | null
+          owner_confirm_sent_at?: string | null
+          owner_confirmed_email?: string | null
+          owner_email?: string | null
           paused_until?: string | null
           recovery_code_created_at?: string | null
           recovery_code_expires_at?: string | null
@@ -161,6 +167,9 @@ export type Database = {
           id?: string
           interval_ms?: number
           last_checkin?: string | null
+          owner_confirm_sent_at?: string | null
+          owner_confirmed_email?: string | null
+          owner_email?: string | null
           paused_until?: string | null
           recovery_code_created_at?: string | null
           recovery_code_expires_at?: string | null
@@ -368,6 +377,30 @@ export type Database = {
         }
         Relationships: []
       }
+      pulse_grace_reminders: {
+        Row: {
+          account_id: string
+          created_at: string
+          cycle_key: string
+          provider_message_id: string | null
+          status: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          cycle_key: string
+          provider_message_id?: string | null
+          status?: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          cycle_key?: string
+          provider_message_id?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       pulse_passkeys: {
         Row: {
           account_id: string
@@ -472,6 +505,12 @@ export type Database = {
         Returns: number
       }
       pulse_advance_alert_states: { Args: never; Returns: number }
+      pulse_grace_due_accounts: {
+        Args: { _limit?: number }
+        Returns: {
+          id: string
+        }[]
+      }
       pulse_overdue_accounts: {
         Args: { _limit?: number }
         Returns: {

@@ -25,8 +25,11 @@ import { Route as AppHistoryRouteImport } from './routes/_app.history'
 import { Route as AppSafetyPlanRouteImport } from './routes/_app.safety-plan'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as ApiContactConfirmRouteImport } from './routes/api/contact-confirm'
+import { Route as ApiOwnerReminderRouteImport } from './routes/api/owner-reminder'
 import { Route as ApiSendAlertRouteImport } from './routes/api/send-alert'
+import { Route as ApiPublicCheckinLinkRouteImport } from './routes/api/public/checkin-link'
 import { Route as ApiPublicConfirmContactRouteImport } from './routes/api/public/confirm-contact'
+import { Route as ApiPublicConfirmOwnerRouteImport } from './routes/api/public/confirm-owner'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicUnsubscribeRouteImport } from './routes/api/public/unsubscribe'
 import { Route as ApiPublicCronOverdueAlertsRouteImport } from './routes/api/public/cron/overdue-alerts'
@@ -115,14 +118,29 @@ const ApiContactConfirmRoute = ApiContactConfirmRouteImport.update({
   path: '/api/contact-confirm',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiOwnerReminderRoute = ApiOwnerReminderRouteImport.update({
+  id: '/api/owner-reminder',
+  path: '/api/owner-reminder',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSendAlertRoute = ApiSendAlertRouteImport.update({
   id: '/api/send-alert',
   path: '/api/send-alert',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCheckinLinkRoute = ApiPublicCheckinLinkRouteImport.update({
+  id: '/api/public/checkin-link',
+  path: '/api/public/checkin-link',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicConfirmContactRoute = ApiPublicConfirmContactRouteImport.update({
   id: '/api/public/confirm-contact',
   path: '/api/public/confirm-contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicConfirmOwnerRoute = ApiPublicConfirmOwnerRouteImport.update({
+  id: '/api/public/confirm-owner',
+  path: '/api/public/confirm-owner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
@@ -184,8 +202,11 @@ export interface FileRoutesByFullPath {
   '/safety-plan': typeof AppSafetyPlanRoute
   '/settings': typeof AppSettingsRoute
   '/api/contact-confirm': typeof ApiContactConfirmRoute
+  '/api/owner-reminder': typeof ApiOwnerReminderRoute
   '/api/send-alert': typeof ApiSendAlertRoute
+  '/api/public/checkin-link': typeof ApiPublicCheckinLinkRoute
   '/api/public/confirm-contact': typeof ApiPublicConfirmContactRoute
+  '/api/public/confirm-owner': typeof ApiPublicConfirmOwnerRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/api/public/cron/overdue-alerts': typeof ApiPublicCronOverdueAlertsRoute
@@ -211,8 +232,11 @@ export interface FileRoutesByTo {
   '/safety-plan': typeof AppSafetyPlanRoute
   '/settings': typeof AppSettingsRoute
   '/api/contact-confirm': typeof ApiContactConfirmRoute
+  '/api/owner-reminder': typeof ApiOwnerReminderRoute
   '/api/send-alert': typeof ApiSendAlertRoute
+  '/api/public/checkin-link': typeof ApiPublicCheckinLinkRoute
   '/api/public/confirm-contact': typeof ApiPublicConfirmContactRoute
+  '/api/public/confirm-owner': typeof ApiPublicConfirmOwnerRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/api/public/cron/overdue-alerts': typeof ApiPublicCronOverdueAlertsRoute
@@ -240,8 +264,11 @@ export interface FileRoutesById {
   '/_app/safety-plan': typeof AppSafetyPlanRoute
   '/_app/settings': typeof AppSettingsRoute
   '/api/contact-confirm': typeof ApiContactConfirmRoute
+  '/api/owner-reminder': typeof ApiOwnerReminderRoute
   '/api/send-alert': typeof ApiSendAlertRoute
+  '/api/public/checkin-link': typeof ApiPublicCheckinLinkRoute
   '/api/public/confirm-contact': typeof ApiPublicConfirmContactRoute
+  '/api/public/confirm-owner': typeof ApiPublicConfirmOwnerRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/unsubscribe': typeof ApiPublicUnsubscribeRoute
   '/api/public/cron/overdue-alerts': typeof ApiPublicCronOverdueAlertsRoute
@@ -269,8 +296,11 @@ export interface FileRouteTypes {
     | '/safety-plan'
     | '/settings'
     | '/api/contact-confirm'
+    | '/api/owner-reminder'
     | '/api/send-alert'
+    | '/api/public/checkin-link'
     | '/api/public/confirm-contact'
+    | '/api/public/confirm-owner'
     | '/api/public/health'
     | '/api/public/unsubscribe'
     | '/api/public/cron/overdue-alerts'
@@ -296,8 +326,11 @@ export interface FileRouteTypes {
     | '/safety-plan'
     | '/settings'
     | '/api/contact-confirm'
+    | '/api/owner-reminder'
     | '/api/send-alert'
+    | '/api/public/checkin-link'
     | '/api/public/confirm-contact'
+    | '/api/public/confirm-owner'
     | '/api/public/health'
     | '/api/public/unsubscribe'
     | '/api/public/cron/overdue-alerts'
@@ -324,8 +357,11 @@ export interface FileRouteTypes {
     | '/_app/safety-plan'
     | '/_app/settings'
     | '/api/contact-confirm'
+    | '/api/owner-reminder'
     | '/api/send-alert'
+    | '/api/public/checkin-link'
     | '/api/public/confirm-contact'
+    | '/api/public/confirm-owner'
     | '/api/public/health'
     | '/api/public/unsubscribe'
     | '/api/public/cron/overdue-alerts'
@@ -347,8 +383,11 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   ZhHkRoute: typeof ZhHkRoute
   ApiContactConfirmRoute: typeof ApiContactConfirmRoute
+  ApiOwnerReminderRoute: typeof ApiOwnerReminderRoute
   ApiSendAlertRoute: typeof ApiSendAlertRoute
+  ApiPublicCheckinLinkRoute: typeof ApiPublicCheckinLinkRoute
   ApiPublicConfirmContactRoute: typeof ApiPublicConfirmContactRoute
+  ApiPublicConfirmOwnerRoute: typeof ApiPublicConfirmOwnerRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   ApiPublicUnsubscribeRoute: typeof ApiPublicUnsubscribeRoute
   ApiPublicCronOverdueAlertsRoute: typeof ApiPublicCronOverdueAlertsRoute
@@ -473,6 +512,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiContactConfirmRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/owner-reminder': {
+      id: '/api/owner-reminder'
+      path: '/api/owner-reminder'
+      fullPath: '/api/owner-reminder'
+      preLoaderRoute: typeof ApiOwnerReminderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/send-alert': {
       id: '/api/send-alert'
       path: '/api/send-alert'
@@ -480,11 +526,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSendAlertRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/checkin-link': {
+      id: '/api/public/checkin-link'
+      path: '/api/public/checkin-link'
+      fullPath: '/api/public/checkin-link'
+      preLoaderRoute: typeof ApiPublicCheckinLinkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/confirm-contact': {
       id: '/api/public/confirm-contact'
       path: '/api/public/confirm-contact'
       fullPath: '/api/public/confirm-contact'
       preLoaderRoute: typeof ApiPublicConfirmContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/confirm-owner': {
+      id: '/api/public/confirm-owner'
+      path: '/api/public/confirm-owner'
+      fullPath: '/api/public/confirm-owner'
+      preLoaderRoute: typeof ApiPublicConfirmOwnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/health': {
@@ -577,8 +637,11 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   ZhHkRoute: ZhHkRoute,
   ApiContactConfirmRoute: ApiContactConfirmRoute,
+  ApiOwnerReminderRoute: ApiOwnerReminderRoute,
   ApiSendAlertRoute: ApiSendAlertRoute,
+  ApiPublicCheckinLinkRoute: ApiPublicCheckinLinkRoute,
   ApiPublicConfirmContactRoute: ApiPublicConfirmContactRoute,
+  ApiPublicConfirmOwnerRoute: ApiPublicConfirmOwnerRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   ApiPublicUnsubscribeRoute: ApiPublicUnsubscribeRoute,
   ApiPublicCronOverdueAlertsRoute: ApiPublicCronOverdueAlertsRoute,

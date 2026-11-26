@@ -45,6 +45,16 @@ export const Route = createFileRoute("/api/public/cron/overdue-alerts")({
           await supabaseAdmin.from("pulse_cron_heartbeats").update({ last_result: { error: "lookup_failed", at: startedAt, source } }).eq("job", "overdue-alerts");
           return Response.json({ error: "Lookup failed" }, { status: 500 });
         }
+        // Grace step: remind the user themselves after the first missed window.
+        let graceSent = 0;
+        const { data: graceDue } = await supabaseAdmin.rpc("pulse_grace_due_accounts", { _limit: 100 });
+        if (graceDue?.length) {
+          const { sendGraceReminder } = await import("@/lib/grace.server");
+          for (const row of graceDue) {
+            try { if ((await sendGraceReminder(row.id)) === "sent") graceSent++; }
+            catch (e) { console.error("Grace reminder failed", e instanceof Error ? e.message : "Unknown error"); }
+          }
+        }
         let sent = 0;
         let skipped = 0;
         for (const row of data ?? []) {
@@ -57,7 +67,7 @@ export const Route = createFileRoute("/api/public/cron/overdue-alerts")({
             console.error("Overdue alert failed", e instanceof Error ? e.message : "Unknown error");
           }
         }
-        const result = { checked: (data ?? []).length, sent, skipped, stateChanges: stateChanges ?? 0, source, gapEmail };
+        const result = { checked: (data ?? []).length, sent, skipped, stateChanges: stateChanges ?? 0, graceSent, source, gapEmail };
         const { error: finishError } = await supabaseAdmin.from("pulse_cron_heartbeats").update({ last_finished_at: new Date().toISOString(), last_result: result }).eq("job", "overdue-alerts");
         if (finishError) return Response.json({ error: "Unable to record sweep completion" }, { status: 500 });
         console.log(JSON.stringify({ event: "overdue_sweep", ...result }));

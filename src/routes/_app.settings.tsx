@@ -5,6 +5,7 @@ import { requestNotificationPermission } from "@/lib/notifications";
 import { usePreferences, SUPPORTED_INTERVALS, formatPauseDate, type IntervalHours } from "@/lib/preferences";
 import { SyncCodeCard } from "@/components/SyncCodeCard";
 import { TestAlertPanel } from "@/components/TestAlertPanel";
+import { OwnerReminderCard } from "@/components/OwnerReminderCard";
 import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
 import { getSmsStatus, saveContactPhone } from "@/lib/sync.functions";
@@ -229,6 +230,7 @@ function SettingsPage() {
               <Button onClick={handleSavePhone} disabled={savingPhone} variant="outline" className="w-full">{savingPhone ? "Saving…" : "Save phone number"}</Button>
               <p className="text-xs text-muted-foreground">{smsConnected ? "Twilio connected — SMS will accompany email when a number is saved." : "SMS pending — texts start once Twilio is connected with an SMS-capable number."} Online recovery must be enabled for alerts; the app must be open and connected.</p>
             </div>}
+            <OwnerReminderCard />
             <TestAlertPanel />
           </div>
         </section>
