@@ -25,8 +25,14 @@ export const Route = createFileRoute("/api/public/cron/overdue-alerts")({
 
         const { sendAccountAlert } = await import("@/lib/alert.server");
         const startedAt = new Date().toISOString();
-        const { error: startError } = await supabaseAdmin.from("pulse_cron_heartbeats").upsert({ job: "overdue-alerts", last_started_at: startedAt });
-        if (startError) return Response.json({ error: "Unable to record sweep start" }, { status: 500 });
+        const { recordSweepStart } = await import("@/lib/sweep-start.server");
+        let gapEmail: string;
+        try {
+          gapEmail = await recordSweepStart(startedAt, process.env["RESEND_API_KEY"]);
+        } catch (error) {
+          console.error("Sweep start failed", error instanceof Error ? error.message : "Unknown error");
+          return Response.json({ error: "Unable to record sweep start" }, { status: 500 });
+        }
         const { data: stateChanges, error: stateErr } = await supabaseAdmin.rpc("pulse_advance_alert_states");
         if (stateErr) {
           console.error("State update failed", stateErr.message);
@@ -51,7 +57,7 @@ export const Route = createFileRoute("/api/public/cron/overdue-alerts")({
             console.error("Overdue alert failed", e instanceof Error ? e.message : "Unknown error");
           }
         }
-        const result = { checked: (data ?? []).length, sent, skipped, stateChanges: stateChanges ?? 0, source };
+        const result = { checked: (data ?? []).length, sent, skipped, stateChanges: stateChanges ?? 0, source, gapEmail };
         const { error: finishError } = await supabaseAdmin.from("pulse_cron_heartbeats").update({ last_finished_at: new Date().toISOString(), last_result: result }).eq("job", "overdue-alerts");
         if (finishError) return Response.json({ error: "Unable to record sweep completion" }, { status: 500 });
         console.log(JSON.stringify({ event: "overdue_sweep", ...result }));
