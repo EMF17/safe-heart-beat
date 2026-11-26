@@ -182,6 +182,7 @@ export type Database = {
           last_error: string | null
           next_attempt_at: string | null
           provider_message_id: string | null
+          recipient_email: string | null
           send_key: string | null
           status: string
           updated_at: string
@@ -197,6 +198,7 @@ export type Database = {
           last_error?: string | null
           next_attempt_at?: string | null
           provider_message_id?: string | null
+          recipient_email?: string | null
           send_key?: string | null
           status?: string
           updated_at?: string
@@ -212,6 +214,7 @@ export type Database = {
           last_error?: string | null
           next_attempt_at?: string | null
           provider_message_id?: string | null
+          recipient_email?: string | null
           send_key?: string | null
           status?: string
           updated_at?: string
@@ -260,6 +263,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "pulse_challenges_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "pulse_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pulse_contact_requests: {
+        Row: {
+          account_id: string
+          created_at: string
+          id: string
+          provider_message_id: string | null
+          recipient_email: string
+          status: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          id?: string
+          provider_message_id?: string | null
+          recipient_email: string
+          status?: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          id?: string
+          provider_message_id?: string | null
+          recipient_email?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pulse_contact_requests_account_id_fkey"
             columns: ["account_id"]
             isOneToOne: false
             referencedRelation: "pulse_accounts"

@@ -12,13 +12,11 @@ export const Route = createFileRoute("/api/contact-confirm")({
         const { verifyToken } = await import("@/lib/sync.server");
         let accountId: string;
         try { accountId = await verifyToken(token); } catch { return Response.json({ error: "Invalid or expired token" }, { status: 401 }); }
-        const { isContactConfirmed, sendConsentRequest } = await import("@/lib/contact-consent.server");
+        const { sendConsentRequest } = await import("@/lib/contact-consent.server");
         if (body.action === "send") return Response.json(await sendConsentRequest(accountId));
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data: a } = await supabaseAdmin.from("pulse_accounts")
-          .select("contact_email, contact_confirmed_email, contact_confirm_sent_at").eq("id", accountId).maybeSingle();
-        if (!a) return Response.json({ error: "Not found" }, { status: 404 });
-        return Response.json({ confirmed: isContactConfirmed(a), requestSentAt: a.contact_confirm_sent_at });
+        const { readContactProtection } = await import("@/lib/contact-protection.server");
+        try { return Response.json(await readContactProtection(accountId)); }
+        catch { return Response.json({ error: "Unable to check contact protection" }, { status: 503 }); }
       },
     },
   },

@@ -71,6 +71,13 @@
       "when": 1795445717931,
       "tag": "0009_revoke_public_access_pulse_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1795667495164,
+      "tag": "0010_contact_confirmation_delivery_receipts",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { safeContactName } from "@/lib/contact-name";
+import { CONFIRMATION_RECIPIENT_GAP_MS } from "./contact-protection";
 
 const norm = (e: string) => e.trim().toLowerCase();
 function secret(): string {
@@ -19,7 +20,7 @@ export function isContactConfirmed(a: { contact_email: string | null; contact_co
 }
 
 const ACCOUNT_GAP_MS = 10 * 60_000;
-const RECIPIENT_GAP_MS = 24 * 3600_000;
+const RECIPIENT_GAP_MS = CONFIRMATION_RECIPIENT_GAP_MS;
 
 /** Sends the one-time "X named you as their safety contact" email. */
 export async function sendConsentRequest(accountId: string): Promise<{ status: "sent" | "confirmed" | "wait" | "blocked" | "failed"; error?: string }> {
@@ -49,9 +50,14 @@ export async function sendConsentRequest(accountId: string): Promise<{ status: "
   const { data: won } = await claim.select("id");
   if (!won?.length) return { status: "wait", error: "A confirmation email is already being sent." };
 
+  const requestId = crypto.randomUUID();
+  const { error: receiptError } = await supabaseAdmin.from("pulse_contact_requests")
+    .insert({ id: requestId, account_id: accountId, recipient_email: norm(email), created_at: nowIso });
+  if (receiptError) return { status: "failed", error: "Could not record the confirmation request. Please try later." };
+
   const who = safeContactName(a.user_name) === "Your contact" ? "Someone" : safeContactName(a.user_name);
   const link = `https://pulse-checkin.app/api/public/confirm-contact?a=${accountId}&e=${encodeURIComponent(norm(email))}&s=${consentSig(accountId, email)}`;
-  const esc = (v: string) => v.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+  const esc = (v: string) => v.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] ?? c);
   const subject = `${who} named you as their Pulse safety contact — please confirm`;
   const text = `${who} named you as their safety contact on Pulse, a daily check-in app.\n\nIf they miss two check-ins in a row, Pulse will email you so you can check on them. You will get no alerts unless you confirm.\n\nConfirm: ${link}\n\nDon't know them or don't want this? Ignore this email, or stop all Pulse emails: ${unsubscribeUrl(email)}`;
   const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px;line-height:1.55;color:#1a1a1a;max-width:560px">
@@ -69,7 +75,13 @@ export async function sendConsentRequest(accountId: string): Promise<{ status: "
   });
   if (!res.ok) {
     console.error(`Consent email failed [${res.status}]: ${await res.text()}`);
+    await supabaseAdmin.from("pulse_contact_requests").update({ status: "failed" }).eq("id", requestId);
     return { status: "failed", error: `Email provider did not accept the message (${res.status}).` };
   }
+  const sent = await res.json() as { id?: unknown };
+  if (typeof sent.id !== "string") return { status: "failed", error: "The email provider did not return a delivery reference." };
+  const { error: saveError } = await supabaseAdmin.from("pulse_contact_requests")
+    .update({ provider_message_id: sent.id, status: "sent" }).eq("id", requestId);
+  if (saveError) return { status: "failed", error: "Email accepted, but its delivery status could not be saved. Do not assume it arrived." };
   return { status: "sent" };
 }

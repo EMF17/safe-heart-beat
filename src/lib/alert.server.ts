@@ -154,7 +154,8 @@ export async function sendAccountAlert(
           const deliver = async (channel: "email" | "sms", send: (idemKey: string) => Promise<Delivery & { providerId?: string }>): Promise<Delivery> => {
             const sk = sendKey(accountId, key, channel);
             const { error: claimError } = await supabaseAdmin.from("pulse_alert_deliveries")
-              .insert({ account_id: accountId, checkin_key: key, channel, send_key: sk, status: "sending", attempts: 1 });
+              .insert({ account_id: accountId, checkin_key: key, channel, send_key: sk, status: "sending", attempts: 1,
+                recipient_email: channel === "email" ? contactEmail.trim().toLowerCase() : null });
             let attempts = 1;
             if (claimError) {
               const { data: receipt } = await supabaseAdmin.from("pulse_alert_deliveries")

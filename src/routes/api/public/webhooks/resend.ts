@@ -30,20 +30,21 @@ export const Route = createFileRoute("/api/public/webhooks/resend")({
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { error: dup } = await supabaseAdmin.from("pulse_email_events")
           .insert({ event_id: id.slice(0, 100), provider_message_id: messageId, event_type: type });
-        if (dup) return Response.json({ duplicate: true });
+        if (dup && dup.code !== "23505") return Response.json({ error: "Unable to record email event" }, { status: 503 });
         const status = STATUS_BY_EVENT[type];
         if (messageId && (status === "delivered" || status === "bounced" || status === "complained")) {
           const now = new Date().toISOString();
-          await supabaseAdmin.from("pulse_alert_deliveries")
+          const { error: deliveryError } = await supabaseAdmin.from("pulse_alert_deliveries")
             .update(status === "delivered" ? { status, delivered_at: now, updated_at: now } : { status: "bounced", bounced_at: now, last_error: type, updated_at: now })
             .eq("provider_message_id", messageId);
+          if (deliveryError) return Response.json({ error: "Unable to record email delivery" }, { status: 503 });
         }
         if (status === "complained" && Array.isArray(event.data?.to)) {
           const { suppress } = await import("@/lib/email-suppression.server");
           for (const to of event.data.to.slice(0, 5)) if (typeof to === "string") await suppress(to, "complaint");
         }
         console.log(JSON.stringify({ event: "resend_webhook", type, messageId }));
-        return Response.json({ ok: true });
+        return Response.json({ ok: true, ...(dup ? { duplicate: true } : {}) });
       },
     },
   },

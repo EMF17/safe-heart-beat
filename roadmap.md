@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Show prominent unconfirmed-contact and bounced-email warnings on the daily screen; confirmation resend verified without real email, bounce tracking and consent read-back verified on phone/desktop; 72 tests passed; awaits publication
 - [x] Email the owner at sweep recovery when the previous sweep started more than 90 minutes ago (29 tests passed, duplicate protection verified; no real emails sent; awaits publication)
 - [x] Add an external completion heartbeat to the hourly sweep and show live last-sweep age on the status page (31 tests passed; real completion displayed)
 - [x] Replaced external monitor with a second independent sweep trigger (GitHub Actions); needs GitHub connected + publish

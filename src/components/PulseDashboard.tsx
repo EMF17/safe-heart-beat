@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Check, Clock } from "lucide-react";
 import { usePulse, type Contact } from "@/lib/pulse";
 import { Button } from "@/components/ui/button";
+import { ContactProtectionNotice } from "@/components/ContactProtectionNotice";
 
 function formatCheckInTime(timestamp: number) {
   return new Date(timestamp).toLocaleString(undefined, {
@@ -55,6 +56,8 @@ export function PulseDashboard() {
           {p.userName ? `Hello, ${p.userName}` : "Your check-in"}
         </h1>
       </header>
+
+      <ContactProtectionNotice token={p.syncToken} email={p.contact.email} name={p.contact.name} />
 
       <Button
         onClick={handleCheckIn}
@@ -195,7 +198,7 @@ function Onboarding({
                 className="w-full bg-transparent border-b border-input px-0 py-2 text-base focus:outline-none focus:border-primary transition-colors"
               />
             </Field>
-            <Field label="Emergency contact email" hint="We'll only email them if you miss two check-ins in a row">
+            <Field label="Emergency contact email" hint="They must confirm before any alerts can be sent">
               <input
                 type="email" required value={email} onChange={e => setEmail(e.target.value)}
                 placeholder="contact@example.com"
@@ -206,12 +209,12 @@ function Onboarding({
             {error && <p className="text-sm text-destructive">{error}</p>}
 
             <div className="pt-2">
-              <button
+              <Button
                 type="submit"
                 className="w-full h-12 rounded-full bg-primary text-primary-foreground font-medium shadow-[var(--shadow-soft)] hover:bg-primary/90 active:scale-[0.98] transition"
               >
-                {onCancel ? "Save" : "Arm my safety net"}
-              </button>
+                {onCancel ? "Save" : "Save contact"}
+              </Button>
             </div>
           </form>
 
