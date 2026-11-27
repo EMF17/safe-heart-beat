@@ -505,6 +505,8 @@ export type Database = {
         Returns: number
       }
       pulse_advance_alert_states: { Args: never; Returns: number }
+      pulse_cleanup_inactive_accounts: { Args: never; Returns: number }
+      pulse_delete_account: { Args: { _account_id: string }; Returns: boolean }
       pulse_grace_due_accounts: {
         Args: { _limit?: number }
         Returns: {

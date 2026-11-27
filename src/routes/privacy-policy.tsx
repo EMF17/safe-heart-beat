@@ -32,7 +32,7 @@ function PrivacyPolicyPage() {
           Privacy Policy for Pulse
         </h1>
         <p className="text-sm text-white/60 mb-10">
-          Last updated: November 24, 2026
+          Last updated: November 27, 2026
         </p>
 
         <section className="mb-8">
@@ -187,7 +187,7 @@ function PrivacyPolicyPage() {
           <ul className="space-y-3 text-sm text-white/80 leading-relaxed">
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span><strong>Delete all data:</strong> Settings → Delete All Data removes everything on your device and permanently deletes your safety record (contact, check-ins and sync code) from our servers.</span>
+              <span><strong>Delete my data:</strong> Settings → Delete my data permanently deletes your online safety record, check-ins, contact details, recovery credentials and related alert and confirmation receipts, then removes Pulse data from this device. If online deletion fails, device data is kept so you can try again. Monitoring stops after deletion. Copies already on another device, sent emails, hosting backups and providers&apos; operational logs are not remotely erased by this button.</span>
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
@@ -195,7 +195,15 @@ function PrivacyPolicyPage() {
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span><strong>Uninstall or clear browser data:</strong> Removes everything stored on your device. To also remove server data, use Delete All Data first, or email us.</span>
+              <span><strong>Uninstall or clear browser data:</strong> Removes everything stored on your device. To also remove server data, use Delete my data first, or email us.</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="shrink-0">·</span>
+              <span><strong>Inactive records:</strong> Online safety records are deleted after six calendar months without a check-in, or six months after creation if there was no check-in. A saved vacation pause extends this until six months after the pause ends. Cleanup runs daily, so deletion may take up to an additional day. Deletion stops monitoring and recovery for that record.</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="shrink-0">·</span>
+              <span><strong>Contact opt-outs:</strong> Every alert email includes a signed link to stop all Pulse emails to that address. Opt-out addresses are retained separately to honour that request even after a safety record is deleted.</span>
             </li>
           </ul>
         </section>
@@ -203,7 +211,7 @@ function PrivacyPolicyPage() {
         <section className="mb-8">
           <h2 className="text-lg font-bold mb-3">Data Security</h2>
           <p className="text-sm text-white/80 leading-relaxed">
-            All connections are encrypted. Server data is locked so only Pulse&apos;s own server code can read it, and your device proves its identity with a signed secret token. Sync codes are stored only as one-way fingerprints.
+            All connections are encrypted. Server data is locked so only Pulse&apos;s own server code can read it. Device tokens and email check-in links are cryptographically signed, not saved as raw tokens in the safety database, and requests are limited using one-way fingerprints of the token and connection address. Sync codes are stored only as one-way fingerprints. The device keeps its bearer token locally to prove ownership; anyone who obtains it may access the record until it expires or the record is deleted.
           </p>
         </section>
 

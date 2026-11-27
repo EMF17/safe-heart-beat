@@ -8,11 +8,11 @@ import { TestAlertPanel } from "@/components/TestAlertPanel";
 import { OwnerReminderCard } from "@/components/OwnerReminderCard";
 import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
-import { getSmsStatus, saveContactPhone } from "@/lib/sync.functions";
+import { getSmsStatus, saveContactPhone, deleteSyncAccount } from "@/lib/sync.functions";
+import { deletePulseData } from "@/lib/data-deletion";
 import { normalizeContactPhone } from "@/lib/contact-phone";
 
 
-const ONBOARDING_KEY = "pulse:onboardingCompleted";
 import {
   MailWarning,
   Trash2,
@@ -68,6 +68,8 @@ function SettingsPage() {
   const [smsConnected, setSmsConnected] = useState(false);
   const savePhone = useServerFn(saveContactPhone);
   const smsStatus = useServerFn(getSmsStatus);
+  const deleteAccount = useServerFn(deleteSyncAccount);
+  const [deleting, setDeleting] = useState(false);
 
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -76,7 +78,7 @@ function SettingsPage() {
     message: string;
     confirmLabel: string;
     destructive: boolean;
-    onConfirm: () => void;
+    onConfirm: () => void | Promise<void>;
   } | null>(null);
 
   // Toast state
@@ -160,27 +162,26 @@ function SettingsPage() {
   };
 
   const closeDialog = () => {
+    if (deleting) return;
     setDialogOpen(false);
     setDialogConfig(null);
   };
 
   const handleDeleteAllData = () => {
     openDialog({
-      title: "Delete all data?",
-      message: "Are you sure? This removes all check-ins, history, and your emergency contact.",
-      confirmLabel: "Delete All Data",
+      title: "Delete my data?",
+      message: "Permanently delete your online safety record, check-ins, contact, recovery credentials and this device’s Pulse settings? Monitoring stops. Contact opt-outs remain in place; previously sent emails cannot be recalled.",
+      confirmLabel: "Delete my data",
       destructive: true,
-      onConfirm: () => {
+      onConfirm: async () => {
+        setDeleting(true);
         try {
-          window.localStorage.clear();
-        } catch {}
-        window.localStorage.removeItem(ONBOARDING_KEY);
-        setContact(null);
-        closeDialog();
-        if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-          navigator.vibrate([10, 50, 10]);
+          await deletePulseData(window.localStorage, (token) => deleteAccount({ data: { token } }));
+          window.location.assign("/");
+        } catch {
+          showToast("Could not delete your online record. Your device data is still here; please try again.");
+          setDeleting(false);
         }
-        navigate({ to: "/" });
       },
     });
   };
@@ -228,7 +229,7 @@ function SettingsPage() {
               <input id="contact-phone" type="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="+852 9123 4567" className="w-full min-w-0 rounded-md border border-input bg-background px-3 py-2 text-base" />
               <p className="text-xs text-muted-foreground">Include the country code. Only add a contact who agrees to receive safety and test texts. Leave blank for email only.</p>
               <Button onClick={handleSavePhone} disabled={savingPhone} variant="outline" className="w-full">{savingPhone ? "Saving…" : "Save phone number"}</Button>
-              <p className="text-xs text-muted-foreground">{smsConnected ? "Twilio connected — SMS will accompany email when a number is saved." : "SMS pending — texts start once Twilio is connected with an SMS-capable number."} Online recovery must be enabled for alerts; the app must be open and connected.</p>
+              <p className="text-xs text-muted-foreground">{smsConnected ? "Twilio connected — SMS will accompany email when a number is saved." : "SMS pending — texts start once Twilio is connected with an SMS-capable number."} Saving a contact creates the online safety record needed for alerts. Recovery is optional; hourly checks continue when the app is closed.</p>
             </div>}
             <OwnerReminderCard />
             <TestAlertPanel />
@@ -387,17 +388,8 @@ function SettingsPage() {
             <h2 className="text-sm font-semibold uppercase tracking-[0.15em]">Data</h2>
           </div>
           <div className="bg-card border border-border/60 rounded-2xl p-4">
-            <button onClick={handleDeleteAllData} className="w-full text-left">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-sm text-destructive">Delete All Data</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    This removes your history, emergency contact, and settings
-                  </p>
-                </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-              </div>
-            </button>
+            <Button onClick={handleDeleteAllData} variant="ghost" className="w-full justify-between text-destructive"><span>Delete my data</span><Trash2 className="w-4 h-4" /></Button>
+            <p className="text-xs text-muted-foreground mt-2">Removes your online safety record and this device’s Pulse data, and stops monitoring. Online records are also deleted after six months without a check-in; a saved vacation pause extends that period until six months after the pause ends.</p>
           </div>
         </section>
 
@@ -461,18 +453,8 @@ function SettingsPage() {
             </div>
             <p className="text-sm text-muted-foreground mb-6">{dialogConfig.message}</p>
             <div className="flex gap-3">
-              <button
-                onClick={closeDialog}
-                className="flex-1 h-11 rounded-full border border-border bg-background/60 text-sm font-medium hover:bg-background transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={dialogConfig.onConfirm}
-                className="flex-1 h-11 rounded-full text-sm font-medium bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
-              >
-                {dialogConfig.confirmLabel}
-              </button>
+              <Button variant="outline" disabled={deleting} onClick={closeDialog} className="flex-1 h-11">Cancel</Button>
+              <Button variant="destructive" disabled={deleting} onClick={dialogConfig.onConfirm} className="flex-1 h-11">{deleting ? "Deleting…" : dialogConfig.confirmLabel}</Button>
             </div>
           </div>
         </div>

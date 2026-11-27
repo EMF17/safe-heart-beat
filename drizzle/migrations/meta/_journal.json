@@ -85,6 +85,20 @@
       "when": 1795704213006,
       "tag": "0011_grace_reminders",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1795792480577,
+      "tag": "0012_atomic_pulse_account_deletion",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1795792541740,
+      "tag": "0013_six_month_inactivity_cleanup",
+      "breakpoints": true
     }
   ]
 }

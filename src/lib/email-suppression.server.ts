@@ -18,10 +18,12 @@ export function unsubscribeUrl(email: string): string {
 }
 export async function isSuppressed(email: string): Promise<boolean> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data } = await supabaseAdmin.from("pulse_email_suppressions").select("email_lower").eq("email_lower", norm(email)).maybeSingle();
+  const { data, error } = await supabaseAdmin.from("pulse_email_suppressions").select("email_lower").eq("email_lower", norm(email)).maybeSingle();
+  if (error) throw new Error("Could not verify email opt-out status");
   return !!data;
 }
 export async function suppress(email: string, reason: string): Promise<void> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  await supabaseAdmin.from("pulse_email_suppressions").upsert({ email_lower: norm(email).slice(0, 320), reason: reason.slice(0, 40) }, { onConflict: "email_lower" });
+  const { error } = await supabaseAdmin.from("pulse_email_suppressions").upsert({ email_lower: norm(email).slice(0, 320), reason: reason.slice(0, 40) }, { onConflict: "email_lower" });
+  if (error) throw new Error("Could not save email opt-out");
 }

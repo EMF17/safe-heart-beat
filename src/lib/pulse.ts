@@ -378,7 +378,7 @@ export function usePulse() {
   const disableSync = useCallback(async (alsoDeleteRemote: boolean) => {
 
     if (alsoDeleteRemote && syncToken) {
-      try { await callDelete({ data: { token: syncToken } }); } catch {}
+      await callDelete({ data: { token: syncToken } });
     }
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(ACCOUNT_KEY);

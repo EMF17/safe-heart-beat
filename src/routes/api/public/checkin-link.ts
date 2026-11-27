@@ -2,8 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 
 const page = (msg: string, form = "") => new Response(
   `<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pulse check-in</title><body style="font-family:system-ui;max-width:480px;margin:48px auto;padding:0 16px;line-height:1.5;font-size:17px"><h1 style="font-size:22px">Pulse check-in</h1><p>${msg}</p>${form}</body>`,
-  { headers: { "Content-Type": "text/html; charset=utf-8" } });
-async function valid(url: URL) {
+  { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" } });
+async function valid(request: Request) {
+  const url = new URL(request.url);
+  const { enforceTokenLimit } = await import("@/lib/token-limit.server");
+  await enforceTokenLimit(url.searchParams.get("s") ?? "", (request.headers.get("cf-connecting-ip") ?? "unknown").slice(0, 64), "link");
   const a = (url.searchParams.get("a") ?? "").slice(0, 40), t = Number(url.searchParams.get("t")), s = (url.searchParams.get("s") ?? "").slice(0, 64);
   if (!/^[0-9a-f-]{36}$/i.test(a) || !Number.isFinite(t) || !s) return null;
   const { verifyCheckin } = await import("@/lib/grace.server");
@@ -15,12 +18,12 @@ export const Route = createFileRoute("/api/public/checkin-link")({
   server: { handlers: {
     GET: async ({ request }) => {
       const url = new URL(request.url);
-      if (!(await valid(url))) return page("This link is not valid.");
+      if (!(await valid(request))) return page("This link is not valid.");
       return page("Tap the button to tell Pulse you're OK. Your contact will not be alerted for this missed check-in.",
         `<form method="post" action="${url.pathname}${url.search.replace(/"/g, "")}"><button style="padding:14px 22px;font-size:18px">I'm OK</button></form>`);
     },
     POST: async ({ request }) => {
-      const p = await valid(new URL(request.url));
+      const p = await valid(request);
       if (!p) return page("This link is not valid.");
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { data } = await supabaseAdmin.from("pulse_accounts").select("last_checkin, checkins").eq("id", p.a).maybeSingle();

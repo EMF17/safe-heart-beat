@@ -10,6 +10,8 @@ import type {
   AuthenticationResponseJSON,
 } from "@simplewebauthn/server";
 import { createHmac, timingSafeEqual, randomBytes } from "crypto";
+import { getRequestHeader } from "@tanstack/react-start/server";
+import { enforceTokenLimit } from "./token-limit.server";
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
@@ -17,7 +19,7 @@ export const RP_NAME = "Pulse";
 export const TOKEN_TTL_SECONDS = 60 * 60 * 24 * 365; // 1 year
 
 function getSecret(): string {
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const key = process.env["SUPABASE_SERVICE_ROLE_KEY"];
   if (!key) throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY");
   return key;
 }
@@ -47,6 +49,7 @@ function verifySignedToken(token: string): { accountId: string; fp: string | nul
   const parts = token.split(".");
   if (parts.length !== 3) throw new Error("Invalid token");
   const [subject, expStr, sig] = parts;
+  if (!subject || !expStr || !sig) throw new Error("Invalid token");
   const exp = Number(expStr);
   if (!Number.isFinite(exp) || exp * 1000 < Date.now()) {
     throw new Error("Token expired");
@@ -60,6 +63,7 @@ function verifySignedToken(token: string): { accountId: string; fp: string | nul
     throw new Error("Invalid token signature");
   }
   const [accountId, fp] = subject.split("~");
+  if (!accountId || !/^[0-9a-f-]{36}$/i.test(accountId)) throw new Error("Invalid token");
   return { accountId, fp: fp ?? null };
 }
 
@@ -69,14 +73,16 @@ function verifySignedToken(token: string): { accountId: string; fp: string | nul
  * Set ownerOnly to reject sync-code tokens (for managing codes / passkeys).
  */
 export async function verifyToken(token: string, opts: { ownerOnly?: boolean } = {}): Promise<string> {
+  await enforceTokenLimit(token, (getRequestHeader("cf-connecting-ip") ?? "unknown").slice(0, 64), "device");
   const { accountId, fp } = verifySignedToken(token);
+  const { data, error } = await supabaseAdmin
+    .from("pulse_accounts")
+    .select("recovery_code_hash, recovery_code_expires_at")
+    .eq("id", accountId)
+    .maybeSingle();
+  if (error || !data) throw new Error("Account missing or deleted");
   if (fp) {
     if (opts.ownerOnly) throw new Error("This device can't manage sync settings. Use your original device.");
-    const { data } = await supabaseAdmin
-      .from("pulse_accounts")
-      .select("recovery_code_hash, recovery_code_expires_at")
-      .eq("id", accountId)
-      .maybeSingle();
     if (!data?.recovery_code_hash || codeFingerprint(data.recovery_code_hash) !== fp) {
       throw new Error("This sync code was revoked. Ask your other device for a new one.");
     }
@@ -408,7 +414,7 @@ const LEGACY_CODE_LENGTH = 16;
 export const MAX_CODE_TTL_HOURS = 24 * 30;
 
 export function formatRecoveryCode(raw: string): string {
-  return `PULSE-${raw.match(/.{1,4}/g)!.join("-")}`;
+  return `PULSE-${(raw.match(/.{1,4}/g) ?? []).join("-")}`;
 }
 
 function hashRecoveryCode(normalized: string): string {
@@ -510,7 +516,7 @@ export async function redeemRecoveryCode(code: string, clientIp = "unknown") {
 
 export async function deleteAccount(token: string) {
   const accountId = await verifyToken(token);
-  const { error } = await supabaseAdmin.from("pulse_accounts").delete().eq("id", accountId);
+  const { error } = await supabaseAdmin.rpc("pulse_delete_account", { _account_id: accountId });
   if (error) throw new Error(error.message);
   return { ok: true };
 }
