@@ -43,31 +43,33 @@ function Page() {
           </h1>
           <p className="mt-5 text-muted-foreground leading-relaxed">
             Looking at check-in services for living alone? Pulse Safety Check-in is free,
-            works in a browser, and requires no sign-up or GPS tracking. The comparison below
-            separates verified published information from older reporting about Demumu;
-            the services should not be assumed to offer equivalent protection.
+            works in a browser, and requires no sign-up or GPS tracking. We haven’t independently
+            tested Demumu, so we don’t compare its current features. Below is what Pulse offers
+            and how its published features compare with Snug.
           </p>
         </section>
 
         <section>
           <h2 className="font-display text-2xl font-semibold">How Pulse works</h2>
           <ol className="mt-4 space-y-2 text-muted-foreground list-decimal pl-5">
-            <li>Add one trusted contact — just a name and an email.</li>
-            <li>Tap "I'm Safe" every 24, 48 or 72 hours.</li>
-            <li>Miss two check-ins in a row and your contact gets one calm email with your local emergency number.</li>
+            <li>Add one trusted contact and ask them to confirm by email.</li>
+            <li>Tap “I’m OK” every 24, 48 or 72 hours.</li>
+            <li>Miss two check-ins in a row and Pulse emails your confirmed contact, asking them to check on you.</li>
           </ol>
+          <p className="mt-4 text-sm text-muted-foreground">Pulse checks hourly, even when your phone is off. Email delivery is not guaranteed. Pulse is not an emergency service or your only safety arrangement.</p>
         </section>
 
         <section>
-          <h2 className="font-display text-2xl font-semibold">Pulse vs Demumu</h2>
-          <CompetitorComparison includeSnug={false} />
+          <h2 className="font-display text-2xl font-semibold">Pulse and Snug</h2>
+          <CompetitorComparison />
         </section>
 
         <section>
           <h2 className="font-display text-2xl font-semibold">Private by design</h2>
           <p className="mt-4 text-muted-foreground leading-relaxed">
-            No sign-up, no ads, no location. Only your contact's email and your latest check-in
-            time are kept, so an alert can still go out if your phone is off.{" "}
+            No sign-up, no ads, no GPS tracking. Saving a contact creates an online safety record
+            containing contact details, check-ins and alert settings so alerts can run when your phone is off.
+            Recovery on another device is optional.{" "}
             <Link to="/privacy-policy" className="text-primary hover:underline">Read the privacy policy</Link>.
           </p>
         </section>

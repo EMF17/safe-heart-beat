@@ -61,10 +61,8 @@ function StatusPage() {
   const rows = [
     { title: "Pulse server", value: !query.data.reachable ? "Latest check failed" : "Responded to the last check", note: "This checks Pulse’s response, not inbox delivery or every service." },
     { title: "Email alerts", value: query.data.emailConfigured === null ? "Unable to check" : query.data.emailConfigured ? "Configured · delivery unverified" : "Not configured", note: query.data.emailConfigured === false ? "Email cannot be sent until the email service is configured." : "Use a test to check acceptance and ask your contact to confirm receipt." },
-    { title: "SMS alerts", value: query.data.smsConfigured === null ? "Unable to check" : query.data.smsConfigured ? "Configured · delivery unverified" : "Not connected", note: "Texts need a connected SMS service, a saved online phone number and a supported destination." },
     { title: "Hourly alert sweep", value: sweepState, note: "A completion timestamp means the sweep finished, not that every email arrived. More than 150 minutes without a completion is overdue." },
     { title: "Backup trigger", value: "Independent schedule", note: "The sweep is started on the hour by the main scheduler and at half past by a separate GitHub schedule. If one stops, the other still runs. Running twice never sends an alert twice." },
-    { title: "WhatsApp alerts", value: "Not available", note: "No WhatsApp messages are sent." },
   ];
   return <AlertInfoLayout>
     <section className="space-y-5">
@@ -78,7 +76,7 @@ function StatusPage() {
         <Button variant="outline" onClick={() => void query.refetch()} disabled={query.isFetching}><RefreshCw className={query.isFetching ? "animate-spin" : ""} />{query.isFetching ? "Checking…" : "Refresh status"}</Button>
         <span className="text-sm text-muted-foreground">Last server response: {checkedAt ?? (query.data.reachable ? "Loading time…" : "Unavailable")}</span>
       </div>
-      {!query.data.reachable && <p role="alert" className="text-sm text-destructive">Unable to reach Pulse for the latest check. Email and SMS configuration could not be verified.</p>}
+      {!query.data.reachable && <p role="alert" className="text-sm text-destructive">Unable to reach Pulse for the latest check. Email configuration could not be verified.</p>}
     </section>
     <section aria-labelledby="services-title" className="border-t border-border pt-8">
       <h2 id="services-title" className="font-display text-2xl font-semibold mb-4">Alert services</h2>

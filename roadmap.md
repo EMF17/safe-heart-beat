@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Remove SMS setup and unfinished service mentions, disable legacy SMS sending, unify “I’m OK,” strengthen email copy while retaining disclaimers, and drop the unverified Demumu column (phone/desktop demo and pages verified; 90 tests passed; awaits publication)
 - [x] Audit token storage/limits and anonymous reads; fix Settings server-side deletion, extend fingerprint-only custom limiter, schedule six-month inactivity cleanup daily, and verify contact opt-outs (90 tests passed; real synthetic record deleted through Settings and old token rejected; app changes await publication)
 - [x] Show prominent unconfirmed-contact and bounced-email warnings on the daily screen; confirmation resend verified without real email, bounce tracking and consent read-back verified on phone/desktop; 72 tests passed; awaits publication
 - [x] Email the owner at sweep recovery when the previous sweep started more than 90 minutes ago (29 tests passed, duplicate protection verified; no real emails sent; awaits publication)
@@ -12,7 +13,7 @@
 - [x] Simplify daily check-in screen to one “I’m OK” button, saved confirmation and next check-in time; keep optional tools elsewhere
 - [x] Add Pulse browser/home-screen icons and prepare matching app-store icons (store submission still required)
 - [x] Add Settings phone number and prepare SMS delivery alongside email
-- [ ] Connect Twilio and verify real SMS delivery (connection declined; needs SMS-capable number and supported destinations)
+- [x] Retire SMS; no Twilio connection or SMS delivery is planned (user decision)
 - [x] Phone-app reminders scheduled on the device (due, missed, 1 hour before alert)
 - [ ] WhatsApp alerts to contacts (waiting: user skipped connecting a WhatsApp Business account)
 - [x] Align homepage and privacy policy with actual storage and disable usage analytics

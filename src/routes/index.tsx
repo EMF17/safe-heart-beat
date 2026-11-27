@@ -136,9 +136,8 @@ function Hero({ returning }: { returning: boolean }) {
         </h1>
 
         <p className="mt-6 text-base md:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
-          Pulse is a two-second check-in for people who live alone. Tap “I’m
-          OK” every 48 hours. After two missed windows, Pulse can request an email
-          to the person you trust.
+          A two-second “I’m OK” for people who live alone. Miss two check-ins
+          and Pulse emails someone who cares, asking them to check on you.
         </p>
 
         <p className="mt-5 text-base text-foreground max-w-xl mx-auto leading-relaxed">
@@ -320,7 +319,7 @@ function Comparison() {
           How Pulse compares
         </h2>
         <p className="mt-4 text-muted-foreground">
-          Considering Demumu or Snug? Here is what we could verify from published sources. Pulse is free, with no sign-up or GPS tracking.
+          Pulse and Snug take different approaches to staying in touch. Compare their published plans below. Pulse is free, with no sign-up or GPS tracking.
         </p>
       </div>
       <CompetitorComparison />
@@ -355,7 +354,7 @@ const FAQS = [
   },
   {
     q: "Does it call emergency services?",
-    a: "No. Pulse can request an email to the person you choose, with local emergency numbers so they know who to call. Our server sends it even if your phone is off; email delivery can't be guaranteed.",
+    a: "No. After two missed check-ins, Pulse emails your confirmed contact and asks them to check on you, with local emergency numbers so they know who to call. Our server sends it even if your phone is off; email delivery can't be guaranteed.",
   },
 ];
 

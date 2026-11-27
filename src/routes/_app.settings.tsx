@@ -8,9 +8,8 @@ import { TestAlertPanel } from "@/components/TestAlertPanel";
 import { OwnerReminderCard } from "@/components/OwnerReminderCard";
 import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
-import { getSmsStatus, saveContactPhone, deleteSyncAccount } from "@/lib/sync.functions";
+import { deleteSyncAccount } from "@/lib/sync.functions";
 import { deletePulseData } from "@/lib/data-deletion";
-import { normalizeContactPhone } from "@/lib/contact-phone";
 
 
 import {
@@ -63,11 +62,6 @@ function SettingsPage() {
   const prefs = usePreferences();
   const [contact, setContact] = useState<Contact | null>(null);
   const [hydrated, setHydrated] = useState(false);
-  const [phone, setPhone] = useState("");
-  const [savingPhone, setSavingPhone] = useState(false);
-  const [smsConnected, setSmsConnected] = useState(false);
-  const savePhone = useServerFn(saveContactPhone);
-  const smsStatus = useServerFn(getSmsStatus);
   const deleteAccount = useServerFn(deleteSyncAccount);
   const [deleting, setDeleting] = useState(false);
 
@@ -91,30 +85,10 @@ function SettingsPage() {
       try {
         const stored = JSON.parse(raw) as Contact;
         setContact(stored);
-        setPhone(stored.phone ?? "");
       } catch {}
     }
     setHydrated(true);
-    smsStatus().then((status) => setSmsConnected(status.connected)).catch(() => {});
   }, []);
-
-  const handleSavePhone = async () => {
-    if (!contact) return;
-    setSavingPhone(true);
-    try {
-      const normalized = normalizeContactPhone(phone);
-      const token = localStorage.getItem("pulse:syncToken");
-      if (token) await savePhone({ data: { token, phone: normalized ?? "" } });
-      const updated = { ...contact, phone: normalized };
-      localStorage.setItem(CONTACT_KEY, JSON.stringify(updated));
-      setContact(updated);
-      setPhone(normalized ?? "");
-      window.dispatchEvent(new Event("pulse:contactChanged"));
-      showToast(normalized ? "Phone number saved." : "SMS number removed; email stays enabled.");
-    } catch (error) {
-      showToast(error instanceof Error ? error.message : "Could not save phone number.");
-    } finally { setSavingPhone(false); }
-  };
 
   const handleReminderToggle = async (next: boolean) => {
     prefs.setReminderEnabled(next);
@@ -224,13 +198,6 @@ function SettingsPage() {
             ) : (
               <p className="text-sm text-muted-foreground">No contact saved</p>
             )}
-            {contact && <div className="space-y-3 border-t border-border pt-4">
-              <label htmlFor="contact-phone" className="block text-sm font-medium">Emergency contact phone (optional)</label>
-              <input id="contact-phone" type="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="+852 9123 4567" className="w-full min-w-0 rounded-md border border-input bg-background px-3 py-2 text-base" />
-              <p className="text-xs text-muted-foreground">Include the country code. Only add a contact who agrees to receive safety and test texts. Leave blank for email only.</p>
-              <Button onClick={handleSavePhone} disabled={savingPhone} variant="outline" className="w-full">{savingPhone ? "Saving…" : "Save phone number"}</Button>
-              <p className="text-xs text-muted-foreground">{smsConnected ? "Twilio connected — SMS will accompany email when a number is saved." : "SMS pending — texts start once Twilio is connected with an SMS-capable number."} Saving a contact creates the online safety record needed for alerts. Recovery is optional; hourly checks continue when the app is closed.</p>
-            </div>}
             <OwnerReminderCard />
             <TestAlertPanel />
           </div>

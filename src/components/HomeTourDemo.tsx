@@ -14,7 +14,7 @@ type StepId = 0 | 1 | 2;
 
 const STEPS = [
   { icon: Mail, label: "Add a contact" },
-  { icon: Hand, label: "Tap I’m Safe" },
+  { icon: Hand, label: "Tap I’m OK" },
   { icon: ShieldCheck, label: "If you go quiet" },
 ] as const;
 
@@ -187,7 +187,7 @@ export function HomeTourDemo() {
                   }`}
                 >
                   <span className="font-display text-lg font-semibold">
-                    I’m Safe
+                    I’m OK
                   </span>
                   <span className="text-[10px] opacity-80 mt-0.5">
                     {checkedInAt ? "tap again" : "tap once"}

@@ -15,7 +15,7 @@ export function TestAlertPanel() {
   const [confirmMsg, setConfirmMsg] = useState<string | null>(null);
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<{ email: string; sms: string } | null>(null);
+  const [result, setResult] = useState<{ email: string } | null>(null);
 
   useEffect(() => {
     const refresh = () => setHasToken(Boolean(localStorage.getItem("pulse:syncToken")));
@@ -68,7 +68,7 @@ export function TestAlertPanel() {
       });
       if (!response.ok) throw new Error("Request failed");
       const data = await response.json() as { email?: { status?: unknown }; sms?: { status?: unknown } };
-      setResult({ email: describeTestChannel("email", data.email?.status), sms: describeTestChannel("sms", data.sms?.status) });
+      setResult({ email: describeTestChannel("email", data.email?.status) });
       setReview(null);
     } catch {
       setError("The test result could not be confirmed. Check your internet connection and saved contact in Settings. Do not assume your contact received it.");
@@ -78,14 +78,14 @@ export function TestAlertPanel() {
   return <section aria-labelledby="test-alert-title" className="space-y-4">
     <h2 id="test-alert-title" className="font-display text-xl font-semibold flex items-center gap-2"><Mail className="size-5 text-primary" />Try a test alert</h2>
     <p className="text-sm text-muted-foreground leading-relaxed">Your contact must first confirm they agree to be your safety contact. Then you can send a clearly labelled test. A test does not change your check-in time or history. Ask them to check their inbox and spam folder.</p>
-    <p className="text-sm text-muted-foreground">One accepted test per channel per day (resets at midnight UTC). SMS requires a connected service and a saved phone number.</p>
+    <p className="text-sm text-muted-foreground">At most one test email per address each week, across all Pulse records.</p>
     {ready && !hasToken && <div className="space-y-3">
       <p className="text-sm">Save a contact in Settings while connected to the internet so Pulse can create the online safety record required for alerts. Your contact must confirm before testing. A Sync Code or passkey is optional and only needed to restore an existing record on another device.</p>
       <Button asChild variant="outline"><Link to="/settings">Set up in Settings</Link></Button>
     </div>}
     {!review && <Button onClick={reviewTest} disabled={!ready || !hasToken || busy} className="min-h-11 whitespace-normal"><Mail />{busy ? "Checking contact…" : "Send test alert"}</Button>}
     {review && <div className="border-l-2 border-primary pl-4 space-y-4">
-      <p className="text-sm">Test recipient: <strong className="break-all">{review.email}</strong>{review.phone && <span className="block break-all">Saved SMS number: {review.phone}</span>}</p>
+      <p className="text-sm">Test recipient: <strong className="break-all">{review.email}</strong></p>
       {review.bounced && <p role="alert" className="font-semibold text-destructive">Your contact’s email bounced. Check their address before relying on alerts.</p>}
       {!review.confirmed ? <div className="space-y-3">
         <p className="text-sm leading-relaxed"><strong>Your contact hasn't confirmed yet.</strong> Pulse sends no alerts — test or real — until they agree. You can request another confirmation email, at most once per address every 24 hours.</p>
@@ -104,6 +104,6 @@ export function TestAlertPanel() {
       </>}
     </div>}
     {error && <p role="alert" className="text-sm text-destructive leading-relaxed">{error}</p>}
-    {result && <div role="status" aria-live="polite" className="space-y-2 text-sm border-l-2 border-primary pl-4"><p>{result.email}</p><p>{result.sms}</p></div>}
+    {result && <div role="status" aria-live="polite" className="space-y-2 text-sm border-l-2 border-primary pl-4"><p>{result.email}</p></div>}
   </section>;
 }

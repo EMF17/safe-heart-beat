@@ -1,10 +1,12 @@
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/twilio";
+const SMS_ENABLED = false;
 
 export function smsConfigured() {
-  return Boolean(process.env.LOVABLE_API_KEY && process.env.TWILIO_API_KEY);
+  return SMS_ENABLED && Boolean(process.env.LOVABLE_API_KEY && process.env.TWILIO_API_KEY);
 }
 
 export async function sendSms(to: string, text: string) {
+  if (!SMS_ENABLED) return { status: "not_connected" as const };
   const gatewayKey = process.env.LOVABLE_API_KEY;
   const connectionKey = process.env.TWILIO_API_KEY;
   if (!gatewayKey || !connectionKey) return { status: "not_connected" as const };

@@ -46,7 +46,7 @@ function HowAlertsWorkPage() {
     <section className="space-y-4 border-t border-border pt-8">
       <h2 className="font-display text-2xl font-semibold">What this does not prove</h2>
       <p className="text-muted-foreground leading-relaxed">An email service accepting a message does not mean it reached the inbox or that your contact read it. Spam filtering, incorrect addresses, outages and a contact being unavailable can all prevent a response. A successful test today does not guarantee a future alert.</p>
-      <p className="text-muted-foreground leading-relaxed">SMS is optional and requires a connected Twilio service, a supported destination and a saved phone number. WhatsApp alerts are not available. Pulse never automatically calls emergency services.</p>
+      <p className="text-muted-foreground leading-relaxed">Pulse alerts your contact by email only. It never automatically calls emergency services.</p>
       <Button asChild variant="outline"><Link to="/status">Check alert status</Link></Button>
     </section>
     <div id="test-alert" className="border-t border-border pt-8 scroll-mt-6"><TestAlertPanel /></div>

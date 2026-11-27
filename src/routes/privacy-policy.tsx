@@ -51,7 +51,7 @@ function PrivacyPolicyPage() {
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span><strong>Check-in history:</strong> Times you tapped &quot;I&apos;m Safe&quot;.</span>
+              <span><strong>Check-in history:</strong> Times you tapped “I’m OK”.</span>
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
@@ -83,7 +83,7 @@ function PrivacyPolicyPage() {
           <ul className="space-y-3 text-sm text-white/80 leading-relaxed">
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
-              <span>Your emergency contact&apos;s email is used to request their confirmation and to send missed-check-in alerts and test alerts after they confirm. If you save an optional phone number, it is included in the online safety record regardless of whether recovery is enabled, for SMS alerts when available. Please obtain your contact&apos;s agreement before adding their number. SMS requires a connected Twilio account and supported destination; delivery is not guaranteed.</span>
+              <span>Your emergency contact&apos;s email is used to request their confirmation and to send missed-check-in alerts and test alerts after they confirm. Pulse alerts are email-only; delivery is not guaranteed. A phone number saved in an earlier version may remain in the online safety record until that record is deleted, but Pulse no longer offers phone-number setup.</span>
             </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
@@ -127,10 +127,6 @@ function PrivacyPolicyPage() {
         <section className="mb-8">
           <h2 className="text-lg font-bold mb-3">Third-Party Services</h2>
           <ul className="space-y-3 text-sm text-white/80 leading-relaxed">
-            <li className="flex gap-2">
-              <span className="shrink-0">·</span>
-              <span><strong>Twilio (optional SMS):</strong> When connected, your contact&apos;s phone number and alert message are sent through Lovable&apos;s connector service to Twilio for delivery. Messages may include the name used in the alert and regional emergency numbers. Twilio and mobile carriers process delivery information under their own retention practices. See <a href="https://www.twilio.com/en-us/legal/privacy" target="_blank" rel="noopener noreferrer" className="underline">Twilio&apos;s privacy notice</a>.</span>
-            </li>
             <li className="flex gap-2">
               <span className="shrink-0">·</span>
               <span>
